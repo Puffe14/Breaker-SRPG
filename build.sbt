@@ -8,3 +8,13 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies += "org.scalafx" % "scalafx_3" % "22.0.0-R33"
+
+//kappale OS2 15.3
+val circeVersion = "0.14.1"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser",
+  "io.circe" %% "circe-yaml"
+).map(_ % circeVersion)
