@@ -1,18 +1,23 @@
 package components
 
 trait Tile(val photoFile: String, val name: String):
+  var position: (Int, Int, Int) = (0, 0, 0)
   def giveName: String = name
+  def pos = position
+  def setPos(x: Int, y: Int, z: Int) =
+    position = (x, y, z)
 end Tile
 
 class Occupiable(file: String,
-                 name: String,
-                 var occupant: Option[Units],
-                 val atk: Int,
-                 val dodge:Int,
-                 val protection: Int,
-                 val hpEffect: Int,
-                 val reduction: Map[String, Int]
+                 name: String
                 ) extends Tile(file, name):
+  var occupant: Option[Units] = None
+  val atk: Int = 0
+  val dodge:Int = 0
+  val protection: Int = 0
+  val hpEffect: Int = 0
+  val reduction: Map[String, Int] = Map()
+  
   def moveReduction(classMovementType: Class) = 0
   def effects: Map[String, Int] = Map("atk" -> 1)
   def occupied: Boolean = occupant.nonEmpty
