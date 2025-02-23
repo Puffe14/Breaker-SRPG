@@ -42,5 +42,15 @@ class Inventory(slotCount: Int):
   //Return items in inventory wrapped in Some
   def items: Vector[Option[Item]] =
     slots
-
+    
+  def equippedWeapon: Option[Weapon] =
+    items.foreach {
+      //if an equipped weapon is found
+      case joku: Weapon if joku.equipped =>
+        return Some(joku)
+      case _ =>
+    }
+    None
+        
 end Inventory
+    

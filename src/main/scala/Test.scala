@@ -3,6 +3,7 @@ import components.*
 class TestMace extends Blunt:
   val name = "test mace"
   val description = "it's the test mace"
+  val dmgType = "force"
   //Info on weapon.
   val durability: Option[Int] = Some(1)
   var spent: Int = 1
@@ -12,7 +13,7 @@ class TestMace extends Blunt:
   val givenPower: Int = 1
   val givenHit: Int = 1
   val givenCrit: Int = 1
-  val givenRange: Int = 1
+  val givenRange: (Int, Int) = (1, 1)
   val givenWeight: Int = 1
 
   //Effective against these types

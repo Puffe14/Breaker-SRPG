@@ -57,12 +57,13 @@ trait Weapon extends Equipment:
   val durability: Option[Int]
   var spent: Int
   val quick: Boolean
+  val dmgType: String
 
   //Direct combat stats.
   val givenPower: Int
   val givenHit: Int
   val givenCrit: Int
-  val givenRange: Int
+  val givenRange: (Int, Int)
   val givenWeight: Int
 
   //Effective against these types
@@ -82,11 +83,12 @@ trait Weapon extends Equipment:
   def power: Int =  givenPower
   def hit: Int =    givenHit
   def crit: Int =   givenCrit
-  def range: Int =  givenRange
+  def range: (Int, Int) =  givenRange
   def weight: Int = givenWeight
   def bonus: Map[String, Int] =     bonusToStats
   def effective: Map[String, Int] = effectiveAgainst
-
+  def typing: String = dmgType
+  
   //Cause the weapon to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
     spent += durabilityLoss
