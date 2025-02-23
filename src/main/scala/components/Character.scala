@@ -27,7 +27,7 @@ class Character(
     //Calculates the new total stat
     val newTotal = stats(which) + amount
     //Changes stats map to reflect change
-    stats = stats + (which -> newTotal)
+    stats += (which -> newTotal)
 
   //Methods for returning important info
   def name = myName

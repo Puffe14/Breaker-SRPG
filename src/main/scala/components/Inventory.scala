@@ -42,15 +42,28 @@ class Inventory(slotCount: Int):
   //Return items in inventory wrapped in Some
   def items: Vector[Option[Item]] =
     slots
-    
+
   def equippedWeapon: Option[Weapon] =
     items.foreach {
       //if an equipped weapon is found
-      case joku: Weapon if joku.equipped =>
-        return Some(joku)
+      case weapon: Weapon if weapon.equipped =>
+        return Some(weapon)
       case _ =>
     }
     None
-        
-end Inventory
+
+  def armors: Vector[Armor] =
+    val slotted = items.flatten
+    var armorsInSlots: Vector[Armor] = Vector()
+
+    slotted.foreach {
+      case armor: Armor =>
+        armorsInSlots = armorsInSlots.appended(armor)
+      case _ =>
+    }
+    armorsInSlots
     
+  def equippedArmors: Vector[Armor] =
+    armors.filter(_.isEquipped)
+
+end Inventory

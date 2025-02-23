@@ -16,25 +16,27 @@ trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: 
 
 end Consumable
 
-/*
+
 //Provides HP up to max
-class Healing(e: Map[String, Int], u: Int, l: Int, amount: Int) extends Consumable(e, u, l):
+trait Healing(e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable:
   //override def use() =
     //uses += 1
   def heal = amount
 
 //Gives a temporary boost on stat(s)
-class Booster extends Consumable
+trait Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable
 
 //Gives a permanent increase to a stat
-class Brand extends Consumable
-*/
+trait Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable
+
 
 trait Equipment extends Item:
   var equipped = false
 
   //Possible stat bonuses from holding weapon.
   val bonusToStats: Map[String, Int]
+
+  def bonusGiven = bonusToStats
 
   //Method fo all equipment that returns wheter they are broken or not.
   def intact: Boolean
@@ -88,7 +90,7 @@ trait Weapon extends Equipment:
   def bonus: Map[String, Int] =     bonusToStats
   def effective: Map[String, Int] = effectiveAgainst
   def typing: String = dmgType
-  
+
   //Cause the weapon to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
     spent += durabilityLoss
@@ -120,6 +122,7 @@ trait Armor extends Equipment:
 
   def break() =
     broken = true
+    equipped = false
 
 end Armor
 
