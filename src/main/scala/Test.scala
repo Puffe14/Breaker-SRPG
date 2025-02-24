@@ -1,18 +1,19 @@
 import components.*
+import game.*
 
 class TestMace extends Blunt:
   val name = "test mace"
   val description = "it's the test mace"
   val dmgType = "force"
   //Info on weapon.
-  val durability: Option[Int] = Some(1)
-  var spent: Int = 1
-  val quick: Boolean = true
+  val durability: Option[Int] = Some(2)
+  var spent: Int = 0
+  val quick: Boolean = false
 
   //Direct combat stats.
   val givenPower: Int = 1
-  val givenHit: Int = 1
-  val givenCrit: Int = 1
+  val givenHit: Int = 65
+  val givenCrit: Int = 50
   val givenRange: (Int, Int) = (1, 1)
   val givenWeight: Int = 1
 
@@ -22,6 +23,64 @@ class TestMace extends Blunt:
   val bonusToStats: Map[String, Int] = Map()
 end TestMace
 
+class TestSpell extends Spell:
+  val name = "test spell"
+  val description = "it's the test magic"
+  val dmgType = "magic"
+  //Info on weapon.
+  val durability: Option[Int] = Some(2)
+  var spent: Int = 0
+  val quick: Boolean = false
+
+  //Direct combat stats.
+  val givenPower: Int = 1
+  val givenHit: Int = 65
+  val givenCrit: Int = 1
+  val givenRange: (Int, Int) = (1, 2)
+  val givenWeight: Int = 1
+
+  //Effective against these types
+  val effectiveAgainst: Map[String, Int] = Map("test" -> 2)
+  //Possible stat bonuses from holding weapon.
+  val bonusToStats: Map[String, Int] = Map()
+end TestSpell
+
+class TestSword extends Spell:
+  val name = "test sword"
+  val description = "it's the test sword"
+  val dmgType = "force"
+  //Info on weapon.
+  val durability: Option[Int] = Some(10)
+  var spent: Int = 0
+  val quick: Boolean = true
+
+  //Direct combat stats.
+  val givenPower: Int = 0
+  val givenHit: Int = 75
+  val givenCrit: Int = 1
+  val givenRange: (Int, Int) = (1, 1)
+  val givenWeight: Int = 1
+
+  //Effective against these types
+  val effectiveAgainst: Map[String, Int] = Map()
+  //Possible stat bonuses from holding weapon.
+  val bonusToStats: Map[String, Int] = Map()
+end TestSword
+
+
+val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
+val testFastMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->10, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
+val testStrongMap = Map("hitpoints" -> 5, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
+val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
+val testZeroMap = Map("hitpoints" -> 0, "strength" -> 0, "magic" -> 0, "skill" -> 0, "speed" -> 0, "defence" -> 0, "resistance" -> 0, "movement" -> 0)
+val testClass = new Class("test", 1, Vector("test"),testStatMap,testStatMap,testZeroMap,testZeroMap)
+
+val cylna =     new Character("cylna", testClass, Vector(),testStatMap,testStatMap)
+val bonk =      new Character("bonk", testClass, Vector(),testStatMap,testStatMap)
+val gonzales =  new Character("gonzales", testClass, Vector(),testStrongMap,testStrongMap)
+val wrys   =    new Character("wrys", testClass, Vector(),testFastMap,testFastMap)
+val ghost =     new Character("ghost", testClass, Vector(),testSpiritMap,testSpiritMap)
+
 class testGrass(file: String, name: String) extends Occupiable(file, name):
 
 end testGrass
@@ -29,6 +88,66 @@ end testGrass
 
 @main
 def test =
+
+  def combatTest() =
+    val itemi = TestMace()
+    val itemi2 = TestMace()
+    val itemi3 = TestSword()
+    val itemi4 = TestSpell()
+    val itemi5 = TestMace()
+    val invi = Inventory(6)
+    val invi2 = Inventory(6)
+    val invi3 = Inventory(6)
+    val invi4 = Inventory(6)
+    val invi5 = Inventory(6)
+
+    invi.add(Some(itemi))
+    invi2.add(Some(itemi2))
+    invi3.add(Some(itemi3))
+    invi4.add(Some(itemi4))
+    invi5.add(Some(itemi5))
+
+    itemi.equip()
+    itemi2.equip()
+    itemi3.equip()
+    itemi4.equip()
+    itemi5.equip()
+
+    val unit1 = Units(cylna)
+    val unit2 = Units(gonzales)
+    val unit3 = Units(wrys)
+    val unit4 = Units(ghost)
+    val unit5 = Units(bonk)
+
+    unit1.inventory.swap(invi, 0, 0)
+    unit2.inventory.swap(invi2, 0, 0)
+    unit3.inventory.swap(invi3, 0, 0)
+    unit4.inventory.swap(invi4, 0, 0)
+    unit5.inventory.swap(invi5, 0, 0)
+
+    val fight12 = Combat(unit1, unit2, 1)
+    val fight34 = Combat(unit3, unit4, 1)
+    val fight43 = Combat(unit4, unit3, 2)
+    val fight15 = Combat(unit1, unit5, 1)
+
+    def testFight(fight: Combat) =
+      println("")
+      fight.select.weapon.foreach(n=>println(n.describe))
+      fight.target.weapon.foreach(n=>println(n.describe))
+      fight.select.weapon.foreach(n=>println(n.intact))
+      fight.target.weapon.foreach(n=>println(n.intact))
+      fight.play()
+      println(fight.select.damageTaken)
+      println(fight.target.damageTaken)
+      fight.select.weapon.foreach(n=>println(n.describe))
+      fight.target.weapon.foreach(n=>println(n.describe))
+
+    testFight(fight12)
+    testFight(fight34)
+    testFight(fight43)
+    testFight(fight15)
+  end combatTest
+
 
   def inventoryTest() =
     val itemi = TestMace()
@@ -92,4 +211,4 @@ def test =
     grid2.tileAt(1,2).foreach(n => grid2.neighbors(n).foreach(n=>println(n.pos)))
 
 
-  gridTest()
+  combatTest()

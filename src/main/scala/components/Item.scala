@@ -71,7 +71,7 @@ trait Weapon extends Equipment:
   //Effective against these types
   val effectiveAgainst: Map[String, Int]
 
-  //True if the weapon is broken.
+  //True if the weapon is not broken.
   override def intact: Boolean =
     durability match
       case Some(maxDurability) => maxDurability > spent

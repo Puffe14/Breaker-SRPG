@@ -1,7 +1,9 @@
 package components
+import game.Rules
+val rules = Rules()
 
 class Units(var character: Character):
-  val inventory = Inventory(6)
+  val inventory = Inventory(rules.unitInventoryLimit)
   var leader: Option[Unit] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[String] = Set()
@@ -9,9 +11,14 @@ class Units(var character: Character):
   var nearbyBonuses: Map[String, Int] = Map()
 
   def name: String = character.name
+  def weapon = inventory.equippedWeapon
+  def unitClass = character.currentClass
+  def types = unitClass.classType
+
 
   //Check if the unit has been killed.
-  def isDead = !(HP > 0)
+  def isDead = !isAlive
+  def isAlive = HP > 0
 
   //Hurt or heal
 
@@ -29,10 +36,8 @@ class Units(var character: Character):
 
   def wounds: Set[String] =
     woundsTaken
-
   def takeWound(wound: String) =
     woundsTaken = woundsTaken ++ wounds
-
   def healWound(wound: String) =
     woundsTaken = woundsTaken -- wounds
 
@@ -83,8 +88,8 @@ class Units(var character: Character):
     //totals all the bonuses together
     total += armorBonus.sum
     total += weaponBonus
-    total += temporaryStats(status)
-    total += nearbyBonuses(status)
+    temporaryStats.get(status).foreach(total+=_)
+    nearbyBonuses.get(status).foreach(total+=_)
     total
   end bonus
 
@@ -110,14 +115,21 @@ class Units(var character: Character):
   def loot: Vector[Item] =
     inventory.equippedArmors
 
-  //effective totals
+  //effective stats totals
+  def hp =  character.maxHp + bonus("hitpoints")
+  def str = character.str + bonus("strength")
+  def mag = character.mag + bonus("magic")
+  def skl = character.skl + bonus("skill")
+  def spd = character.spd + bonus("speed")
+  def dfn = character.dfn + bonus("defence")
+  def res = character.res + bonus("resistance")
 
 
   //Unit combat stats
 
   //Current and max HP
-  def HP: Int = character.maxHp - damageTaken
-  def MaxHP: Int = character.maxHp
+  def HP: Int = hp - damageTaken
+  def MaxHP: Int = hp
 
   //Move
   def MOVE: Int = character.move
@@ -134,54 +146,55 @@ class Units(var character: Character):
   def AT: Int =
     inventory.equippedWeapon match
       case Some(magical) if magical.typing == "magic" =>
-         magical.power + character.mag + bonus("magic")
+         magical.power + mag + bonus("AT")
       case Some(physical) if physical.typing == "force" =>
-         physical.power + character.str + bonus("strength")
+         physical.power + str + bonus("AT")
       case _ => 0
 
   //Rate of critical hits
   def CR: Int =
     inventory.equippedWeapon.foreach(n =>
-      return (n.crit + character.skl * 0.5).toInt
+      return (n.crit + skl * 0.5).toInt + bonus("CR")
     )
     0
 
   //Attack speed: Total speed - weight
   def AS: Int =
     inventory.equippedWeapon.foreach(n =>
-      return character.spd - n.weight + bonus("speed")
+      return spd - n.weight + bonus("AS")
+    )
+    0
+
+  //Combat skill
+  def SK: Int =
+    inventory.equippedWeapon.foreach(n =>
+      return skl - n.weight + bonus("SK")
     )
     0
 
   //Physical defence
   def PD: Int =
-    inventory.equippedWeapon.foreach(n =>
-      return character.dfn + bonus("defence")
-    )
-    0
+    dfn + bonus("PD")
 
   //Magical defence
   def MD: Int =
-    inventory.equippedWeapon.foreach(n =>
-      return character.res + bonus("resistance")
-    )
-    0
+    res + bonus("MD")
 
   //Hit rate
   def HI: Int =
     inventory.equippedWeapon.foreach(n =>
-      return (character.skl + character.spd*0.5).toInt
+      return n.hit + (skl + spd*0.5).toInt + bonus("HI")
     )
     0
 
   //Rate of avoiding attacks
   def AV: Int =
-    (character.spd + character.skl*0.5).toInt
+    (spd + skl*0.5).toInt  + bonus("AV")
 
   //Rate of avoiding critical hits
   def CA: Int =
     inventory.equippedWeapon.foreach(n =>
-      return (10 - n.weight).toInt
+      return 10 - n.weight + bonus("CA")
     )
     0
 

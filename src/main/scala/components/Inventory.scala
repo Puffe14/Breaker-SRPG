@@ -46,8 +46,8 @@ class Inventory(slotCount: Int):
   def equippedWeapon: Option[Weapon] =
     items.foreach {
       //if an equipped weapon is found
-      case weapon: Weapon if weapon.equipped =>
-        return Some(weapon)
+      case Some(w: Weapon) if w.equipped =>
+        return Some(w)
       case _ =>
     }
     None
@@ -62,7 +62,7 @@ class Inventory(slotCount: Int):
       case _ =>
     }
     armorsInSlots
-    
+
   def equippedArmors: Vector[Armor] =
     armors.filter(_.isEquipped)
 
