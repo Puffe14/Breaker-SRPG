@@ -110,11 +110,15 @@ trait Blunt extends Weapon
 trait Long extends Weapon
 trait Ranged extends Weapon
 trait Spell extends Weapon
+trait Medkit(amount: Int) extends Equipment:
+  def heal = amount
 
 
 
-trait Armor extends Equipment:
+trait Armor(part: String) extends Equipment:
 
+  //case Helmet(""), Body, Arms, Legs
+  
   private var broken = false
 
   override def intact =
@@ -125,8 +129,3 @@ trait Armor extends Equipment:
     equipped = false
 
 end Armor
-
-trait Helmet extends Weapon
-trait Body extends Weapon
-trait Arms extends Weapon
-trait Legs extends Weapon

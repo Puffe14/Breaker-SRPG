@@ -1,11 +1,14 @@
 package game
 import components.*
+
+import scala.collection.mutable
 import scala.util.Random
 
 
 class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   val rules = Rules()
-
+  var log: mutable.Buffer[String] = mutable.Buffer()
+  
   def select = selectedUnit
   def target = targetUnit
   
@@ -14,21 +17,22 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   def skillDifference: Int = selectedUnit.SK - targetUnit.SK
   def roll100: Int = Random().nextInt(100)
   def everyoneLived: Boolean = !selectedUnit.isDead && !targetUnit.isDead
-  def inCounterRange: Boolean = targetUnit.weapon.forall(w => !between(range, w.range))
+  def inCounterRange: Boolean = targetUnit.weapon.forall(w => between(range, w.range))
 
   //evalution methods
   private def lowest(evaluation: Int, minimum: Int): Int =
     if evaluation > minimum then evaluation
     else minimum
   private def between(int: Int, pair: (Int,Int)) =
-    pair(0) <= int && int >= pair(1)
+    pair(0) >= int && int <= pair(1)
 
   //methods for seeing if a unit can still fight
   def targetCanAttack:   Boolean =
     targetUnit.weapon.forall(_.intact)   && targetAttacks > 0 && everyoneLived && inCounterRange
   def selectedCanAttack: Boolean =
     selectedUnit.weapon.forall(_.intact) && selectedAttacks > 0 && everyoneLived
-
+  def resetLog() =
+    log = mutable.Buffer()
 
   //sets how many attacks the unit can perform
 
@@ -62,10 +66,45 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
       if isEffective then damage *= rules.effectiveMultipllier
       if isCritical then damage *= rules.critMultiplier
       defender.takeDamage(damage)
-      println(s"${attacker.name} hit ${defender.name} with $damage damage")
+      log += (s"${attacker.name} hit ${defender.name} with $damage damage")
       weapon.spend(1)
     else
-      println(s"${attacker.name} misses ${defender.name}")
+      log += (s"${attacker.name} misses ${defender.name}")
+
+  //method for the performing break/wound attaks
+  def skill(attacker: Units, defender: Units, targetPart: String, skillType: String, weapon: Weapon) =
+    var bonusHit = 0
+    var damage = 0
+    //gives bonus to hitrate if the weapon is effective against enemy
+    val isEffective = //if the attackers weapon has an effectiveness against defenders type
+        attacker.weapon.forall(w => attacker.types.exists(w.effective.contains(_)))
+    if isEffective then bonusHit += rules.skillBonusHitRateForEffective
+    //checks if the attack hits, hitrate / ratio  - avoid + bonus
+    val isHit = roll100 < attacker.HI / rules.skillHitRatePenaltyRatio - defender.AV + bonusHit
+    if skillType == "heal" then
+      attacker.medkit.foreach(m =>
+        damage = lowest(attacker.HL + m.heal, 0)
+      )
+      log += (s"${attacker.name} heals ${defender.name} with $damage")
+      target.healDamage(damage)
+    else if skillType == "treat" then
+      log += (s"${attacker.name} treats ${defender.name}'s $targetPart")
+      target.healWound(targetPart)
+    //Ifthe skill requires a hit check
+    else if isHit then
+      if skillType == "break" then
+        log += (s"${attacker.name} breaks ${defender.name}'s $targetPart")
+        //target.breakArmor()
+      if skillType == "wound" then
+        log += (s"${attacker.name} wounds ${defender.name}'s $targetPart")
+        target.takeWound(targetPart)
+      //item spend loss based on it's weight
+      weapon.spend(lowest(weapon.weight/2, 2))
+      if attacker.name == selectedUnit.name then log += "atk miss"
+      if attacker.name == targetUnit.name then log += "def miss"
+    else
+      log += s"${attacker.name} misses ${defender.name}"
+
 
   def playAttack(attacker: Units, defender: Units) =
     if everyoneLived then
@@ -87,14 +126,21 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
+  def selectedAttemptWound(part: String) =
+    if selectedCanAttack && everyoneLived then
+      selectedUnit.weapon.foreach(skill(selectedUnit, targetUnit, part, "wound", _))
+      selectedAttacks -= 1
+      if !selectedCanAttack then selectedAttacks = 0
+
   //if the battle starter will be next
   def selectedNext =
     selectedAttacks > targetAttacks
 
-  def play() =
-    println(s"${selectedUnit.name} attacks ${targetUnit.name}")
-    println(s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
-    println(s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+  def play(): Vector[String] =
+    resetLog()
+    log += (s"${selectedUnit.name} attacks ${targetUnit.name}")
+    log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
+    log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
 
     //who attacks first
     if skillDifference < -rules.vantageDiff then
@@ -107,13 +153,28 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
 
     //keep attacking until both run out of attack
     while (targetAttacks > 0 || selectedAttacks > 0) && everyoneLived do
-      println(s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+      log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
       if selectedNext then
         selectedStrikes()
       else
         targetStrikes()
-    if selectedUnit.isDead then println(s"${selectedUnit.name} died")
-    else if targetUnit.isDead then println(s"${targetUnit.name} died")
-    println("battle ends")
+    if selectedUnit.isDead then log += (s"${selectedUnit.name} died")
+    else if targetUnit.isDead then log += (s"${targetUnit.name} died")
+    log += ("battle ends")
+    log.toVector
+
+  def playWound(part: String): Vector[String] =
+    resetLog()
+    log += (s"${selectedUnit.name} break attacks ${targetUnit.name}")
+    log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
+    log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+
+    //selected attempts break first
+    selectedAttemptWound(part)
+    //target counters once if possible
+    targetStrikes()
+    log += ("battle ends")
+    log.toVector
+
 
 end Combat

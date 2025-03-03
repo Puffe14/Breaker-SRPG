@@ -6,7 +6,7 @@ class TestMace extends Blunt:
   val description = "it's the test mace"
   val dmgType = "force"
   //Info on weapon.
-  val durability: Option[Int] = Some(2)
+  val durability: Option[Int] = Some(12)
   var spent: Int = 0
   val quick: Boolean = false
 
@@ -28,7 +28,7 @@ class TestSpell extends Spell:
   val description = "it's the test magic"
   val dmgType = "magic"
   //Info on weapon.
-  val durability: Option[Int] = Some(2)
+  val durability: Option[Int] = Some(10)
   var spent: Int = 0
   val quick: Boolean = false
 
@@ -55,7 +55,7 @@ class TestSword extends Spell:
   val quick: Boolean = true
 
   //Direct combat stats.
-  val givenPower: Int = 0
+  val givenPower: Int = 2
   val givenHit: Int = 75
   val givenCrit: Int = 1
   val givenRange: (Int, Int) = (1, 1)
@@ -69,7 +69,7 @@ end TestSword
 
 
 val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
-val testFastMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->10, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
+val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
 val testStrongMap = Map("hitpoints" -> 5, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
 val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
 val testZeroMap = Map("hitpoints" -> 0, "strength" -> 0, "magic" -> 0, "skill" -> 0, "speed" -> 0, "defence" -> 0, "resistance" -> 0, "movement" -> 0)
@@ -86,6 +86,29 @@ class testGrass(file: String, name: String) extends Occupiable(file, name):
 end testGrass
 
 
+class LogTest:
+  var fight = Combat(Units(bonk), Units(bonk), 1)
+
+  def set() =
+    val itemi = TestMace()
+    val itemi2 = TestSword()
+    val invi = Inventory(6)
+    val invi2 = Inventory(6)
+    invi.add(Some(itemi))
+    invi2.add(Some(itemi2))
+    itemi.equip()
+    itemi2.equip()
+    val unit1 = Units(cylna)
+    val unit2 = Units(wrys)
+    unit1.inventory.swap(invi, 0, 0)
+    unit2.inventory.swap(invi2, 0, 0)
+    val fight12 = Combat(unit1, unit2, 1)
+    fight = fight12
+
+  def log: Vector[String] =
+    fight.play()
+
+
 @main
 def test =
 
@@ -93,7 +116,7 @@ def test =
     val itemi = TestMace()
     val itemi2 = TestMace()
     val itemi3 = TestSword()
-    val itemi4 = TestSpell()
+    val itemi4 = TestSword()
     val itemi5 = TestMace()
     val invi = Inventory(6)
     val invi2 = Inventory(6)
@@ -126,23 +149,42 @@ def test =
     unit5.inventory.swap(invi5, 0, 0)
 
     val fight12 = Combat(unit1, unit2, 1)
+    val fight13 = Combat(unit1, unit3, 1)
     val fight34 = Combat(unit3, unit4, 1)
     val fight43 = Combat(unit4, unit3, 2)
     val fight15 = Combat(unit1, unit5, 1)
 
     def testFight(fight: Combat) =
       println("")
-      fight.select.weapon.foreach(n=>println(n.describe))
-      fight.target.weapon.foreach(n=>println(n.describe))
-      fight.select.weapon.foreach(n=>println(n.intact))
-      fight.target.weapon.foreach(n=>println(n.intact))
+      println("")
+      println(fight.select)
+      println("")
+      println(fight.target)
+      println("")
       fight.play()
-      println(fight.select.damageTaken)
-      println(fight.target.damageTaken)
-      fight.select.weapon.foreach(n=>println(n.describe))
-      fight.target.weapon.foreach(n=>println(n.describe))
+      println("")
+      println(fight.select.shortInfo)
+      println("")
+      println(fight.target.shortInfo)
+      /*fight.select.weapon.foreach(n=>println(n.describe))
+      fight.target.weapon.foreach(n=>println(n.describe))*/
 
+    def testWound(fight: Combat) =
+      println("")
+      println("")
+      println(fight.select)
+      println("")
+      println(fight.target)
+      println("")
+      fight.playWound("head")
+      println("")
+      println(fight.select.wounds)
+      println("")
+      println(fight.target.wounds)
+    
+    testWound(fight12)
     testFight(fight12)
+    testFight(fight13)
     testFight(fight34)
     testFight(fight43)
     testFight(fight15)
@@ -211,4 +253,6 @@ def test =
     grid2.tileAt(1,2).foreach(n => grid2.neighbors(n).foreach(n=>println(n.pos)))
 
 
+  //gridTest()
+  //inventoryTest()
   combatTest()

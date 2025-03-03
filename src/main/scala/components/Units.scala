@@ -12,6 +12,7 @@ class Units(var character: Character):
 
   def name: String = character.name
   def weapon = inventory.equippedWeapon
+  def medkit = inventory.equippedMedkit
   def unitClass = character.currentClass
   def types = unitClass.classType
 
@@ -37,9 +38,9 @@ class Units(var character: Character):
   def wounds: Set[String] =
     woundsTaken
   def takeWound(wound: String) =
-    woundsTaken = woundsTaken ++ wounds
+    woundsTaken = woundsTaken + wound
   def healWound(wound: String) =
-    woundsTaken = woundsTaken -- wounds
+    woundsTaken = woundsTaken - wound
 
 
   //Change stat collections
@@ -197,5 +198,18 @@ class Units(var character: Character):
       return 10 - n.weight + bonus("CA")
     )
     0
+
+  //Amount of healing given
+  def HL: Int =
+    mag/3 + skl/2
+
+  def shortInfo =
+    name + s" $HP/$MaxHP\n" +
+    " Weapon: " + weapon.getOrElse("None").toString
+  
+  override def toString =
+    name + s" $HP/$MaxHP\n" +
+    " Combat:\n" + s"  AT: $AT, HI: $HI, CR: $CR \n  AS: $AS, SK: $SK \n  PD: $PD, MD: $MD, AV: $AV, CA: $CA \n" +
+    " Items: " + inventory.toString()
 
 end Units

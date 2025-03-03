@@ -10,4 +10,7 @@ class Rules {
   //inventory limits
   val playerStorageLimit = 50
   val unitInventoryLimit = 6
+  //bonus
+  val skillBonusHitRateForEffective = 20
+  val skillHitRatePenaltyRatio = 2
 }

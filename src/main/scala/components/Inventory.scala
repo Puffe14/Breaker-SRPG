@@ -43,11 +43,21 @@ class Inventory(slotCount: Int):
   def items: Vector[Option[Item]] =
     slots
 
+  
   def equippedWeapon: Option[Weapon] =
     items.foreach {
       //if an equipped weapon is found
       case Some(w: Weapon) if w.equipped =>
         return Some(w)
+      case _ =>
+    }
+    None
+    
+  def equippedMedkit: Option[Medkit] =
+    items.foreach {
+      //if an equipped weapon is found
+      case Some(m: Medkit) if m.equipped =>
+        return Some(m)
       case _ =>
     }
     None
@@ -65,5 +75,11 @@ class Inventory(slotCount: Int):
 
   def equippedArmors: Vector[Armor] =
     armors.filter(_.isEquipped)
+
+  override def toString =
+    items.map {
+      case Some(i) => i.describe
+      case None => "empty"
+    }.mkString(", ")
 
 end Inventory
