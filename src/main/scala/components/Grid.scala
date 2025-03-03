@@ -1,6 +1,8 @@
 package components
 
 class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
+  def allTiles = tiles
+
   def visibleTiles: Vector[Tile] =
     tiles
 
@@ -10,7 +12,6 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
      Some(tiles(atPos))
     else None
 
-
   def givePostitionToTiles() =
     var i = 0
     if tiles.size == elevation.size then
@@ -19,6 +20,16 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
         i+=1
     else
       println("Incorrect size of elevation vector.")
+
+  def occupiables: Vector[Occupiable] =
+    allTiles
+      .collect { case a: Occupiable => a }
+
+  def unitsOnTiles: Vector[Units] =
+    occupiables.flatMap(_.occupantOnTile)
+    
+  def tilesWithUnits: Vector[Occupiable] =
+    occupiables.filter(_.occupied)
 
   def neighbors(chosenTile: Tile): Vector[Tile] =
     val x = chosenTile.pos(0)

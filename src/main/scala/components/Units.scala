@@ -9,6 +9,7 @@ class Units(var character: Character):
   var woundsTaken: Set[String] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
+  var team: String = ""
 
   def name: String = character.name
   def weapon = inventory.equippedWeapon
@@ -16,6 +17,7 @@ class Units(var character: Character):
   def unitClass = character.currentClass
   def types = unitClass.classType
 
+  def setTeam(newTeam: String) = team = newTeam
 
   //Check if the unit has been killed.
   def isDead = !isAlive
@@ -208,7 +210,7 @@ class Units(var character: Character):
     " Weapon: " + weapon.getOrElse("None").toString
   
   override def toString =
-    name + s" $HP/$MaxHP\n" +
+    name + s" $HP/$MaxHP  MV: $MOVE\n" +
     " Combat:\n" + s"  AT: $AT, HI: $HI, CR: $CR \n  AS: $AS, SK: $SK \n  PD: $PD, MD: $MD, AV: $AV, CA: $CA \n" +
     " Items: " + inventory.toString()
 
