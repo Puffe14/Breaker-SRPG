@@ -31,7 +31,10 @@ class Occupiable(file: String,
   def effects: Map[String, Int] = Map("atk" -> 1)
   def occupied: Boolean = occupant.nonEmpty
   def addOccupant(newUnit: Units) = occupant = Some(newUnit)
-  def removeOccupant() = occupant = None
+  def removeOccupant(): Option[Units] =
+    val tempO = occupant
+    occupant = None
+    occupant
   def occupantOnTile = occupant
 end Occupiable
 

@@ -30,7 +30,8 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
     
   def tilesWithUnits: Vector[Occupiable] =
     occupiables.filter(_.occupied)
-
+  
+  
   def neighbors(chosenTile: Tile): Vector[Tile] =
     val x = chosenTile.pos(0)
     val y = chosenTile.pos(1)

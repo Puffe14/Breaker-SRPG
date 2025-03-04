@@ -67,6 +67,8 @@ class TestSword extends Spell:
   val bonusToStats: Map[String, Int] = Map()
 end TestSword
 
+val club = BluntFile("club")
+val mace = BluntFile("mace")
 
 val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3)
 val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
@@ -101,9 +103,13 @@ class LogTest:
   val unit2 = Units(wrys)
   unit1.setTeam("player")
   unit2.setTeam("enemy")
+  def dmace = BluntFile("d_mace")
+  def wclub = BluntFile("w_club")
 
   def setFight() =
-    val itemi = TestMace()
+    unit1.healDamage(100)
+    unit2.healDamage(100)
+    val itemi = wclub
     val itemi2 = TestSword()
     val invi = Inventory(6)
     val invi2 = Inventory(6)
@@ -144,8 +150,22 @@ class LogTest:
   def theField: FieldMap =
     field
 
+  def moveUnit1(x: Int, y: Int) =
+    field.theGrid.tileAt(x, y).foreach(targetTile =>
+      if moveAreaTiles.contains(targetTile) then
+        field.moveTo(unit1, targetTile)
+      else
+        println(s"tile ${targetTile.pos} not available")
+        println("pls give one of these")
+        println(moveAreaPosString)
+    )
+
   def moveAreaTiles =
     field.movementRangeTiles(unit1)
+
+  def moveAreaPosString =
+    moveAreaTiles.map(_.pos).mkString(", ")
+
 
 
 @main
@@ -299,7 +319,11 @@ def test =
                          "win")
     field.movementRangeTiles(unit1)
 
+  def fileTest() =
+    println(club)
+    println(mace)
 
-  gridTest()
+  fileTest()
+  //gridTest()
   //inventoryTest()
   //combatTest()

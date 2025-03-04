@@ -19,9 +19,18 @@ class FieldMap(enemies: Vector[Group],
 
   //Methods for interfacing with units on field
 
-  def tileOf(unit: Units): Option[Tile] =
+  def tileOf(unit: Units): Option[Occupiable] =
     grid.occupiables
         .find(_.occupantOnTile == Some(unit))
+
+  def moveTo(unit: Units, target: Tile) =
+    val former = tileOf(unit)
+    target match
+      case o: Occupiable =>
+        former.foreach(_.removeOccupant())
+        o.addOccupant(unit)
+      case _ => println(s"$target cannot be occupied")
+
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE

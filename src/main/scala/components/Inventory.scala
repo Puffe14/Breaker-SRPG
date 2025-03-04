@@ -62,6 +62,8 @@ class Inventory(slotCount: Int):
     }
     None
 
+
+  //! voiko armors ja weapons tehdä paremmin?
   def armors: Vector[Armor] =
     val slotted = items.flatten
     var armorsInSlots: Vector[Armor] = Vector()
@@ -73,8 +75,32 @@ class Inventory(slotCount: Int):
     }
     armorsInSlots
 
+  def weapons: Vector[Weapon] =
+    val slotted = items.flatten
+    var weaponInSlots: Vector[Weapon] = Vector()
+
+    slotted.foreach {
+      case weapon: Weapon =>
+        weaponInSlots = weaponInSlots.appended(weapon)
+      case _ =>
+    }
+    weaponInSlots
+
+
   def equippedArmors: Vector[Armor] =
     armors.filter(_.isEquipped)
+
+
+  //---------------------
+
+  def equipWeapon(weapon: Weapon) =
+    equippedWeapon.foreach(_.unequip())
+    weapon.equip()
+
+
+
+  //----------------------
+
 
   override def toString =
     items.map {

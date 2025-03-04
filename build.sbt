@@ -8,6 +8,8 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies += "org.scalafx" % "scalafx_3" % "22.0.0-R33"
+libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.11.3"
+libraryDependencies += "com.lihaoyi" %% "upickle" % "3.2.0"
 
 //kappale OS2 15.3
 val circeVersion = "0.14.1"

@@ -60,13 +60,25 @@ object Main extends JFXApp3:
 
   def checkOver() =
     if over then
-      println("\n \"fight\" / \"reset\":")
+      println("\n \"fight\" / \"reset\" / \"move Int Int\":"+
+      s"\n${testObject.moveAreaPosString}")
       val command = readLine()
+
       command match
         case "fight" => reset()
         case "reset" =>
           testObject.setFight()
           reset()
+        case s if s.contains("move") =>
+          val moveCommand = s.split(" ")
+          val x: Int = moveCommand(1).toInt
+          val y: Int = moveCommand(2).toInt
+          if moveCommand.size == 3 then
+            testObject.moveUnit1(x, y)
+            testObject.setFight()
+            reset()
+          else
+            println("give command as \"move int int\"")
         case _ =>
 
 
@@ -157,7 +169,7 @@ object Main extends JFXApp3:
         t.occupantOnTile.foreach(u =>
           //var tileInt = 0
           val pos = t.pos
-          println(u.name +" at "+pos)
+          //println(u.name +" at "+pos)
           val x = pos(0)*16*tileScale   - pos(1)*16*tileScale   + gridPos(0) + 32
           val y = pos(0)* 8*tileScale   + pos(1)* 8*tileScale   + gridPos(1) - 48
           if u.name == atkName then warriorPos = (x, y)

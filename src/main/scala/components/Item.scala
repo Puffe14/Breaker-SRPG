@@ -1,4 +1,7 @@
 package components
+import upickle.default.*
+import os.*
+
 
 trait Item {
   val name: String
@@ -52,8 +55,8 @@ trait Equipment extends Item:
 
 end Equipment
 
-
 trait Weapon extends Equipment:
+//trait Weapon(filename: String) extends Equipment:
 
   //Info on weapon.
   val durability: Option[Int]
@@ -129,3 +132,31 @@ trait Armor(part: String) extends Equipment:
     equipped = false
 
 end Armor
+
+
+case class BluntFile(filename: String) extends Blunt derives ReadWriter:
+  val wdata = ItemWeapon.getItem("d_mace")
+  val name = wdata("name").str
+  val description = wdata("description").str
+  val durability: Option[Int] = wdata("durability").str.toIntOption
+  val rank: String = wdata("rank").str
+  var spent: Int = wdata("spent").str.toInt
+  val quick: Boolean = wdata("quick").str == "true"
+  val dmgType: String = wdata("type").str
+  val givenPower: Int = wdata("power").str.toInt
+  val givenHit: Int = wdata("hit").str.toInt
+  val givenCrit: Int = wdata("crit").str.toInt
+  val givenRange: (Int, Int) = (1, 1)
+  val givenWeight: Int = wdata("weight").str.toInt
+  val effectiveAgainst: Map[String, Int] = Map() //wdata("effective")
+  val bonusToStats: Map[String, Int] = Map()
+end BluntFile
+
+/**/
+
+object ItemWeapon:
+  def getData(weaponType: String) =
+    ujson.read(os.read(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+  def getItem(filename: String) =
+    val data = getData("")
+    data(filename)

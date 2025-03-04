@@ -1,0 +1,34 @@
+{
+  "d_mace": {
+    "name": "Damascus Mace",
+    "description": "A powerful mace forged from peculiar steel.",
+    "rank": "B",
+    "spent": "0",
+    "durability": "30",
+    "quick": "false",
+    "type": "force",
+    "power": "10",
+    "hit": "75",
+    "crit": "10",
+    "range": "[1, 1]",
+    "weight": "8",
+    "effective": {},
+    "bonus": {}
+  },
+  "w_club": {
+    "name": "Wooden Club",
+    "description": "A basic, wooden club.",
+    "rank": "E",
+    "spent": "0",
+    "durability": "15",
+    "quick": "false",
+    "type": "force",
+    "power": "3",
+    "hit": "60",
+    "crit": "0",
+    "range": "[1, 1]",
+    "weight": "4",
+    "effective": {},
+    "bonus": {}
+  }
+}
