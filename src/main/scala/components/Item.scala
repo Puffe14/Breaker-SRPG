@@ -106,6 +106,13 @@ trait Weapon extends Equipment:
       case None =>
         s"$name: $description"
 
+  override def toString: String =
+    durability match
+      case Some(maxDurability) =>
+        s"$name (${maxDurability-spent}/$maxDurability)"
+      case None =>
+        s"$name"
+
 end Weapon
 
 trait Sharp extends Weapon
@@ -115,12 +122,14 @@ trait Ranged extends Weapon
 trait Spell extends Weapon
 trait Medkit(amount: Int) extends Equipment:
   def heal = amount
+  def intact = true
 
 
 
 trait Armor(part: String) extends Equipment:
 
   //case Helmet(""), Body, Arms, Legs
+  def partName = part
   
   private var broken = false
 
@@ -134,8 +143,10 @@ trait Armor(part: String) extends Equipment:
 end Armor
 
 
+
+
 case class BluntFile(filename: String) extends Blunt derives ReadWriter:
-  val wdata = ItemWeapon.getItem("d_mace")
+  val wdata = ItemWeapon.getItem(filename)
   val name = wdata("name").str
   val description = wdata("description").str
   val durability: Option[Int] = wdata("durability").str.toIntOption

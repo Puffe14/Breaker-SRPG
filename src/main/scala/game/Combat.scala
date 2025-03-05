@@ -72,7 +72,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
       log += (s"${attacker.name} misses ${defender.name}")
 
   //method for the performing break/wound attaks
-  def skill(attacker: Units, defender: Units, targetPart: String, skillType: String, weapon: Weapon) =
+  def skill(attacker: Units, defender: Units, targetPart: String, skillType: String, weaponUsed: Option[Weapon]) =
     var bonusHit = 0
     var damage = 0
     //gives bonus to hitrate if the weapon is effective against enemy
@@ -81,6 +81,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     if isEffective then bonusHit += rules.skillBonusHitRateForEffective
     //checks if the attack hits, hitrate / ratio  - avoid + bonus
     val isHit = roll100 < attacker.HI / rules.skillHitRatePenaltyRatio - defender.AV + bonusHit
+
     if skillType == "heal" then
       attacker.medkit.foreach(m =>
         damage = lowest(attacker.HL + m.heal, 0)
@@ -90,18 +91,18 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else if skillType == "treat" then
       log += (s"${attacker.name} treats ${defender.name}'s $targetPart")
       target.healWound(targetPart)
-    //Ifthe skill requires a hit check
+
+    //If the skill requires a hit check
     else if isHit then
       if skillType == "break" then
         log += (s"${attacker.name} breaks ${defender.name}'s $targetPart")
-        //target.breakArmor()
+        target.breakPiece(targetPart)
       if skillType == "wound" then
         log += (s"${attacker.name} wounds ${defender.name}'s $targetPart")
         target.takeWound(targetPart)
-      //item spend loss based on it's weight
-      weapon.spend(lowest(weapon.weight/2, 2))
-      if attacker.name == selectedUnit.name then log += "atk miss"
-      if attacker.name == targetUnit.name then log += "def miss"
+      //item spend loss based on its weight
+      weaponUsed.foreach(w => w.spend(lowest(w.weight/2, 2)))
+      //if attacker.name == selectedUnit.name then log += s"${attacker.name} miss"
     else
       log += s"${attacker.name} misses ${defender.name}"
 
@@ -126,15 +127,21 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
-  def selectedAttemptWound(part: String) =
-    if selectedCanAttack && everyoneLived then
-      selectedUnit.weapon.foreach(skill(selectedUnit, targetUnit, part, "wound", _))
+  def selectedAttemptSkill(part: String, skillType: String) =
+    if everyoneLived then
+      if selectedUnit.weapon.nonEmpty then
+        selectedUnit.weapon.foreach(w=>skill(selectedUnit, targetUnit, part, skillType, Some(w)))
+      else
+        skill(selectedUnit, targetUnit, part, skillType, None)
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
   //if the battle starter will be next
   def selectedNext =
     selectedAttacks > targetAttacks
+
+
+  ////// plays out outcomes
 
   def play(): Vector[String] =
     resetLog()
@@ -165,14 +172,44 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
 
   def playWound(part: String): Vector[String] =
     resetLog()
+    log += (s"${selectedUnit.name} wound attacks ${targetUnit.name}")
+    log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
+    log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+
+    //selected attempts break first
+    selectedAttemptSkill(part, "wound")
+    //target counters once if possible
+    targetStrikes()
+    log += ("battle ends")
+    log.toVector
+
+  def playBreak(part: String): Vector[String] =
+    resetLog()
     log += (s"${selectedUnit.name} break attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
     log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
 
     //selected attempts break first
-    selectedAttemptWound(part)
+    selectedAttemptSkill(part, "break")
     //target counters once if possible
     targetStrikes()
+    log += ("battle ends")
+    log.toVector
+
+
+  def playTreat(part: String): Vector[String] =
+    resetLog()
+    log += (s"${selectedUnit.name} treats ${targetUnit.name}")
+    //selected treats target
+    selectedAttemptSkill(part, "treat")
+    log += ("battle ends")
+    log.toVector
+
+  def playHeal(): Vector[String] =
+    resetLog()
+    log += (s"${selectedUnit.name} heals ${targetUnit.name}")
+    //selected treats target
+    selectedAttemptSkill("none", "heal")
     log += ("battle ends")
     log.toVector
 

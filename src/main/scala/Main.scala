@@ -32,14 +32,15 @@ object Main extends JFXApp3:
   var miss = false
   var atkDead = false
   var defDead = false
+  var event = ""
   val distance = 50
   def processing = attacking || defending
   def over = iteratorLog.isEmpty
 
   val testObject = LogTest()
-  testObject.setFight()
+  testObject.setF12()
   testObject.setGrid()
-  var log = testObject.log.filterNot(n => n.contains("left")||n.contains("can"))
+  var log = testObject.log(event).filterNot(n => n.contains("left")||n.contains("can"))
   var iteratorLog = log.iterator
 
   def reset() =
@@ -53,32 +54,68 @@ object Main extends JFXApp3:
     miss = false
     atkDead = false
     defDead = false
-    log = testObject.log.filterNot(n => n.contains("left")||n.contains("can"))
+    log = testObject.log(event).filterNot(n => n.contains("left")||n.contains("can"))
     iteratorLog = log.iterator
     println(log)
   end reset
 
   def checkOver() =
     if over then
-      println("\n \"fight\" / \"reset\" / \"move Int Int\":"+
-      s"\n${testObject.moveAreaPosString}")
+      println("\n \"fight\" / \"reset\" / \"move Int Int\" / \"equip Int\" / \"inventory\":"+
+      s"\n${testObject.moveAreaPosString}\nwpns: ${testObject.weaponsUnit1String}")
       val command = readLine()
 
       command match
-        case "fight" => reset()
-        case "reset" =>
-          testObject.setFight()
+        case "fight" =>
+          event = ""
+          testObject.setF12()
           reset()
+
+        case "break" =>
+          event = "break"
+          testObject.setF12()
+          reset()
+
+        case "wound" =>
+          event = "wound"
+          testObject.setF12()
+          reset()
+
+        case "heal" =>
+          testObject.setF31()
+          event = "heal"
+          reset()
+
+        case "treat" =>
+          testObject.setF32()
+          event = "treat"
+          reset()
+
+        case "reset" =>
+          event = ""
+          testObject.resetFighters()
+          testObject.setF12()
+
+        case "inventory" =>
+          println(testObject.inventoryUnit1())
+
+        case s if s.contains("equip") =>
+          val equipCommand = s.split(" ")
+          val slot = equipCommand(1).toIntOption
+          slot.foreach(testObject.equipUnit1(_))
+          if slot.isEmpty then println(s"Number not found. Give one of these:\n ${testObject.weaponsUnit1.indices}")
+
         case s if s.contains("move") =>
           val moveCommand = s.split(" ")
           val x: Int = moveCommand(1).toInt
           val y: Int = moveCommand(2).toInt
           if moveCommand.size == 3 then
             testObject.moveUnit1(x, y)
-            testObject.setFight()
-            reset()
+            //testObject.setFight()
+            //reset()
           else
             println("give command as \"move int int\"")
+
         case _ =>
 
 
@@ -96,14 +133,26 @@ object Main extends JFXApp3:
                                   new Image(new FileInputStream(imagePath + "knight_atk_2.png")),
                                   new Image(new FileInputStream(imagePath + "knight_hurt.png")),
                                   new Image(new FileInputStream(imagePath + "dead.png")))
+  val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_idle.png")),
+                                  new Image(new FileInputStream(imagePath + "guy_atk_1.png")),
+                                  new Image(new FileInputStream(imagePath + "guy_atk_2.png")),
+                                  new Image(new FileInputStream(imagePath + "guy_hurt.png")),
+                                  new Image(new FileInputStream(imagePath + "dead.png")))
   val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field_gray.png")),
                                   new Image(new FileInputStream(imagePath + "field_movet.png")),
                                   new Image(new FileInputStream(imagePath + "field_red.png")),
                                   new Image(new FileInputStream(imagePath + "field_sand.png")))
 
-  val attackerImages = imgAtkWar
-  val defenderImages = imgDefKni
+  val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
+  var attackerImages = imgAtkWar
+  var defenderImages = imgDefKni
+  val idleImages = Map("cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
+                       "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
+                       "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")))
 
+  val imageSets = Map("cylna" -> imgAtkWar,
+                      "wrys" -> imgDefKni,
+                      "bonk" -> imgAtkGuy)
 
   def start() =
 
@@ -141,6 +190,13 @@ object Main extends JFXApp3:
       scaleX = -characterScale
       scaleY = characterScale
 
+    def unit(imgNum: Int, images: Seq[Image], xpos: Int, ypos: Int, flip: Boolean) = new ImageView:
+      if flip then x = xpos - 48 else x = xpos
+      val mirror = if flip then -1 else 1
+      y = ypos
+      image = images(imgNum)
+      scaleX = characterScale * mirror
+      scaleY = characterScale
 
 
     def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
@@ -169,23 +225,29 @@ object Main extends JFXApp3:
         t.occupantOnTile.foreach(u =>
           //var tileInt = 0
           val pos = t.pos
+          val flip = u.team != "player"
           //println(u.name +" at "+pos)
           val x = pos(0)*16*tileScale   - pos(1)*16*tileScale   + gridPos(0) + 32
           val y = pos(0)* 8*tileScale   + pos(1)* 8*tileScale   + gridPos(1) - 48
-          if u.name == atkName then warriorPos = (x, y)
-          if u.name == defName then knightPos = (x, y)
+          if u.name == atkName then //warriorPos = (x, y)
+            toDraw += unit(atkInt, imageSets.getOrElse(u.name, Seq(deadImg)),
+            x, y, flip)
+          else if u.name == defName then //knightPos = (x, y)
+            toDraw += unit(defInt, imageSets.getOrElse(u.name, Seq(deadImg)),
+            x, y, flip)
+          else toDraw += unit(0, Seq(idleImages.getOrElse(u.name, deadImg)),
+            x, y, flip)
         )
-          //toDraw += tileImage(t.pos, tileInt))
       )
-      //toDraw.foreach(t => root.children += t)
+      toDraw.foreach(t => root.children += t)
 
 
     ////
 
     val emptyRootKids = root.children
     //root.children += rectangle
-    root.children += attacker
-    root.children += defender
+    //root.children += attacker
+    //root.children += defender
     println(log)
     val timer = AnimationTimer(t => {
       update()
@@ -194,8 +256,8 @@ object Main extends JFXApp3:
         root.children += rectangle
         drawField()
         drawUnits()
-        root.children += attacker
-        root.children += defender
+        //root.children += attacker
+        //root.children += defender
       if time % distance == 1 then
         checkOver()
     })
@@ -229,7 +291,7 @@ object Main extends JFXApp3:
               attacking = true
             else
               defending = true
-          case str if str.contains("hit") =>
+          case str if str.contains("hit") || str.contains("heal") =>
             val split = str.split(" ")
             miss = false
             if split(0) == atkName then

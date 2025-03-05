@@ -45,7 +45,7 @@ class TestSpell extends Spell:
   val bonusToStats: Map[String, Int] = Map()
 end TestSpell
 
-class TestSword extends Spell:
+class TestSword extends Sharp:
   val name = "test sword"
   val description = "it's the test sword"
   val dmgType = "force"
@@ -67,8 +67,19 @@ class TestSword extends Spell:
   val bonusToStats: Map[String, Int] = Map()
 end TestSword
 
-val club = BluntFile("club")
-val mace = BluntFile("mace")
+class TestMedkit(heal: Int) extends Medkit(heal):
+  val bonusToStats = Map[String, Int]()
+  val description = "test medkit"
+  val name = "testmeds"
+  
+class TestHelmet extends Armor("head"):
+  val name = "helmet"
+  val description = "a basic helmet"
+  val bonusToStats = Map("defence" -> 20)
+
+
+val club = BluntFile("w_club")
+val mace = BluntFile("d_mace")
 
 val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3)
 val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
@@ -101,27 +112,52 @@ class LogTest:
                        new Organization(Vector(), Vector(), new Inventory(50)), "win")
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
+  val unit3 = Units(bonk)
+  val units = Vector(unit1, unit2, unit3)
   unit1.setTeam("player")
+  unit3.setTeam("player")
   unit2.setTeam("enemy")
   def dmace = BluntFile("d_mace")
   def wclub = BluntFile("w_club")
+  def testmed = TestMedkit(10)
 
-  def setFight() =
-    unit1.healDamage(100)
-    unit2.healDamage(100)
-    val itemi = wclub
+  def resetFighters() =
+    
+    units.foreach(_.healDamage(100))
+    units.foreach(_.inventory.removeAll())
+
+    val itemi = TestMace()
     val itemi2 = TestSword()
+    val itemi3 = TestHelmet()
     val invi = Inventory(6)
     val invi2 = Inventory(6)
-    invi.add(Some(itemi))
-    invi2.add(Some(itemi2))
+
+    //invi2.add(Some(itemi2))
     itemi.equip()
     itemi2.equip()
-    unit1.inventory.swap(invi, 0, 0)
-    unit2.inventory.swap(invi2, 0, 0)
+    itemi3.equip()
+    //unit1.inventory.swap(invi, 0, 0)
+    unit1.inventory.add(Some(itemi))
+    unit1.inventory.add(Some(dmace))
+    unit1.inventory.add(Some(wclub))
+    unit2.inventory.add(Some(itemi2))
+    unit2.inventory.add(Some(itemi3))
+    unit3.inventory.add(Some(testmed))
+ 
+    //unit2.inventory.swap(invi2, 0, 0)
+  
+  def setF12() =
     val fight12 = Combat(unit1, unit2, 1)
     fight = fight12
-  end setFight
+  end setF12
+
+  def setF32() =
+    val heal32 = Combat(unit3, unit2, 1)
+    fight = heal32
+
+  def setF31() =
+    val heal31 = Combat(unit3, unit1, 1)
+    fight = heal31
 
   def setGrid() =
     def gTile = testGrass("pöö","g")
@@ -139,13 +175,20 @@ class LogTest:
     grid.givePostitionToTiles()
     grid.occupiables.head.addOccupant(unit1)
     grid.occupiables(5).addOccupant(unit2)
+    grid.occupiables(1).addOccupant(unit3)
 
     field = FieldMap(Vector(), Vector(), grid,
                      new Organization(Vector(), Vector(), storage), "win")
   end setGrid
 
-  def log: Vector[String] =
-    fight.play()
+  def log(which: String): Vector[String] =
+    which match
+      case "break" => fight.playBreak("head")
+      case "wound" => fight.playWound("head")
+      case "heal" => fight.playHeal()
+      case "treat" => fight.playTreat("head")
+      case _ => fight.play()
+
 
   def theField: FieldMap =
     field
@@ -159,6 +202,21 @@ class LogTest:
         println("pls give one of these")
         println(moveAreaPosString)
     )
+
+  def inventoryUnit1() =
+    unit1.inventory.toString
+
+  def weaponsUnit1 =
+    unit1.inventory.weapons
+
+  def equipUnit1(slot: Int) =
+    val choosables = unit1.inventory.weapons
+    if choosables.size > slot then
+      unit1.equip(choosables(slot))
+    else println("unchoosable")
+
+  def weaponsUnit1String =
+    weaponsUnit1.map(_.toString).mkString(", ")
 
   def moveAreaTiles =
     field.movementRangeTiles(unit1)
@@ -203,11 +261,11 @@ def test =
     itemi4.equip()
     itemi5.equip()
 
-    unit1.inventory.swap(invi, 0, 0)
-    unit2.inventory.swap(invi2, 0, 0)
-    unit3.inventory.swap(invi3, 0, 0)
-    unit4.inventory.swap(invi4, 0, 0)
-    unit5.inventory.swap(invi5, 0, 0)
+    unit1.unitsInventory.swap(invi, 0, 0)
+    unit2.unitsInventory.swap(invi2, 0, 0)
+    unit3.unitsInventory.swap(invi3, 0, 0)
+    unit4.unitsInventory.swap(invi4, 0, 0)
+    unit5.unitsInventory.swap(invi5, 0, 0)
 
     val fight12 = Combat(unit1, unit2, 1)
     val fight13 = Combat(unit1, unit3, 1)

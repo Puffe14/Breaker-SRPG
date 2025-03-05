@@ -1,5 +1,7 @@
 package components
 
+import scala.collection.mutable
+
 class Inventory(slotCount: Int):
   //Creates the slots for the inventory, filled with None.
   private var slots: Vector[Option[Item]] = Vector.fill(slotCount)(None)
@@ -18,6 +20,11 @@ class Inventory(slotCount: Int):
         Some(foundItem)
       case _ => None
 
+  def removeAll(): Vector[Option[Item]] =
+    val removed: mutable.Buffer[Option[Item]] = mutable.Buffer() 
+    slots.foreach(removed += remove(_))
+    removed.toVector
+  
   //Adds an item to the inventory. Returns false if there are no slots to fill.
   def add(item: Option[Item]): Boolean =
     if slots.contains(None) then
@@ -63,7 +70,12 @@ class Inventory(slotCount: Int):
     None
 
 
-  //! voiko armors ja weapons tehdä paremmin?
+  def equippedArmors: Vector[Armor] =
+    armors.filter(_.isEquipped)
+
+
+  //! voiko armors ja weapons tehdä paremmin? ???
+
   def armors: Vector[Armor] =
     val slotted = items.flatten
     var armorsInSlots: Vector[Armor] = Vector()
@@ -86,18 +98,16 @@ class Inventory(slotCount: Int):
     }
     weaponInSlots
 
-
-  def equippedArmors: Vector[Armor] =
-    armors.filter(_.isEquipped)
-
-
   //---------------------
 
   def equipWeapon(weapon: Weapon) =
     equippedWeapon.foreach(_.unequip())
     weapon.equip()
-
-
+  
+  def equipArmor(armor: Armor) =
+    //unequips any armor piece that fits on the same part of the body
+    equippedArmors.filter(_.partName == armor.partName).foreach(_.unequip())
+    armor.equip()
 
   //----------------------
 
