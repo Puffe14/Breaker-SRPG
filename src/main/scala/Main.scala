@@ -98,6 +98,8 @@ object Main extends JFXApp3:
 
         case "inventory" =>
           println(testObject.inventoryUnit1())
+        
+        case "info" => testObject.info
 
         case s if s.contains("equip") =>
           val equipCommand = s.split(" ")
@@ -201,7 +203,7 @@ object Main extends JFXApp3:
 
     def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
       x = loc(0)*16*tileScale   - loc(1)*16*tileScale   + gridPos(0)
-      y = loc(0)* 8*tileScale   + loc(1)*8*tileScale    + gridPos(1)
+      y = loc(0)* 8*tileScale   + loc(1)*8*tileScale    + gridPos(1) - loc(2)*8*tileScale
       image = imgTiles(color)
       scaleX = tileScale
       scaleY = tileScale
@@ -228,7 +230,7 @@ object Main extends JFXApp3:
           val flip = u.team != "player"
           //println(u.name +" at "+pos)
           val x = pos(0)*16*tileScale   - pos(1)*16*tileScale   + gridPos(0) + 32
-          val y = pos(0)* 8*tileScale   + pos(1)* 8*tileScale   + gridPos(1) - 48
+          val y = pos(0)* 8*tileScale   + pos(1)* 8*tileScale   + gridPos(1) - 48   - pos(2)*8*tileScale
           if u.name == atkName then //warriorPos = (x, y)
             toDraw += unit(atkInt, imageSets.getOrElse(u.name, Seq(deadImg)),
             x, y, flip)
@@ -291,7 +293,7 @@ object Main extends JFXApp3:
               attacking = true
             else
               defending = true
-          case str if str.contains("hit") || str.contains("heal") =>
+          case str if str.contains("hit") || str.contains("heals") || str.contains("breaks")  || str.contains("wounds") || str.contains("treats")=>
             val split = str.split(" ")
             miss = false
             if split(0) == atkName then

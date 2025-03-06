@@ -1,5 +1,6 @@
 package components
 
+import scala.collection.mutable
 import scala.util.Random
 
 class Character(
@@ -7,6 +8,8 @@ class Character(
    val myName: String,
    var currentClass: Class,
    val possibleClass: Vector[Class],
+   var level: Int = 1,
+   var exp: Int = 1,
    val growths: Map[String, Int],
    var stats:  Map[String, Int]):
 
@@ -14,13 +17,31 @@ class Character(
   def swapClass(newClass: Class) =
     currentClass = newClass
 
+  //Increase experience and handle if reaches lvlup
+  def expTrack(increase: Int): Vector[String] =
+    val message: mutable.Buffer[String] = mutable.Buffer()
+    exp += increase
+    val lvlsUp = exp/100
+    if lvlsUp > 0 then
+      message += "LEVEL UP\n"
+      for i <- 0 until lvlsUp do
+        message += levelUp().map((k, v) => s"$k: $v").mkString(", ")
+    exp = 0
+    message.toVector
+  end expTrack
+
   //Rolls growths for level-ups and collects them for display
-  def levelUp(): Vector[Int] =
-    var levelUps = Vector[Int]()
+  def levelUp(): Map[String, Int] =
+    val levelUpsMap = mutable.Map[String, Int]()
     val roll = Random().nextInt(100)
-    if roll > growths("strength") then
-      levelUps = levelUps.appended(roll/100 + 1)
-    levelUps
+    growths.keys.foreach(stat =>
+      val currentG = growths(stat)
+      if roll < currentG then
+        val up = (currentG-1)/100 + 1
+        levelUpsMap += (stat->up)
+        addToStat(stat, up)
+    )
+    levelUpsMap.toMap
 
   //adds Int to a stat
   def addToStat(which: String, amount: Int) =

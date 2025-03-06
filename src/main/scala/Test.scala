@@ -86,13 +86,14 @@ val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" 
 val testStrongMap = Map("hitpoints" -> 5, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
 val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
 val testZeroMap = Map("hitpoints" -> 0, "strength" -> 0, "magic" -> 0, "skill" -> 0, "speed" -> 0, "defence" -> 0, "resistance" -> 0, "movement" -> 0)
+val test100Map = Map("hitpoints" -> 100, "strength" -> 100, "magic" -> 100, "skill" -> 100, "speed" -> 100, "defence" -> 100, "resistance" -> 100)
 val testClass = new Class("test", 1, Vector("test"),testStatMap,testStatMap,testZeroMap,testZeroMap)
 
-val cylna =     new Character("cylna", testClass, Vector(),testStrongMap,testStatMap)
-val bonk =      new Character("bonk", testClass, Vector(),testStatMap,testStatMap)
-val gonzales =  new Character("gonzales", testClass, Vector(),testStrongMap,testStrongMap)
-val wrys   =    new Character("wrys", testClass, Vector(),testFastMap,testFastMap)
-val ghost =     new Character("ghost", testClass, Vector(),testSpiritMap,testSpiritMap)
+val cylna =     new Character("cylna", testClass, Vector(),1,0,test100Map,testStrongMap)
+val bonk =      new Character("bonk", testClass, Vector(),1,0,testStatMap,testStatMap)
+val gonzales =  new Character("gonzales", testClass, Vector(),1,0,testStrongMap,testStrongMap)
+val wrys   =    new Character("wrys", testClass, Vector(),1,0,testFastMap,testFastMap)
+val ghost =     new Character("ghost", testClass, Vector(),1,0,testSpiritMap,testSpiritMap)
 
 class testGrass(file: String, name: String) extends Occupiable(file, name):
 end testGrass
@@ -129,6 +130,7 @@ class LogTest:
     val itemi = TestMace()
     val itemi2 = TestSword()
     val itemi3 = TestHelmet()
+    val itemi4 = testmed
     val invi = Inventory(6)
     val invi2 = Inventory(6)
 
@@ -136,13 +138,14 @@ class LogTest:
     itemi.equip()
     itemi2.equip()
     itemi3.equip()
+    itemi4.equip()
     //unit1.inventory.swap(invi, 0, 0)
     unit1.inventory.add(Some(itemi))
     unit1.inventory.add(Some(dmace))
     unit1.inventory.add(Some(wclub))
     unit2.inventory.add(Some(itemi2))
     unit2.inventory.add(Some(itemi3))
-    unit3.inventory.add(Some(testmed))
+    unit3.inventory.add(Some(itemi4))
  
     //unit2.inventory.swap(invi2, 0, 0)
   
@@ -170,7 +173,7 @@ class LogTest:
         gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile), 4, 6,
-      Vector(0,0,1,1,0,2,0,0,1,1,0,2,0,0,1,1,0,2,0,1,1,0,2,1))
+      Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0))
 
     grid.givePostitionToTiles()
     grid.occupiables.head.addOccupant(unit1)
@@ -187,7 +190,8 @@ class LogTest:
       case "wound" => fight.playWound("head")
       case "heal" => fight.playHeal()
       case "treat" => fight.playTreat("head")
-      case _ => fight.play()
+      case _ =>
+        fight.play()
 
 
   def theField: FieldMap =
@@ -205,6 +209,10 @@ class LogTest:
 
   def inventoryUnit1() =
     unit1.inventory.toString
+    levelUp(unit1)
+
+  def levelUp(unit: Units) =
+    unit.character.expTrack(300).foreach(println)
 
   def weaponsUnit1 =
     unit1.inventory.weapons
@@ -220,6 +228,9 @@ class LogTest:
 
   def moveAreaTiles =
     field.movementRangeTiles(unit1)
+
+  def info =
+    units.foreach(println(_))
 
   def moveAreaPosString =
     moveAreaTiles.map(_.pos).mkString(", ")
