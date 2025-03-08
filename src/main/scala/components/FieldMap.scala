@@ -5,7 +5,8 @@ class FieldMap(enemies: Vector[Group],
                allies: Vector[Group],
                grid: Grid,
                var player: Organization,
-               clearCondition: String):
+               clearCondition: String,
+               rotation: Int):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
   def groups: Vector[Group] = Vector()
@@ -64,6 +65,9 @@ class FieldMap(enemies: Vector[Group],
       case _ =>
         Vector()
   end moveCheck
+
+  def tilesVisible: Vector[Tile] =
+    grid.visibleTiles(rotation)
 
 
   def movementRangeTiles(mover: Units): Set[Tile] =

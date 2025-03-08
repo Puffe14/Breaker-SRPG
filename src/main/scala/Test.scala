@@ -110,7 +110,7 @@ end testWall
 class LogTest:
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(), Vector(), new Inventory(50)), "win")
+                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0)
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
@@ -173,7 +173,7 @@ class LogTest:
         gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile), 4, 6,
-      Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0))
+      Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0))
 
     grid.givePostitionToTiles()
     grid.occupiables.head.addOccupant(unit1)
@@ -181,7 +181,7 @@ class LogTest:
     grid.occupiables(1).addOccupant(unit3)
 
     field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), "win")
+                     new Organization(Vector(), Vector(), storage), "win", 0)
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -364,9 +364,9 @@ def test =
     grid2.givePostitionToTiles()
     println(grid.tileAt(0,1))
     println("tile positions 3,2")
-    grid2.visibleTiles.foreach(n=>println(n.pos))
+    grid2.visibleTiles(0).foreach(n=>println(n.pos))
     println("tile positions 2,3")
-    grid.visibleTiles.foreach(n=>println(n.pos))
+    grid.visibleTiles(0).foreach(n=>println(n.pos))
     println("grid1")
     println("tile 0,0")
     grid.tileAt(0,0).foreach(n => grid.neighbors(n).foreach(n=>println(n.pos)))
@@ -385,7 +385,7 @@ def test =
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
                          new Organization(Vector(), Vector(), invi5),
-                         "win")
+                         "win", 0)
     field.movementRangeTiles(unit1)
 
   def fileTest() =

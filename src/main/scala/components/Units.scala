@@ -13,6 +13,7 @@ class Units(var character: Character):
 
   def name: String = character.name
   def weapon = unitsInventory.equippedWeapon
+  def armor = unitsInventory.equippedArmors
   def medkit = unitsInventory.equippedMedkit
   def unitClass = character.currentClass
   def types = unitClass.classType
@@ -73,6 +74,10 @@ class Units(var character: Character):
     character.currentClass.classBuffs
   def givenNearbyDebuffs: Map[String, Int] =
     character.currentClass.classDebuffs
+
+  def statusList: Vector[String] =
+    wounds.map("wound "+_).toVector
+    ++ armor.map("armor "+_.partName)
 
 
   //bonuses
@@ -148,7 +153,10 @@ class Units(var character: Character):
   def MaxHP: Int = hp
 
   //Move
-  def MOVE: Int = character.move
+  def MOVE: Int = character.move + bonus("move")
+
+  //Jump
+  def JUMP: Int = character.move + bonus("jump")
 
   //Range
   def Range: (Int, Int) =
@@ -199,7 +207,8 @@ class Units(var character: Character):
   //Hit rate
   def HI: Int =
     unitsInventory.equippedWeapon.foreach(n =>
-      return n.hit + (skl + spd*0.5).toInt + bonus("HI")
+      return (n.hit + (skl + spd*0.5).toInt + bonus("HI")) /
+        (if wounds.contains("head") then 2 else 1)
     )
     0
 

@@ -3,8 +3,8 @@ package components
 class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
   def allTiles = tiles
 
-  def visibleTiles: Vector[Tile] =
-    tiles
+  def visibleTiles(direction: Int): Vector[Tile] =
+    tiles.filterNot(tileHidden(_, direction))
 
   def tileAt(x: Int, y: Int): Option[Tile] =
     val atPos = x + y*row
@@ -30,7 +30,7 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
     
   def tilesWithUnits: Vector[Occupiable] =
     occupiables.filter(_.occupied)
-  
+
   
   def neighbors(chosenTile: Tile): Vector[Tile] =
     val x = chosenTile.pos(0)
@@ -39,8 +39,7 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
       n == tileAt(x-1, y)||
       n == tileAt(x+1, y)||
       n == tileAt(x, y-1)||
-      n == tileAt(x, y+1))
-    */
+      n == tileAt(x, y+1))*/
     var total: Vector[Tile] = Vector()
     //found.foreach(n => total = total ++ n)*/
     total = tiles.filter(n =>
@@ -50,5 +49,26 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
       nxy == (x, y-1)||
       nxy == (x, y+1))
     total
+
+  /*      directions  0, 1, 2, 3
+        (11)          (13)            (33)           (31)
+  //  (21)(12)      (12)(23)        (23)(32)       (32)(21)
+    (31)(22)(13)  (11)(22)(33)    (13)(22)(31)   (33)(22)(11)
+      (32)(23)      (21)(32)        (12)(21)       (23)(12)
+        (33)          (31)            (11)           (13)
+  */
+
+  def tileInFront(tile: Tile, dir: Int): Option[Tile] =
+    val (x, y, z) = tile.pos
+         if dir == 0 then tileAt(x+1, y+1)
+    else if dir == 1 then tileAt(x+1, y-1)
+    else if dir == 2 then tileAt(x-1, y-1)
+    else if dir == 3 then tileAt(x-1, y+1)
+    else None
+
+  def tileHidden(tile: Tile, dir: Int): Boolean =
+    tileInFront(tile, dir).forall(
+      t => t.pos(2) > tile.pos(2)
+    )
 
 end Grid

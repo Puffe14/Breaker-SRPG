@@ -156,6 +156,11 @@ object Main extends JFXApp3:
                       "wrys" -> imgDefKni,
                       "bonk" -> imgAtkGuy)
 
+  val iconImages =
+    Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
+        "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")))
+
+
   def start() =
 
     stage = new JFXApp3.PrimaryStage:
@@ -200,6 +205,13 @@ object Main extends JFXApp3:
       scaleX = characterScale * mirror
       scaleY = characterScale
 
+    def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
+      x = loc(0)*16*tileScale   - loc(1)*16*tileScale   + gridPos(0)  -16
+      y = loc(0)* 8*tileScale   + loc(1)*8*tileScale    + gridPos(1)  -16  - loc(2)*8*tileScale + number*6*tileScale
+      image = iconImages(name)
+      scaleX = tileScale
+      scaleY = tileScale
+
 
     def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
       x = loc(0)*16*tileScale   - loc(1)*16*tileScale   + gridPos(0)
@@ -210,7 +222,7 @@ object Main extends JFXApp3:
 
     def drawField() =
       val toDraw = mutable.Buffer[ImageView]()
-      testObject.theField.theGrid.allTiles
+      testObject.theField.tilesVisible
         .foreach(t =>
           var tileInt = 0
           if t.name == "w" then tileInt = 2
@@ -239,6 +251,9 @@ object Main extends JFXApp3:
             x, y, flip)
           else toDraw += unit(0, Seq(idleImages.getOrElse(u.name, deadImg)),
             x, y, flip)
+          //status icons
+          for i <- u.statusList.indices do
+            toDraw += statusImage(pos,u.statusList(i),i)
         )
       )
       toDraw.foreach(t => root.children += t)
