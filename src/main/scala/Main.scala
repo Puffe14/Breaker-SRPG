@@ -15,8 +15,8 @@ object Main extends JFXApp3:
 
   val screenW = 600
   val screenH = 450
-  val characterScale = 2
-  val tileScale = 2
+  var characterScale = 2
+  var tileScale = 2
 
   var warriorPos = (0, 0)
   var knightPos = (325, 225)
@@ -121,6 +121,14 @@ object Main extends JFXApp3:
           val dirCommand = s.split(" ")
           val direction = dirCommand(1).toIntOption
           direction.foreach(testObject.theField.setRotation(_))
+          
+        case s if s.contains("zoom") =>
+          val dirCommand = s.split(" ")
+          val zoom = dirCommand(1).toIntOption
+          zoom.foreach(z =>
+            tileScale = z
+            characterScale = z
+          )
 
         case s if s.contains("move") =>
           val moveCommand = s.split(" ")
