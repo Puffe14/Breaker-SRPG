@@ -26,7 +26,7 @@ class Character(
       message += "LEVEL UP\n"
       for i <- 0 until lvlsUp do
         message += levelUp().map((k, v) => s"$k: $v").mkString(", ")
-    exp = 0
+      exp = 0
     message.toVector
   end expTrack
 
@@ -63,4 +63,5 @@ class Character(
   def dfn: Int =   stats("defence") + currentClass.dfn
   def res: Int = stats("resistance") + currentClass.res
   def move:Int = currentClass.move
+  def jump:Int = currentClass.jump
 end Character

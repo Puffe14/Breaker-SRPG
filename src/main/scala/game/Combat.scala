@@ -19,12 +19,115 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   def everyoneLived: Boolean = !selectedUnit.isDead && !targetUnit.isDead
   def inCounterRange: Boolean = targetUnit.weapon.forall(w => between(range, w.range))
 
+  def forecast: Map[String,Double] =
+    val a = selectedUnit
+    val b = targetUnit
+    //predicted dmg
+    val aDmg = predictDmg(a, b)
+    val bDmg = predictDmg(b, a)
+    //total hit and crit rate
+    val aHitCrit = predictHitCrit(a, b)
+    val bHitCrit = predictHitCrit(b, a)
+    //the number of attacks including quick doubles
+    val aAtks = predictAtks(a)
+    val bAtks = predictAtks(b)
+    //TOTAL dmg
+    val aTotal = aDmg * aAtks
+    val bTotal = bDmg * bAtks
+    //Hidden expected value calculation, for AI (Let players make decisions, no value judgements)
+    val aEV = EV(aDmg, aHitCrit(0), aHitCrit(1), aAtks)
+    val bEV = EV(bDmg, bHitCrit(0), bHitCrit(1), bAtks)
+    //the direction of attacks
+    val arrow =
+      if skillDifference < -rules.vantageDiff && targetCanAttack then
+        0 //"<-"
+      else if attackSpeedDifference > rules.alacrityDiff then
+        1 //"->->"
+      else
+        2 //"->"
+    //Provides a map of all calculated results for outside use.
+    Map("aDmg" ->aDmg,       "bDmg"->bDmg,
+        "aHit"->aHitCrit(0), "bHit"->bHitCrit(0),
+        "aCrit"->aHitCrit(1),"bCrit"->bHitCrit(1),
+        "aAtks"->aAtks,      "bAtks"->bAtks,
+        "aTotal"->aTotal,     "bTotal"->bTotal,
+        "aEV"->aEV,          "bEV"->bEV,
+        "arrow"->arrow
+    )
+
+  def forecastString: String =
+    val f = forecast
+    val direction = f("arrow").toInt match
+      case 1 => "->->"
+      case 0 => "<-"
+      case _ => "->"
+    /*s"\n${select.name} x${f("aAtks")}:\n DMG ${f("aDmg")}, HIT ${f("aHit")}, CRIT ${f("aCrit")}" +
+    s"\n$direction\n" +
+    s"${target.name} x${f("bAtks")}:\n DMG ${f("bDmg")}, HIT ${f("bHit")}, CRIT ${f("bCrit")}"*/
+    s"${select.name} x${f("aAtks")}: DMG ${f("aDmg")}, HIT ${f("aHit")}, CRIT ${f("aCrit")}" +
+    s"   $direction"   +
+    s"${target.name} x${f("bAtks")}: DMG ${f("bDmg")}, HIT ${f("bHit")}, CRIT ${f("bCrit")}"
+
+
+  /** Estimated value for attacks. dmg is already calculated */
+  private def EV(dmg: Int, hit: Int, crit: Int, times: Int): Double =
+    var total = 0.0
+    val dhit = hit/100.0
+    val dcrit = crit/100.0
+    val notcrit = 1 - dcrit
+    //not critting possibilities
+    total += notcrit*dmg
+    //critting
+    total += dcrit*dmg*rules.critMultiplier
+    //hitting
+    total *= dhit
+    //damage hits or crits * chance for either * times executed
+    total*times
+
+  private def predictAtks(unit: Units) =
+    val strikes = if quick(unit) then 2 else 1
+    if unit == selectedUnit then
+      selectedAttacks*strikes
+    else if unit == targetUnit then
+      targetAttacks*strikes
+    else 0
+
+  private def predictDmg(attacker: Units, defender: Units): Int =
+    var damage = 0
+    attacker.weapon.foreach( weapon =>
+      val isEffective = //if the attackers weapon has an effectiveness against defenders type
+         defender.types.exists(weapon.effective.contains(_))
+      if      weapon.typing == "force" then
+        damage = lowest(attacker.AT - defender.PD, 0)
+      else if weapon.typing == "magic" then
+        damage = lowest(attacker.AT - defender.MD, 0)
+      if isEffective then damage *= rules.effectiveMultipllier
+    )
+    damage
+
+  private def quick(unit: Units): Boolean =
+   unit.weapon.forall(_.quick)
+
+  private def predictHitCrit(attacker: Units, defender: Units): (Int, Int) =
+    var hit = 0
+    var crit = 0
+    attacker.weapon.foreach( weapon =>
+      hit  = highest(lowest(attacker.HI - defender.AV, 0), 100)
+      crit = highest(lowest(attacker.CR - defender.CA, 0), 100)
+    )
+    (hit, crit)
+
+
   //evalution methods
   private def lowest(evaluation: Int, minimum: Int): Int =
     if evaluation > minimum then evaluation
     else minimum
+  private def highest(evaluation: Int, maximum: Int): Int =
+    if evaluation < maximum then evaluation
+    else maximum
   private def between(int: Int, pair: (Int,Int)) =
     pair(0) >= int && int <= pair(1)
+
 
   //methods for seeing if a unit can still fight
   def targetCanAttack:   Boolean =
@@ -33,6 +136,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     selectedUnit.weapon.forall(_.intact) && selectedAttacks > 0 && everyoneLived
   def resetLog() =
     log = mutable.Buffer()
+
 
   //sets how many attacks the unit can perform
 
@@ -49,27 +153,21 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else if attackSpeedDifference < -rules.doubleDiff then 2
     else 1
 
+
   //method for the performing attacks
   def attack(attacker: Units, defender: Units, weapon: Weapon) =
     val isHit = roll100 < attacker.HI - defender.AV //if the attack hits
 
     if isHit then
       val isCritical = roll100 < attacker.CR //if a critical hit is rolled
-      val isEffective = //if the attackers weapon has an effectiveness against defenders type
-        attacker.weapon.forall(w => attacker.types.exists(w.effective.contains(_)))
-      var damage = 0
-
-      if      weapon.typing == "force" then
-        damage = lowest(attacker.AT - defender.PD, 0)
-      else if weapon.typing == "magic" then
-        damage = lowest(attacker.AT - defender.MD, 0)
-      if isEffective then damage *= rules.effectiveMultipllier
+      var damage = predictDmg(attacker, defender)
       if isCritical then damage *= rules.critMultiplier
       defender.takeDamage(damage)
       log += (s"${attacker.name} hit ${defender.name} with $damage damage")
       weapon.spend(1)
     else
       log += (s"${attacker.name} misses ${defender.name}")
+
 
   //method for the performing break/wound attaks
   def skill(attacker: Units, defender: Units, targetPart: String, skillType: String, weaponUsed: Option[Weapon]) =
@@ -169,6 +267,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else if targetUnit.isDead then log += (s"${targetUnit.name} died")
     log += ("battle ends")
     log.toVector
+  end play
 
   def playWound(part: String): Vector[String] =
     resetLog()

@@ -6,16 +6,24 @@ class FieldMap(enemies: Vector[Group],
                grid: Grid,
                var player: Organization,
                clearCondition: String,
-               rotation: Int):
+               var rotation: Int):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
   def groups: Vector[Group] = Vector()
   def setPlayer(org: Organization) =
     player = org
   def setLeaders() = ()
-  def isCleared() = ()
+  def isCleared: Boolean =
+    clearCondition match
+      case "defend" => false
+      case "defeat" => false
+      case "route"  => grid.unitsOnTiles.forall(_.team!="enemy")
+      case _ => false
   def theGrid = grid
   def SAVEABLE: String = ""
+
+  def currentRotation = rotation
+  def setRotation(newDir: Int) = rotation = newDir%4
 
 
   //Methods for interfacing with units on field
@@ -32,18 +40,24 @@ class FieldMap(enemies: Vector[Group],
         o.addOccupant(unit)
       case _ => println(s"$target cannot be occupied")
 
+  def clearDead() =
+    grid.tilesWithUnits.filter(_.occupantOnTile
+                       .forall(_.isDead))
+                       .foreach(_.removeOccupant())
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE
 
-  def moveCheck(moveLeft: Double, tile: Tile, types: Vector[String], team: String): Vector[Tile] =
+  def moveCheck(moveLeft: Double, tile: Tile, types: Vector[String], team: String, elevation: Int, jump: Int): Vector[Tile] =
 
     def findSurrounding(thisOneOk: Boolean) =
       val accessibles = mutable.Buffer[Tile]()
       if thisOneOk then accessibles += tile
-      val availableNeighbors = grid.neighbors(tile).collect { case a: Occupiable => a }
+      val availableNeighbors = grid.neighbors(tile)
+                                   .collect { case a: Occupiable => a }
+                                   .filter(t => grid.elevationDifference(elevation, t) <= jump)
       availableNeighbors
-        .foreach(accessibles ++= moveCheck(moveLeft-tile.moveReduction(types), _, types, team))
+        .foreach(accessibles ++= moveCheck(moveLeft-tile.moveReduction(types), _, types, team, tile.pos(2), jump))
       accessibles.toVector
     end findSurrounding
 
@@ -64,11 +78,14 @@ class FieldMap(enemies: Vector[Group],
       //If other checks fail
       case _ =>
         Vector()
+
   end moveCheck
+
+
+  //Useful methods for finding stuff
 
   def tilesVisible: Vector[Tile] =
     grid.visibleTiles(rotation)
-
 
   def movementRangeTiles(mover: Units): Set[Tile] =
     //find the location of the moving unit and find their info
@@ -77,8 +94,19 @@ class FieldMap(enemies: Vector[Group],
     val movementType = mover.types
     var tilesFound = Set[Tile]()
     locationTile.foreach( t =>
-      tilesFound = moveCheck(movementRange, t, movementType, mover.team).toSet
+      tilesFound = moveCheck(movementRange, t, movementType, mover.team, t.pos(2), mover.JUMP).toSet
     )
     tilesFound
+
+  def attackRangeUnits(mover: Units): Set[Units] =
+    //find the location of the moving unit and find their info
+    val locationTile = tileOf(mover)
+    val (minR, maxR) = mover.Range
+    var unitsFound = Set[Units]()
+    locationTile.foreach( t =>
+      for i <- minR to maxR do
+        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - mover
+    )
+    unitsFound
 
 end FieldMap

@@ -27,4 +27,5 @@ class Class(
   def spd: Int = classStats("speed")
   def dfn: Int =   classStats("defence")
   def res: Int = classStats("resistance")
+  def jump:Int = classStats("jump")
 end Class

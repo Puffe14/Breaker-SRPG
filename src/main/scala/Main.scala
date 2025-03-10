@@ -15,14 +15,15 @@ object Main extends JFXApp3:
 
   val screenW = 600
   val screenH = 450
-  val characterScale = 4
-  val tileScale = 4
+  val characterScale = 2
+  val tileScale = 2
 
   var warriorPos = (0, 0)
   var knightPos = (325, 225)
-  val gridPos = (200, 100)
+  val gridPos = (300, 200)
 
   var time   = 0
+  var deadTime = 0
   var atkInt = 0
   var defInt = 0
   var atkName = ""
@@ -45,6 +46,7 @@ object Main extends JFXApp3:
 
   def reset() =
     time   = 0
+    deadTime = 0
     atkInt = 0
     defInt = 0
     atkName = ""
@@ -62,14 +64,17 @@ object Main extends JFXApp3:
   def checkOver() =
     if over then
       println("\n \"fight\" / \"reset\" / \"move Int Int\" / \"equip Int\" / \"inventory\":"+
-      s"\n${testObject.moveAreaPosString}\nwpns: ${testObject.weaponsUnit1String}")
+      s"\n${testObject.moveAreaPosString}\nwpns: ${testObject.weaponsUnit1String}\n${testObject.unit1CanAtkString}")
       val command = readLine()
 
       command match
+
         case "fight" =>
-          event = ""
-          testObject.setF12()
-          reset()
+          if testObject.unit1CanAtk then
+            event = ""
+            testObject.setF1C()
+            reset()
+          else println("not in range!")
 
         case "break" =>
           event = "break"
@@ -95,6 +100,11 @@ object Main extends JFXApp3:
           event = ""
           testObject.resetFighters()
           testObject.setF12()
+          
+        case "revive" =>
+          event = ""
+          testObject.resetFighters()
+          testObject.setGrid()
 
         case "inventory" =>
           println(testObject.inventoryUnit1())
@@ -106,6 +116,11 @@ object Main extends JFXApp3:
           val slot = equipCommand(1).toIntOption
           slot.foreach(testObject.equipUnit1(_))
           if slot.isEmpty then println(s"Number not found. Give one of these:\n ${testObject.weaponsUnit1.indices}")
+
+        case s if s.contains("dir") =>
+          val dirCommand = s.split(" ")
+          val direction = dirCommand(1).toIntOption
+          direction.foreach(testObject.theField.setRotation(_))
 
         case s if s.contains("move") =>
           val moveCommand = s.split(" ")
@@ -143,18 +158,21 @@ object Main extends JFXApp3:
   val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field_gray.png")),
                                   new Image(new FileInputStream(imagePath + "field_movet.png")),
                                   new Image(new FileInputStream(imagePath + "field_red.png")),
-                                  new Image(new FileInputStream(imagePath + "field_sand.png")))
+                                  new Image(new FileInputStream(imagePath + "field_sand.png")),
+                                  new Image(new FileInputStream(imagePath + "field_base.png")))
 
   val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
   var attackerImages = imgAtkWar
   var defenderImages = imgDefKni
   val idleImages = Map("cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                        "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
-                       "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")))
+                       "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")),
+                       "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 
   val imageSets = Map("cylna" -> imgAtkWar,
                       "wrys" -> imgDefKni,
-                      "bonk" -> imgAtkGuy)
+                      "bonk" -> imgAtkGuy,
+                      "ghost" -> imgAtkGuy)
 
   val iconImages =
     Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
@@ -173,6 +191,24 @@ object Main extends JFXApp3:
     val scene = Scene(parent = root)
     stage.scene = scene
 
+    def tilePosX(loc: (Int, Int, Int)): Int =
+      val (x,y,z) = loc
+      val dir = testObject.theField.currentRotation
+      if dir == 0 then       x*16*tileScale   - y*16*tileScale   + gridPos(0)
+      else if dir == 1 then  x*16*tileScale   + y*16*tileScale   + gridPos(0)
+      else if dir == 2 then -x*16*tileScale   + y*16*tileScale   + gridPos(0)
+      else if dir == 3 then -x*16*tileScale   - y*16*tileScale   + gridPos(0)
+      else 0
+
+    def tilePosY(loc: (Int, Int, Int)): Int =
+      val (x,y,z) = loc
+      val dir = testObject.theField.currentRotation
+      if dir == 0 then       x* 8*tileScale   + y*8*tileScale    + gridPos(1) - z*8*tileScale
+      else if dir == 1 then -x* 8*tileScale   + y*8*tileScale    + gridPos(1) - z*8*tileScale
+      else if dir == 2 then -x* 8*tileScale   - y*8*tileScale    + gridPos(1) - z*8*tileScale
+      else if dir == 3 then  x* 8*tileScale   - y*8*tileScale    + gridPos(1) - z*8*tileScale
+      else 0
+
 
     ////draw functions
 
@@ -182,6 +218,7 @@ object Main extends JFXApp3:
       width = screenW
       height = screenH
       fill = White
+      viewOrder_(0.1)
 
     def attacker = new ImageView:
       x = warriorPos(0)
@@ -191,47 +228,60 @@ object Main extends JFXApp3:
       scaleY = characterScale
 
     def defender = new ImageView:
-      x = knightPos(0) - 48
+      x = knightPos(0) - tileScale*12
       y = knightPos(1)
       image = defenderImages(defInt)
       scaleX = -characterScale
       scaleY = characterScale
 
-    def unit(imgNum: Int, images: Seq[Image], xpos: Int, ypos: Int, flip: Boolean) = new ImageView:
-      if flip then x = xpos - 48 else x = xpos
+    def unit(imgNum: Int, images: Seq[Image], xpos: Int, ypos: Int, zpos: Int, flip: Boolean) = new ImageView:
+      if flip then x = xpos - tileScale*12 else x = xpos
       val mirror = if flip then -1 else 1
-      y = ypos
+      y = ypos + 8*tileScale*zpos
       image = images(imgNum)
       scaleX = characterScale * mirror
       scaleY = characterScale
+      smooth = false
+      viewOrder_(-zpos.toDouble)
 
     def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
-      x = loc(0)*16*tileScale   - loc(1)*16*tileScale   + gridPos(0)  -16
-      y = loc(0)* 8*tileScale   + loc(1)*8*tileScale    + gridPos(1)  -16  - loc(2)*8*tileScale + number*6*tileScale
+      x = tilePosX(loc)  -tileScale*8
+      y = tilePosY(loc)  -tileScale*8 + number*6*tileScale
       image = iconImages(name)
       scaleX = tileScale
       scaleY = tileScale
+      viewOrder_(-loc(2).toDouble)
+
 
 
     def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
-      x = loc(0)*16*tileScale   - loc(1)*16*tileScale   + gridPos(0)
-      y = loc(0)* 8*tileScale   + loc(1)*8*tileScale    + gridPos(1) - loc(2)*8*tileScale
+      val (lx, ly, lz) = loc
+      x = tilePosX(loc)
+      y = tilePosY(loc)
       image = imgTiles(color)
       scaleX = tileScale
       scaleY = tileScale
+      smooth = false
+      viewOrder_(-lz.toDouble)
 
     def drawField() =
       val toDraw = mutable.Buffer[ImageView]()
-      testObject.theField.tilesVisible
+      testObject.theField.theGrid.allTiles//.tilesVisible
         .foreach(t =>
           var tileInt = 0
+          var bottomInt = 4
           if t.name == "w" then tileInt = 2
           if t.name == "s" then tileInt = 3
-          toDraw += tileImage(t.pos, tileInt))
+          toDraw += tileImage(t.pos, tileInt)
+          //add bottom
+          (1 to t.pos(2)).foreach(i =>
+            val bottomPos = (t.pos(0), t.pos(1), i-1)
+            toDraw += tileImage(bottomPos, bottomInt))
+        )
       testObject.moveAreaTiles
         .foreach(t => toDraw += tileImage(t.pos, 1))
-      //toDraw.sortBy(t => t.y.toInt)
-      toDraw.foreach(t => root.children += t)
+      toDraw.sortBy(t => t.y.toInt)
+              .foreach(t => root.children += t)
 
     def drawUnits() =
       val toDraw = mutable.Buffer[ImageView]()
@@ -241,16 +291,17 @@ object Main extends JFXApp3:
           val pos = t.pos
           val flip = u.team != "player"
           //println(u.name +" at "+pos)
-          val x = pos(0)*16*tileScale   - pos(1)*16*tileScale   + gridPos(0) + 32
-          val y = pos(0)* 8*tileScale   + pos(1)* 8*tileScale   + gridPos(1) - 48   - pos(2)*8*tileScale
+          val x = tilePosX(pos) + tileScale*8
+          val y = tilePosY(pos) - tileScale*12   - pos(2)*8*tileScale
+          val z = pos(2)
           if u.name == atkName then //warriorPos = (x, y)
             toDraw += unit(atkInt, imageSets.getOrElse(u.name, Seq(deadImg)),
-            x, y, flip)
+            x, y, z, flip)
           else if u.name == defName then //knightPos = (x, y)
             toDraw += unit(defInt, imageSets.getOrElse(u.name, Seq(deadImg)),
-            x, y, flip)
+            x, y, z, flip)
           else toDraw += unit(0, Seq(idleImages.getOrElse(u.name, deadImg)),
-            x, y, flip)
+            x, y, z, flip)
           //status icons
           for i <- u.statusList.indices do
             toDraw += statusImage(pos,u.statusList(i),i)
@@ -259,22 +310,17 @@ object Main extends JFXApp3:
       toDraw.foreach(t => root.children += t)
 
 
-    ////
+    ////ANIMATION
 
     val emptyRootKids = root.children
-    //root.children += rectangle
-    //root.children += attacker
-    //root.children += defender
     println(log)
     val timer = AnimationTimer(t => {
       update()
       if time % distance == 0 then
-
+        root.children.clear()
         root.children += rectangle
         drawField()
         drawUnits()
-        //root.children += attacker
-        //root.children += defender
       if time % distance == 1 then
         checkOver()
     })
@@ -288,6 +334,10 @@ object Main extends JFXApp3:
 
     if atkDead then atkInt = 4
     if defDead then defInt = 4
+    if atkDead || defDead then
+      deadTime += 1
+      if deadTime > distance then
+        testObject.theField.clearDead()
 
     ////////////goes through the log to process which animation is required
     if iteratorLog.hasNext && !processing then
@@ -317,6 +367,7 @@ object Main extends JFXApp3:
               defending = true
           case str if str.contains("died") =>
             val split = str.split(" ")
+            deadTime = 0
             if split(0) == atkName then
               atkDead = true
             else

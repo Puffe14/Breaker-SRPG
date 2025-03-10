@@ -31,6 +31,9 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
   def tilesWithUnits: Vector[Occupiable] =
     occupiables.filter(_.occupied)
 
+  def unitsFromTiles(tileList: Vector[Tile]): Vector[Units] =
+    tileList.collect{case a: Occupiable => a}.filter(_.occupied).flatMap(_.occupantOnTile)
+
   
   def neighbors(chosenTile: Tile): Vector[Tile] =
     val x = chosenTile.pos(0)
@@ -68,7 +71,21 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
 
   def tileHidden(tile: Tile, dir: Int): Boolean =
     tileInFront(tile, dir).forall(
-      t => t.pos(2) > tile.pos(2)
+      t => t.pos(2) > tile.pos(2) + 2
     )
+
+  //positive means that it requires JUMP, negative might be used for something
+  def elevationDifference(elevation: Int, tile: Tile): Int =
+    tile.pos(2) - elevation
+
+  //distance of tiles a to b based on their x and y
+  def tileDistance(tiles: (Tile, Tile)): Int =
+    val (a, b) = tiles
+    val (ax, ay, az) = a.pos
+    val (bx, by, bz) = b.pos
+    ((ax-bx).abs+(ay-by).abs)
+
+  def tileInRangeFrom(tile: Tile, range: Int): Vector[Tile] =
+    allTiles.filter(tileDistance(_,tile)==range)
 
 end Grid

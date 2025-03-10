@@ -55,7 +55,7 @@ class TestSword extends Sharp:
   val quick: Boolean = true
 
   //Direct combat stats.
-  val givenPower: Int = 1
+  val givenPower: Int = 5
   val givenHit: Int = 75
   val givenCrit: Int = 1
   val givenRange: (Int, Int) = (1, 1)
@@ -67,7 +67,7 @@ class TestSword extends Sharp:
   val bonusToStats: Map[String, Int] = Map()
 end TestSword
 
-class TestMedkit(heal: Int) extends Medkit(heal):
+class TestMedkit extends Medkit(10):
   val bonusToStats = Map[String, Int]()
   val description = "test medkit"
   val name = "testmeds"
@@ -81,7 +81,7 @@ class TestHelmet extends Armor("head"):
 val club = BluntFile("w_club")
 val mace = BluntFile("d_mace")
 
-val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3)
+val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3, "jump" -> 2)
 val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
 val testStrongMap = Map("hitpoints" -> 5, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
 val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
@@ -114,13 +114,16 @@ class LogTest:
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
-  val units = Vector(unit1, unit2, unit3)
+  val unit4 = Units(ghost)
+  val units = Vector(unit1, unit2, unit3, unit4)
   unit1.setTeam("player")
   unit3.setTeam("player")
   unit2.setTeam("enemy")
+  unit4.setTeam("enemy")
   def dmace = BluntFile("d_mace")
   def wclub = BluntFile("w_club")
-  def testmed = TestMedkit(10)
+  def testspell = TestSpell()
+  def testmed = TestMedkit()
 
   def resetFighters() =
     
@@ -131,6 +134,7 @@ class LogTest:
     val itemi2 = TestSword()
     val itemi3 = TestHelmet()
     val itemi4 = testmed
+    val itemi5 = testspell
     val invi = Inventory(6)
     val invi2 = Inventory(6)
 
@@ -139,13 +143,16 @@ class LogTest:
     itemi2.equip()
     itemi3.equip()
     itemi4.equip()
+    itemi5.equip()
     //unit1.inventory.swap(invi, 0, 0)
     unit1.inventory.add(Some(itemi))
     unit1.inventory.add(Some(dmace))
     unit1.inventory.add(Some(wclub))
+    unit1.inventory.add(Some(testspell))
     unit2.inventory.add(Some(itemi2))
     unit2.inventory.add(Some(itemi3))
     unit3.inventory.add(Some(itemi4))
+    unit4.inventory.add(Some(itemi5))
  
     //unit2.inventory.swap(invi2, 0, 0)
   
@@ -153,6 +160,15 @@ class LogTest:
     val fight12 = Combat(unit1, unit2, 1)
     fight = fight12
   end setF12
+
+  def setF1C() =
+    val target = unit1RangeUnits.head
+    var range = 1
+    field.tileOf(unit1).foreach(t1=>field.tileOf(target)
+      .foreach(t2=> range = field.theGrid.tileDistance(t1,t2)))
+    val fight1C = Combat(unit1, target, range)
+    fight = fight1C
+  end setF1C
 
   def setF32() =
     val heal32 = Combat(unit3, unit2, 1)
@@ -173,15 +189,16 @@ class LogTest:
         gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile), 4, 6,
-      Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0))
+      Vector(1,1,0,0,1,0,0,0,0,0,0,0,2,2,3,0,0,0,0,0,0,0,0,0)) //Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0)
 
     grid.givePostitionToTiles()
     grid.occupiables.head.addOccupant(unit1)
     grid.occupiables(5).addOccupant(unit2)
     grid.occupiables(1).addOccupant(unit3)
+    grid.occupiables(17).addOccupant(unit4)
 
     field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), "win", 0)
+                     new Organization(Vector(), Vector(), storage), "win", 3)
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -190,8 +207,7 @@ class LogTest:
       case "wound" => fight.playWound("head")
       case "heal" => fight.playHeal()
       case "treat" => fight.playTreat("head")
-      case _ =>
-        fight.play()
+      case _ =>      fight.play()
 
 
   def theField: FieldMap =
@@ -235,6 +251,14 @@ class LogTest:
   def moveAreaPosString =
     moveAreaTiles.map(_.pos).mkString(", ")
 
+  def unit1RangeUnits =
+    field.attackRangeUnits(unit1)
+  def unit1CanAtk =
+    field.attackRangeUnits(unit1).nonEmpty
+
+  def unit1CanAtkString =
+    "can attack: "+field.attackRangeUnits(unit1).map(_.name).mkString(", ") + "\n" +
+      fight.forecastString
 
 
 @main
@@ -385,7 +409,7 @@ def test =
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
                          new Organization(Vector(), Vector(), invi5),
-                         "win", 0)
+                         "win", 1)
     field.movementRangeTiles(unit1)
 
   def fileTest() =

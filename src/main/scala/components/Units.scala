@@ -7,6 +7,7 @@ class Units(var character: Character):
   var leader: Option[Unit] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[String] = Set()
+  var statusSet: Set[String] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
   var team: String = ""
@@ -49,6 +50,12 @@ class Units(var character: Character):
     woundsTaken = woundsTaken + wound
   def healWound(wound: String) =
     woundsTaken = woundsTaken - wound
+  def status: Set[String] =
+    statusSet
+  def takeStatus(effect: String) =
+    statusSet = statusSet + effect
+  def healStatus(effect: String) =
+    statusSet = statusSet - effect
 
 
   //Change stat collections
@@ -78,7 +85,7 @@ class Units(var character: Character):
   def statusList: Vector[String] =
     wounds.map("wound "+_).toVector
     ++ armor.map("armor "+_.partName)
-
+    ++ status.toVector
 
   //bonuses
 
@@ -156,7 +163,7 @@ class Units(var character: Character):
   def MOVE: Int = character.move + bonus("move")
 
   //Jump
-  def JUMP: Int = character.move + bonus("jump")
+  def JUMP: Int = character.jump + bonus("jump")
 
   //Range
   def Range: (Int, Int) =
