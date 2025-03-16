@@ -126,10 +126,11 @@ trait Medkit(amount: Int) extends Equipment:
 
 
 
-trait Armor(part: String) extends Equipment:
+trait Armor(part: Part) extends Equipment:
 
   //case Helmet(""), Body, Arms, Legs
-  def partName = part
+  def partName = part.toString
+  def bodyPart = part
   
   private var broken = false
 
@@ -143,6 +144,13 @@ trait Armor(part: String) extends Equipment:
 end Armor
 
 
+enum Part:
+  case Head, Torso, Arms, Legs, AnyPart
+  def similarTo(other: Part): Boolean =
+    this.getClass == other.getClass
+  def partType = this.getClass
+  def name = "head"
+end Part
 
 
 case class BluntFile(filename: String) extends Blunt derives ReadWriter:

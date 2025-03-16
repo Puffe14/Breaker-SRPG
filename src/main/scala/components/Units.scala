@@ -1,4 +1,5 @@
 package components
+import components.Part.Head
 import game.Rules
 val rules = Rules()
 
@@ -6,7 +7,7 @@ class Units(var character: Character):
   val unitsInventory = Inventory(rules.unitInventoryLimit)
   var leader: Option[Unit] = None
   var damageTaken: Int = 0
-  var woundsTaken: Set[String] = Set()
+  var woundsTaken: Set[Part] = Set()
   var statusSet: Set[String] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
@@ -44,11 +45,11 @@ class Units(var character: Character):
       .find(_.partName == part)
       .foreach(breakArmor(_))
 
-  def wounds: Set[String] =
+  def wounds: Set[Part] =
     woundsTaken
-  def takeWound(wound: String) =
+  def takeWound(wound: Part) =
     woundsTaken = woundsTaken + wound
-  def healWound(wound: String) =
+  def healWound(wound: Part) =
     woundsTaken = woundsTaken - wound
   def status: Set[String] =
     statusSet
@@ -83,9 +84,10 @@ class Units(var character: Character):
     character.currentClass.classDebuffs
 
   def statusList: Vector[String] =
-    wounds.map("wound "+_).toVector
-    ++ armor.map("armor "+_.partName)
+    wounds.map("wound "+_.name).toVector
+    ++ armor.map("armor "+_.bodyPart.name)
     ++ status.toVector
+
 
   //bonuses
 
@@ -215,7 +217,7 @@ class Units(var character: Character):
   def HI: Int =
     unitsInventory.equippedWeapon.foreach(n =>
       return (n.hit + (skl + spd*0.5).toInt + bonus("HI")) /
-        (if wounds.contains("head") then 2 else 1)
+        (if wounds.exists(p => p.similarTo(Head)) then 2 else 1)
     )
     0
 

@@ -1,5 +1,6 @@
 package game
 import components.*
+import components.Part.AnyPart
 
 import scala.collection.mutable
 import scala.util.Random
@@ -19,6 +20,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   def everyoneLived: Boolean = !selectedUnit.isDead && !targetUnit.isDead
   def inCounterRange: Boolean = targetUnit.weapon.forall(w => between(range, w.range))
 
+  //ei välltämättä odottamaton määrä dataa, objektiksi?
   def forecast: Map[String,Double] =
     val a = selectedUnit
     val b = targetUnit
@@ -170,7 +172,9 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
 
 
   //method for the performing break/wound attaks
-  def skill(attacker: Units, defender: Units, targetPart: String, skillType: String, weaponUsed: Option[Weapon]) =
+
+  // eri skillit objekteiks???, trait hit skill / no hit or sommin
+  def skill(attacker: Units, defender: Units, targetPart: Part, skillType: String, weaponUsed: Option[Weapon]) =
     var bonusHit = 0
     var damage = 0
     //gives bonus to hitrate if the weapon is effective against enemy
@@ -194,7 +198,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else if isHit then
       if skillType == "break" then
         log += (s"${attacker.name} breaks ${defender.name}'s $targetPart")
-        target.breakPiece(targetPart)
+        target.inventory.equippedArmors.find(_.bodyPart.similarTo(targetPart)).foreach(target.breakArmor(_))
       if skillType == "wound" then
         log += (s"${attacker.name} wounds ${defender.name}'s $targetPart")
         target.takeWound(targetPart)
@@ -225,7 +229,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
-  def selectedAttemptSkill(part: String, skillType: String) =
+  def selectedAttemptSkill(part: Part, skillType: String) =
     if everyoneLived then
       if selectedUnit.weapon.nonEmpty then
         selectedUnit.weapon.foreach(w=>skill(selectedUnit, targetUnit, part, skillType, Some(w)))
@@ -269,7 +273,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     log.toVector
   end play
 
-  def playWound(part: String): Vector[String] =
+  def playWound(part: Part): Vector[String] =
     resetLog()
     log += (s"${selectedUnit.name} wound attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
@@ -282,7 +286,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     log += ("battle ends")
     log.toVector
 
-  def playBreak(part: String): Vector[String] =
+  def playBreak(part: Part): Vector[String] =
     resetLog()
     log += (s"${selectedUnit.name} break attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
@@ -296,7 +300,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     log.toVector
 
 
-  def playTreat(part: String): Vector[String] =
+  def playTreat(part: Part): Vector[String] =
     resetLog()
     log += (s"${selectedUnit.name} treats ${targetUnit.name}")
     //selected treats target
@@ -308,7 +312,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     resetLog()
     log += (s"${selectedUnit.name} heals ${targetUnit.name}")
     //selected treats target
-    selectedAttemptSkill("none", "heal")
+    selectedAttemptSkill(AnyPart, "heal")
     log += ("battle ends")
     log.toVector
 

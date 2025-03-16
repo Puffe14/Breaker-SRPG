@@ -1,4 +1,5 @@
 import components.*
+import components.Part.Head
 import game.*
 
 class TestMace extends Blunt:
@@ -72,7 +73,7 @@ class TestMedkit extends Medkit(10):
   val description = "test medkit"
   val name = "testmeds"
   
-class TestHelmet extends Armor("head"):
+class TestHelmet extends Armor(Head):
   val name = "helmet"
   val description = "a basic helmet"
   val bonusToStats = Map("defence" -> 20)
@@ -203,10 +204,10 @@ class LogTest:
 
   def log(which: String): Vector[String] =
     which match
-      case "break" => fight.playBreak("head")
-      case "wound" => fight.playWound("head")
+      case "break" => fight.playBreak(Head)
+      case "wound" => fight.playWound(Head)
       case "heal" => fight.playHeal()
-      case "treat" => fight.playTreat("head")
+      case "treat" => fight.playTreat(Head)
       case _ =>      fight.play()
 
 
@@ -330,7 +331,7 @@ def test =
       println("")
       println(fight.target)
       println("")
-      fight.playWound("head")
+      fight.playWound(Head)
       println("")
       println(fight.select.wounds)
       println("")
