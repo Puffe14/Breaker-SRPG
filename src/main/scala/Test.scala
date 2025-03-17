@@ -112,6 +112,7 @@ class LogTest:
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
                        new Organization(Vector(), Vector(), new Inventory(50)), "win", 0)
+  val game = Game()
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
@@ -247,7 +248,9 @@ class LogTest:
     field.movementRangeTiles(unit1)
 
   def info =
+    game.currentMap = Some(field)
     units.foreach(println(_))
+    println(game.availableActions(unit1).map(_.toString).mkString("\n"))
 
   def moveAreaPosString =
     moveAreaTiles.map(_.pos).mkString(", ")

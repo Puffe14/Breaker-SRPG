@@ -9,7 +9,7 @@ class FieldMap(enemies: Vector[Group],
                var rotation: Int):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
-  def groups: Vector[Group] = Vector()
+  def groups: Vector[Group] = enemies ++ allies
   def setPlayer(org: Organization) =
     player = org
   def setLeaders() = ()
@@ -31,6 +31,11 @@ class FieldMap(enemies: Vector[Group],
   def tileOf(unit: Units): Option[Occupiable] =
     grid.occupiables
         .find(_.occupantOnTile == Some(unit))
+
+  def unitDistanceFrom(mainTile: Tile, unit: Units): Int =
+    tileOf(unit) match
+      case Some(tile) => theGrid.tileDistance(mainTile, tile)
+      case _ => 0
 
   def moveTo(unit: Units, target: Tile) =
     val former = tileOf(unit)
@@ -95,6 +100,7 @@ class FieldMap(enemies: Vector[Group],
     var tilesFound = Set[Tile]()
     locationTile.foreach( t =>
       tilesFound = moveCheck(movementRange, t, movementType, mover.team, t.pos(2), mover.JUMP).toSet
+      tilesFound += t
     )
     tilesFound
 
@@ -108,5 +114,15 @@ class FieldMap(enemies: Vector[Group],
         unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - mover
     )
     unitsFound
+
+  /**Checks who can be attacked on a particular location.
+   * Returns the unit and distance from checked tile.*/
+  def attackRangeUnitsAt(mover: Units, tile: Tile): Set[(Units,Int,Tile)] =
+
+    val (minR, maxR) = mover.Range
+    var unitsFound = Set[Units]()
+    for i <- minR to maxR do
+      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet - mover
+    unitsFound.map(unit => (unit, unitDistanceFrom(tile, unit), tile))
 
 end FieldMap

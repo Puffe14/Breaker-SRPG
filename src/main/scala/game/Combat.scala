@@ -29,7 +29,7 @@ import scala.util.Random
     )
     damage
 
-class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
+class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   val rules = Rules()
   var log: mutable.Buffer[String] = mutable.Buffer()
   
@@ -99,7 +99,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else
       log += (s"${attacker.name} misses ${defender.name}")
   end attack
-  
+
 
   def playAttack(attacker: Units, defender: Units) =
     if everyoneLived then
@@ -155,6 +155,9 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     log += ("battle ends")
     log.toVector
   end play
+
+  override def toString =
+    forecastString
 
 end Combat
 
@@ -244,7 +247,7 @@ class Skill(selectedUnit: Units, targetUnit: Units, range: Int) extends Combat(s
       skill(selectedUnit, targetUnit)
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
-      
+
   override def play(): Vector[String] =
     resetLog()
     log += (s"${selectedUnit.name} ${this.toString}s ${targetUnit.name}")
@@ -266,7 +269,7 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
     var cost = 0
     selectedUnit.weapon.foreach(w=> cost = lowest(w.weight/2, 2))
     cost
-    
+
   def spend(attacker: Units) = attacker.weapon.foreach(w => w.spend(skillCost))
 
   // eri skillit objekteiks???, trait hit skill / no hit or sommin

@@ -63,6 +63,7 @@ trait Equipment extends Item:
 
 end Equipment
 
+
 trait Weapon extends Equipment:
 //trait Weapon(filename: String) extends Equipment:
 
