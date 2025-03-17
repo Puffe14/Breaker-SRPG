@@ -5,6 +5,29 @@ import components.Part.AnyPart
 import scala.collection.mutable
 import scala.util.Random
 
+  //evalution methods
+  def lowest(evaluation: Int, minimum: Int): Int =
+    if evaluation > minimum then evaluation
+    else minimum
+  def highest(evaluation: Int, maximum: Int): Int =
+    if evaluation < maximum then evaluation
+    else maximum
+  def between(int: Int, pair: (Int,Int)) =
+    pair(0) >= int && int <= pair(1)
+  private def quick(unit: Units): Boolean =
+   unit.weapon.forall(_.quick)
+  def predictDmg(attacker: Units, defender: Units): Int =
+    var damage = 0
+    attacker.weapon.foreach( weapon =>
+      val isEffective = //if the attackers weapon has an effectiveness against defenders type
+         defender.types.exists(weapon.effective.contains(_))
+      if      weapon.typing == "force" then
+        damage = lowest(attacker.AT - defender.PD, 0)
+      else if weapon.typing == "magic" then
+        damage = lowest(attacker.AT - defender.MD, 0)
+      if isEffective then damage *= rules.effectiveMultipllier
+    )
+    damage
 
 class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   val rules = Rules()
@@ -19,116 +42,6 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
   def roll100: Int = Random().nextInt(100)
   def everyoneLived: Boolean = !selectedUnit.isDead && !targetUnit.isDead
   def inCounterRange: Boolean = targetUnit.weapon.forall(w => between(range, w.range))
-
-  //ei välltämättä odottamaton määrä dataa, objektiksi?
-  def forecast: Map[String,Double] =
-    val a = selectedUnit
-    val b = targetUnit
-    //predicted dmg
-    val aDmg = predictDmg(a, b)
-    val bDmg = predictDmg(b, a)
-    //total hit and crit rate
-    val aHitCrit = predictHitCrit(a, b)
-    val bHitCrit = predictHitCrit(b, a)
-    //the number of attacks including quick doubles
-    val aAtks = predictAtks(a)
-    val bAtks = predictAtks(b)
-    //TOTAL dmg
-    val aTotal = aDmg * aAtks
-    val bTotal = bDmg * bAtks
-    //Hidden expected value calculation, for AI (Let players make decisions, no value judgements)
-    val aEV = EV(aDmg, aHitCrit(0), aHitCrit(1), aAtks)
-    val bEV = EV(bDmg, bHitCrit(0), bHitCrit(1), bAtks)
-    //the direction of attacks
-    val arrow =
-      if skillDifference < -rules.vantageDiff && targetCanAttack then
-        0 //"<-"
-      else if attackSpeedDifference > rules.alacrityDiff then
-        1 //"->->"
-      else
-        2 //"->"
-    //Provides a map of all calculated results for outside use.
-    Map("aDmg" ->aDmg,       "bDmg"->bDmg,
-        "aHit"->aHitCrit(0), "bHit"->bHitCrit(0),
-        "aCrit"->aHitCrit(1),"bCrit"->bHitCrit(1),
-        "aAtks"->aAtks,      "bAtks"->bAtks,
-        "aTotal"->aTotal,     "bTotal"->bTotal,
-        "aEV"->aEV,          "bEV"->bEV,
-        "arrow"->arrow
-    )
-
-  def forecastString: String =
-    val f = forecast
-    val direction = f("arrow").toInt match
-      case 1 => "->->"
-      case 0 => "<-"
-      case _ => "->"
-    /*s"\n${select.name} x${f("aAtks")}:\n DMG ${f("aDmg")}, HIT ${f("aHit")}, CRIT ${f("aCrit")}" +
-    s"\n$direction\n" +
-    s"${target.name} x${f("bAtks")}:\n DMG ${f("bDmg")}, HIT ${f("bHit")}, CRIT ${f("bCrit")}"*/
-    s"${select.name} x${f("aAtks")}: DMG ${f("aDmg")}, HIT ${f("aHit")}, CRIT ${f("aCrit")}" +
-    s"   $direction"   +
-    s"${target.name} x${f("bAtks")}: DMG ${f("bDmg")}, HIT ${f("bHit")}, CRIT ${f("bCrit")}"
-
-
-  /** Estimated value for attacks. dmg is already calculated */
-  private def EV(dmg: Int, hit: Int, crit: Int, times: Int): Double =
-    var total = 0.0
-    val dhit = hit/100.0
-    val dcrit = crit/100.0
-    val notcrit = 1 - dcrit
-    //not critting possibilities
-    total += notcrit*dmg
-    //critting
-    total += dcrit*dmg*rules.critMultiplier
-    //hitting
-    total *= dhit
-    //damage hits or crits * chance for either * times executed
-    total*times
-
-  private def predictAtks(unit: Units) =
-    val strikes = if quick(unit) then 2 else 1
-    if unit == selectedUnit then
-      selectedAttacks*strikes
-    else if unit == targetUnit then
-      targetAttacks*strikes
-    else 0
-
-  private def predictDmg(attacker: Units, defender: Units): Int =
-    var damage = 0
-    attacker.weapon.foreach( weapon =>
-      val isEffective = //if the attackers weapon has an effectiveness against defenders type
-         defender.types.exists(weapon.effective.contains(_))
-      if      weapon.typing == "force" then
-        damage = lowest(attacker.AT - defender.PD, 0)
-      else if weapon.typing == "magic" then
-        damage = lowest(attacker.AT - defender.MD, 0)
-      if isEffective then damage *= rules.effectiveMultipllier
-    )
-    damage
-
-  private def quick(unit: Units): Boolean =
-   unit.weapon.forall(_.quick)
-
-  private def predictHitCrit(attacker: Units, defender: Units): (Int, Int) =
-    var hit = 0
-    var crit = 0
-    attacker.weapon.foreach( weapon =>
-      hit  = highest(lowest(attacker.HI - defender.AV, 0), 100)
-      crit = highest(lowest(attacker.CR - defender.CA, 0), 100)
-    )
-    (hit, crit)
-
-
-  //evalution methods
-  private def lowest(evaluation: Int, minimum: Int): Int =
-    if evaluation > minimum then evaluation
-    else minimum
-  private def highest(evaluation: Int, maximum: Int): Int =
-    if evaluation < maximum then evaluation
-    else maximum
-  private def between(int: Int, pair: (Int,Int)) =
-    pair(0) >= int && int <= pair(1)
 
 
   //methods for seeing if a unit can still fight
@@ -155,6 +68,22 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
     else if attackSpeedDifference < -rules.doubleDiff then 2
     else 1
 
+  def forecast =
+    Forecast(selectedUnit,targetUnit,selectedAttacks,targetAttacks,skillDifference,attackSpeedDifference)
+
+  def forecastString: String =
+    val f = forecast
+    val direction = f.arrow match
+      case 1 => "->->"
+      case 0 => "<-"
+      case _ => "->"
+    /*s"\n${select.name} x${f.aAtks}:\n DMG ${f.aDmg}, HIT ${f.aHit}, CRIT ${f.aCrit}" +
+    s"\n$direction\n" +
+    s"${target.name} x${f.bAtks}:\n DMG ${f.bDmg}, HIT ${f.bHit}, CRIT ${f.bCrit}"*/
+    s"${select.name} x${f.aAtks}: DMG ${f.aDmg}, HIT ${f.aHit}, CRIT ${f.aCrit}" +
+    s"   $direction   " +
+    s"${target.name} x${f.bAtks}: DMG ${f.bDmg}, HIT ${f.bHit}, CRIT ${f.bCrit}"
+  
 
   //method for the performing attacks
   def attack(attacker: Units, defender: Units, weapon: Weapon) =
@@ -318,3 +247,78 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int):
 
 
 end Combat
+
+
+
+//ei välltämättä odottamaton määrä dataa, objektiksi?
+class Forecast(a: Units, b: Units, aAtkNum: Int, bAtkNum: Int, skill: Int, speed: Int):
+  //Provides all calculated results for outside use.
+
+  //predicted dmg
+  val aDmg = predictDmg(a, b)
+  val bDmg = predictDmg(b, a)
+  //total hit and crit rate
+  val (aHit, aCrit) = predictHitCrit(a, b)
+  val (bHit, bCrit) = predictHitCrit(b, a)
+  //the number of attacks including quick doubles
+  val aAtks = predictAtks(a)
+  val bAtks = predictAtks(b)
+  //TOTAL dmg
+  val aTotal = aDmg * aAtks
+  val bTotal = bDmg * bAtks
+  //Hidden expected value calculation, for AI (Let players make decisions, no value judgements)
+  val aEV = EV(aDmg, aHit, aCrit, aAtks)
+  val bEV = EV(bDmg, bHit, bCrit, bAtks)
+  //the direction of attacks
+  val arrow =
+    if skill < -rules.vantageDiff && bAtkNum > 0 then
+      0 //"<-"
+    else if speed > rules.alacrityDiff then
+      1 //"->->"
+    else
+      2 //"->"
+
+  /** Estimated value for attacks. dmg is already calculated */
+  private def EV(dmg: Int, hit: Int, crit: Int, times: Int): Double =
+    var total = 0.0
+    val dhit = hit/100.0
+    val dcrit = crit/100.0
+    val notcrit = 1 - dcrit
+    //not critting possibilities
+    total += notcrit*dmg
+    //critting
+    total += dcrit*dmg*rules.critMultiplier
+    //hitting
+    total *= dhit
+    //damage hits or crits * chance for either * times executed
+    total*times
+
+  private def predictAtks(unit: Units) =
+    val strikes = if quick(unit) then 2 else 1
+    if unit == a then
+      aAtkNum*strikes
+    else if unit == b then
+      bAtkNum*strikes
+    else 0
+
+  private def predictDmg(attacker: Units, defender: Units): Int =
+    var damage = 0
+    attacker.weapon.foreach( weapon =>
+      val isEffective = //if the attackers weapon has an effectiveness against defenders type
+         defender.types.exists(weapon.effective.contains(_))
+      if      weapon.typing == "force" then
+        damage = lowest(attacker.AT - defender.PD, 0)
+      else if weapon.typing == "magic" then
+        damage = lowest(attacker.AT - defender.MD, 0)
+      if isEffective then damage *= rules.effectiveMultipllier
+    )
+    damage
+
+  private def predictHitCrit(attacker: Units, defender: Units): (Int, Int) =
+    var hit = 0
+    var crit = 0
+    attacker.weapon.foreach( weapon =>
+      hit  = highest(lowest(attacker.HI - defender.AV, 0), 100)
+      crit = highest(lowest(attacker.CR - defender.CA, 0), 100)
+    )
+    (hit, crit)

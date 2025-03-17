@@ -144,15 +144,6 @@ trait Armor(part: Part) extends Equipment:
 end Armor
 
 
-enum Part:
-  case Head, Torso, Arms, Legs, AnyPart
-  def similarTo(other: Part): Boolean =
-    this.getClass == other.getClass
-  def partType = this.getClass
-  def name = "head"
-end Part
-
-
 case class BluntFile(filename: String) extends Blunt derives ReadWriter:
   val wdata = ItemWeapon.getItem(filename)
   val name = wdata("name").str

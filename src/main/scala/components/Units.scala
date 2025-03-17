@@ -8,7 +8,7 @@ class Units(var character: Character):
   var leader: Option[Unit] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[Part] = Set()
-  var statusSet: Set[String] = Set()
+  var statusSet: Set[Status] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
   var team: String = ""
@@ -40,9 +40,9 @@ class Units(var character: Character):
   def breakArmor(piece: Armor) =
     piece.break()
     
-  def breakPiece(part: String) =
+  def breakPiece(part: Part) =
     inventory.armors
-      .find(_.partName == part)
+      .find(_.bodyPart.similarTo(part))
       .foreach(breakArmor(_))
 
   def wounds: Set[Part] =
@@ -51,11 +51,11 @@ class Units(var character: Character):
     woundsTaken = woundsTaken + wound
   def healWound(wound: Part) =
     woundsTaken = woundsTaken - wound
-  def status: Set[String] =
+  def status: Set[Status] =
     statusSet
-  def takeStatus(effect: String) =
+  def takeStatus(effect: Status) =
     statusSet = statusSet + effect
-  def healStatus(effect: String) =
+  def healStatus(effect: Status) =
     statusSet = statusSet - effect
 
 
@@ -86,7 +86,7 @@ class Units(var character: Character):
   def statusList: Vector[String] =
     wounds.map("wound "+_.name).toVector
     ++ armor.map("armor "+_.bodyPart.name)
-    ++ status.toVector
+    ++ status.map(_.fileName).toVector
 
 
   //bonuses
