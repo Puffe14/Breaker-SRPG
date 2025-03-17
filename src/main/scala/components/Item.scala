@@ -12,6 +12,7 @@ trait Item {
 trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: Int) extends Item:
   //Item effect is handled differently based on item type.
   def effects = effectToStats
+  def utilize(unit: Units) = use()
   def use() =
     uses += 1
   def isEmpty: Boolean =
@@ -22,15 +23,22 @@ end Consumable
 
 //Provides HP up to max
 trait Healing(e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable:
-  //override def use() =
-    //uses += 1
   def heal = amount
+  override def utilize(unit: Units) =
+    unit.healDamage(heal)
+    use()
 
 //Gives a temporary boost on stat(s)
-trait Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable
+trait Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable:
+  override def utilize(unit: Units) =
+    effects.foreach(n => unit.addTemporaryStat(n(0), n(1)))
+    use()
 
 //Gives a permanent increase to a stat
-trait Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable
+trait Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable:
+  override def utilize(unit: Units) =
+    effects.foreach(n => unit.addPermanent(n(0), n(1)))
+    use()
 
 
 trait Equipment extends Item:

@@ -118,21 +118,8 @@ class Units(var character: Character):
 
   //Item and loot handling
 
-  def useItem(item: Item) =
-    item match
-      //heals unit
-      case co: Healing =>
-        healDamage(co.heal)
-        co.use()
-      //gives a temporary boost to stats
-      case bo: Booster =>
-        bo.effects.foreach(n => addTemporaryStat(n(0), n(1)))
-        bo.use()
-      //gives a permanent increase to character stat
-      case br: Brand   =>
-        br.effects.foreach(n => addPermanent(n(0), n(1)))
-        br.use()
-      case _ =>
+  def useItem(item: Consumable) =
+    item.utilize(this)
 
   def equip(item: Item) =
     item match
