@@ -1,5 +1,5 @@
 import components.*
-import components.Part.Head
+import components.Part.*
 import game.*
 
 class TestMace extends Blunt:
@@ -204,10 +204,10 @@ class LogTest:
 
   def log(which: String): Vector[String] =
     which match
-      case "break" => fight.playBreak(Head)
-      case "wound" => fight.playWound(Head)
-      case "heal" => fight.playHeal()
-      case "treat" => fight.playTreat(Head)
+      case "break" => Break(unit1,unit2,1,Head).play()
+      case "wound" => Wound(unit1,unit2,1,Head).play()
+      case "heal" =>  Heal(unit3,unit1,1,testmed).play()
+      case "treat" => Treat(unit3,unit2,1,testmed,Head).play()
       case _ =>      fight.play()
 
 
@@ -262,8 +262,11 @@ class LogTest:
       fight.forecastString
 
 
+
+
+
 @main
-def test =
+def test() =
 
   val itemi = TestMace()
   val itemi2 = TestMace()
@@ -331,7 +334,7 @@ def test =
       println("")
       println(fight.target)
       println("")
-      fight.playWound(Head)
+      //fight.playWound(Head)
       println("")
       println(fight.select.wounds)
       println("")

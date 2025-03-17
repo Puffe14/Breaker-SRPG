@@ -184,6 +184,7 @@ object Main extends JFXApp3:
 
   val iconImages =
     Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
+        "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
         "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")))
 
 
