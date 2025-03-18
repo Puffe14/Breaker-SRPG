@@ -118,7 +118,6 @@ class FieldMap(enemies: Vector[Group],
   /**Checks who can be attacked on a particular location.
    * Returns the unit and distance from checked tile.*/
   def attackRangeUnitsAt(mover: Units, tile: Tile): Set[(Units,Int,Tile)] =
-
     val (minR, maxR) = mover.Range
     var unitsFound = Set[Units]()
     for i <- minR to maxR do

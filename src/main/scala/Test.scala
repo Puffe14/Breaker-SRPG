@@ -209,6 +209,7 @@ class LogTest:
       case "wound" => Wound(unit1,unit2,1,Head).play()
       case "heal" =>  Heal(unit3,unit1,1,testmed).play()
       case "treat" => Treat(unit3,unit2,1,testmed,Head).play()
+      case "ai" => game.nextOnStack().play()
       case _ =>      fight.play()
 
 
@@ -264,6 +265,10 @@ class LogTest:
     "can attack: "+field.attackRangeUnits(unit1).map(_.name).mkString(", ") + "\n" +
       fight.forecastString
 
+  def AIup() =
+    AI.game = game
+    AI.currentUnit = Some(unit2)
+    AI.executeActions()
 
 
 

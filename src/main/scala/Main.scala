@@ -66,7 +66,7 @@ object Main extends JFXApp3:
       println("\n \"fight\" / \"reset\" / \"move Int Int\" / \"equip Int\" / \"inventory\":"+
       s"\n${testObject.moveAreaPosString}\nwpns: ${testObject.weaponsUnit1String}\n${testObject.unit1CanAtkString}")
       val command = readLine()
-
+      testObject.theField.clearDead()
       command match
 
         case "fight" =>
@@ -94,6 +94,11 @@ object Main extends JFXApp3:
         case "treat" =>
           testObject.setF32()
           event = "treat"
+          reset()
+
+        case "ai" =>
+          testObject.AIup()
+          event = "ai"
           reset()
 
         case "reset" =>

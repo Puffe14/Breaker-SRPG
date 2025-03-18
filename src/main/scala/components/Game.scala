@@ -1,7 +1,5 @@
 package components
 
-import game.Combat
-
 
 class Game:
   var currentMapNumber: Int = 0
@@ -11,6 +9,17 @@ class Game:
   var player: Option[Organization] = None
   var acting: Option[Units] = None
   var target: Option[Units] = None
+  var stack: Iterator[Action] = Iterator()
+
+  // ACTION STACK
+
+  def addToStack(act: Action) =
+    stack = stack ++ Iterable(act)
+
+  def nextOnStack(): Action =
+    if stack.nonEmpty then stack.next()
+    else new EmptyAction()
+
 
   def availableActions(unit: Units): Vector[Action] =
     currentMap match
@@ -20,7 +29,9 @@ class Game:
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile))) //Who can be attacked? --(who, from)
           .toSet //all available unit, distance, tile combinations
           .map((targetable, distance, currentTile) =>
-            Combat(unit, targetable, distance))
+            val newAction = Combat(unit, targetable, distance)
+            newAction.location = Some(currentTile)
+            newAction)
           .toVector
 
   def initialize() =

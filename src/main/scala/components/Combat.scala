@@ -1,6 +1,8 @@
-package game
+package components
+
 import components.*
 import components.Part.AnyPart
+import game.Rules
 
 import scala.collection.mutable
 import scala.util.Random
