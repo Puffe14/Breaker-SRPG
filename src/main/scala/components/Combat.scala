@@ -155,6 +155,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
     if selectedUnit.isDead then log += (s"${selectedUnit.name} died")
     else if targetUnit.isDead then log += (s"${targetUnit.name} died")
     log += ("battle ends")
+    selectedUnit.endTurn()
     log.toVector
   end play
 

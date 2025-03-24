@@ -1,5 +1,6 @@
 package components
 import components.Part.Head
+import components.Team.Ally
 import game.Rules
 val rules = Rules()
 
@@ -11,7 +12,10 @@ class Units(var character: Character):
   var statusSet: Set[Status] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
-  var team: String = ""
+  var team: Team = Ally
+  
+  var moved = false
+  var acted = false
 
   def name: String = character.name
   def weapon = unitsInventory.equippedWeapon
@@ -20,7 +24,7 @@ class Units(var character: Character):
   def unitClass = character.currentClass
   def types = unitClass.classType
   def inventory = unitsInventory
-  def setTeam(newTeam: String) = team = newTeam
+  def setTeam(newTeam: Team) = team = newTeam
 
   //Check if the unit has been killed.
   def isDead = !isAlive
@@ -58,6 +62,15 @@ class Units(var character: Character):
   def healStatus(effect: Status) =
     statusSet = statusSet - effect
 
+  //turn handling
+  def endTurn() =
+    moved = true
+    acted = true
+  def refresh() =
+    moved = false
+    acted = false
+  def turnOver = acted
+  def moveOver = moved
 
   //Change stat collections
   def addPermanent(which: String, amount: Int) =

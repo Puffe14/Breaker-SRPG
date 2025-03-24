@@ -3,9 +3,11 @@ package components
 
 class Group(var members: Vector[Units], var behaviour: Behaviour,
             var side: Team, var conditionMet: Boolean = false):
+  def haveNotActed =
+    members.filterNot(m=>m.turnOver||m.isDead)
   def conditionTrue: Boolean =
     conditionMet
-  def changeSide() = ()
+  def changeSide(newSide: Team) = side = newSide
   def changeBehaviour(newBehaviour: Behaviour) =
     behaviour = newBehaviour
   def metCondition() =
@@ -14,6 +16,7 @@ end Group
 
 
 enum Behaviour:
+  //def a = ()
   case Agressive, Stand, onSight, Reach
 
 

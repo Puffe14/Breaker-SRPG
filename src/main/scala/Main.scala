@@ -10,6 +10,7 @@ import scalafx.scene.paint.Color.*
 import scala.io.StdIn.readLine
 import java.io.FileInputStream
 import scala.collection.mutable
+import components.Team.*
 
 object Main extends JFXApp3:
 
@@ -41,7 +42,7 @@ object Main extends JFXApp3:
   val testObject = LogTest()
   testObject.setF12()
   testObject.setGrid()
-  var log = testObject.log(event).filterNot(n => n.contains("left")||n.contains("can"))
+  var log = Vector("")
   var iteratorLog = log.iterator
 
   def reset() =
@@ -56,16 +57,17 @@ object Main extends JFXApp3:
     miss = false
     atkDead = false
     defDead = false
-    log = testObject.log(event).filterNot(n => n.contains("left")||n.contains("can"))
+    log = testObject.log(event).filterNot(n => n.contains("left")||n.contains("can")||n.contains("Empty Action"))
     iteratorLog = log.iterator
     println(log)
+    if log.exists(_.contains("waited")) then log = Vector()
   end reset
 
   def checkOver() =
     if over then
       println("\n \"fight\" / \"reset\" / \"move Int Int\" / \"equip Int\" / \"inventory\":"+
       s"\n${testObject.moveAreaPosString}\nwpns: ${testObject.weaponsUnit1String}\n${testObject.unit1CanAtkString}")
-      val command = readLine()
+      val command = if testObject.AIcontrol then "pass" else readLine()
       testObject.theField.clearDead()
       command match
 
@@ -97,9 +99,16 @@ object Main extends JFXApp3:
           reset()
 
         case "ai" =>
-          testObject.AIup()
           event = "ai"
           reset()
+
+        case "pass" =>
+          event = "pass"
+          reset()
+
+        case "turn" =>
+          event = "turn"
+          testObject.game.refreshAll()
 
         case "reset" =>
           event = ""
@@ -303,7 +312,7 @@ object Main extends JFXApp3:
         t.occupantOnTile.foreach(u =>
           //var tileInt = 0
           val pos = t.pos
-          val flip = u.team != "player"
+          val flip = u.team != Player
           //println(u.name +" at "+pos)
           val x = tilePosX(pos) + tileScale*8
           val y = tilePosY(pos) - tileScale*12   - pos(2)*8*tileScale

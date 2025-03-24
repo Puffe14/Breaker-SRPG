@@ -1,4 +1,6 @@
 package components
+import components.Team.Enemy
+
 import scala.collection.mutable
 
 class FieldMap(enemies: Vector[Group],
@@ -17,7 +19,7 @@ class FieldMap(enemies: Vector[Group],
     clearCondition match
       case "defend" => false
       case "defeat" => false
-      case "route"  => grid.unitsOnTiles.forall(_.team!="enemy")
+      case "route"  => grid.unitsOnTiles.forall(_.team!=Enemy)
       case _ => false
   def theGrid = grid
   def SAVEABLE: String = ""
@@ -50,10 +52,12 @@ class FieldMap(enemies: Vector[Group],
                        .forall(_.isDead))
                        .foreach(_.removeOccupant())
 
+  def unitsOnTeam(team: Team) =
+    allCharacters.filter(_.team == team)
 
   //Methdos for determining which tiles a unit could occupy with current MOVE
 
-  def moveCheck(moveLeft: Double, tile: Tile, types: Vector[String], team: String, elevation: Int, jump: Int): Vector[Tile] =
+  def moveCheck(moveLeft: Double, tile: Tile, types: Vector[String], team: Team, elevation: Int, jump: Int): Vector[Tile] =
 
     def findSurrounding(thisOneOk: Boolean) =
       val accessibles = mutable.Buffer[Tile]()

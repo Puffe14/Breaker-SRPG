@@ -20,6 +20,8 @@ class Game:
     if stack.nonEmpty then stack.next()
     else new EmptyAction()
 
+  def clearStack(): Unit =
+    stack = Iterator()
 
   def availableActions(unit: Units): Vector[Action] =
     currentMap match
@@ -38,5 +40,20 @@ class Game:
     ()
   def handleTurn() =
     ()
+
+  def move(u: Units): Option[Move] =
+    currentMap match
+      case Some(fm) => Some(Move(u, fm))
+      case _ => None
+
+  def refreshAll() =
+    clearStack()
+    currentMap.foreach(
+      _.allCharacters.foreach(_.refresh())
+    )
+
+  //TESTING
+  def enemyTurnOver =
+    currentMap.forall(_.unitsOnTeam(Team.Enemy).forall(_.turnOver))
 
 end Game

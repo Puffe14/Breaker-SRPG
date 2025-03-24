@@ -1,5 +1,7 @@
 import components.*
+import components.Behaviour.Agressive
 import components.Part.*
+import components.Team.*
 import game.*
 
 class TestMace extends Blunt:
@@ -82,9 +84,9 @@ class TestHelmet extends Armor(Head):
 val club = BluntFile("w_club")
 val mace = BluntFile("d_mace")
 
-val testStatMap = Map("hitpoints" -> 5, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3, "jump" -> 2)
+val testStatMap = Map("hitpoints" -> 55, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3, "jump" -> 2)
 val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
-val testStrongMap = Map("hitpoints" -> 5, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
+val testStrongMap = Map("hitpoints" -> 25, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
 val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
 val testZeroMap = Map("hitpoints" -> 0, "strength" -> 0, "magic" -> 0, "skill" -> 0, "speed" -> 0, "defence" -> 0, "resistance" -> 0, "movement" -> 0)
 val test100Map = Map("hitpoints" -> 100, "strength" -> 100, "magic" -> 100, "skill" -> 100, "speed" -> 100, "defence" -> 100, "resistance" -> 100)
@@ -109,26 +111,28 @@ end testWall
 
 
 class LogTest:
-  var fight = Combat(Units(bonk), Units(bonk), 1)
-  var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0)
   val game = Game()
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
   val unit4 = Units(ghost)
   val units = Vector(unit1, unit2, unit3, unit4)
-  unit1.setTeam("player")
-  unit3.setTeam("player")
-  unit2.setTeam("enemy")
-  unit4.setTeam("enemy")
+  val group = Group(Vector(unit2, unit4),Agressive,Enemy)
+  var ai = false
+  var fight = Combat(Units(bonk), Units(bonk), 1)
+  var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
+                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0)
+
+  unit1.setTeam(Player)
+  unit3.setTeam(Player)
+  unit2.setTeam(Enemy)
+  unit4.setTeam(Enemy)
   def dmace = BluntFile("d_mace")
   def wclub = BluntFile("w_club")
   def testspell = TestSpell()
   def testmed = TestMedkit()
 
   def resetFighters() =
-    
     units.foreach(_.healDamage(100))
     units.foreach(_.inventory.removeAll())
 
@@ -209,7 +213,12 @@ class LogTest:
       case "wound" => Wound(unit1,unit2,1,Head).play()
       case "heal" =>  Heal(unit3,unit1,1,testmed).play()
       case "treat" => Treat(unit3,unit2,1,testmed,Head).play()
-      case "ai" => game.nextOnStack().play()
+      case "ai" => AIup()
+      case "pass" =>
+        if game.stack.isEmpty && !game.enemyTurnOver then
+          AIup()
+        else
+          game.nextOnStack().play()
       case _ =>      fight.play()
 
 
@@ -265,13 +274,19 @@ class LogTest:
     "can attack: "+field.attackRangeUnits(unit1).map(_.name).mkString(", ") + "\n" +
       fight.forecastString
 
-  def AIup() =
+  def AIup(): Vector[String] =
+    game.currentMap = Some(field)
     AI.game = game
     AI.currentUnit = Some(unit2)
-    AI.executeActions()
+    AI.currentGroup = Some(group)
+    AI.continue(group)
+    ai = true
+    //println("Ai up "+game.stack.mkString(", "))
+    Vector()
 
-
-
+  def AIcontrol: Boolean =
+    if game.enemyTurnOver then ai = false
+    ai
 
 @main
 def test() =
