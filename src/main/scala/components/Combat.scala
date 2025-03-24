@@ -166,7 +166,6 @@ end Combat
 
 
 
-//ei välltämättä odottamaton määrä dataa, objektiksi?
 class Forecast(a: Units, b: Units, aAtkNum: Int, bAtkNum: Int, skill: Int, speed: Int):
   //Provides all calculated results for outside use.
 
@@ -257,6 +256,7 @@ class Skill(selectedUnit: Units, targetUnit: Units, range: Int) extends Combat(s
     //selected treats target
     selectedAttemptSkill()
     log += ("battle ends")
+    selectedUnit.endTurn()
     log.toVector
 
   // eri skillit objekteiks???, trait hit skill / no hit or sommin
@@ -322,6 +322,7 @@ class Wound(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) exte
     //target counters once if possible
     targetStrikes()
     log += ("battle ends")
+    selectedUnit.endTurn()
     log.toVector
 
   override def skillEffect(attacker: Units, defender: Units) =
@@ -342,6 +343,7 @@ class Break(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) exte
     //target counters once if possible
     targetStrikes()
     log += ("battle ends")
+    selectedUnit.endTurn()
     log.toVector
 
   override def skillEffect(attacker: Units, defender: Units): Unit =

@@ -5,6 +5,8 @@ class Group(var members: Vector[Units], var behaviour: Behaviour,
             var side: Team, var conditionMet: Boolean = false):
   def haveNotActed =
     members.filterNot(m=>m.turnOver||m.isDead)
+  def doneActing =
+    haveNotActed.isEmpty
   def conditionTrue: Boolean =
     conditionMet
   def changeSide(newSide: Team) = side = newSide
@@ -17,7 +19,7 @@ end Group
 
 enum Behaviour:
   //def a = ()
-  case Agressive, Stand, onSight, Reach
+  case Agressive, Stand, OnSight, Reach
 
 
 //change unit and move methods to follow Team

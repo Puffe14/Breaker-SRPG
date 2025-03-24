@@ -98,6 +98,40 @@ class Inventory(slotCount: Int):
     }
     weaponInSlots
 
+  def medkit: Vector[Medkit] =
+    //fromSlots(Vector[Medkit]())
+    val slotted = items.flatten
+    var medInSlots: Vector[Medkit] = Vector()
+
+    slotted.foreach {
+      case med: Medkit =>
+        medInSlots = medInSlots.appended(med)
+      case _ =>
+    }
+    medInSlots
+    
+  def consumables: Vector[Consumable] =
+    val slotted = items.flatten
+    var medInSlots: Vector[Consumable] = Vector()
+
+    slotted.foreach {
+      case med: Consumable =>
+        medInSlots = medInSlots.appended(med)
+      case _ =>
+    }
+    medInSlots
+
+  def fromSlots[T](itemClass: Vector[T]): Vector[T] =
+    val slotted = items.flatten
+    var itemInSlots: Vector[T] = Vector()
+
+    slotted.foreach {
+      case item: T =>
+        itemInSlots = itemInSlots.appended(item)
+      case _ =>
+    }
+    itemInSlots
+
   //---------------------
 
   def equipWeapon(weapon: Weapon) =

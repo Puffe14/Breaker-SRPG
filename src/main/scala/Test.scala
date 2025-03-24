@@ -74,7 +74,11 @@ class TestMedkit extends Medkit(10):
   val bonusToStats = Map[String, Int]()
   val description = "test medkit"
   val name = "testmeds"
-  
+
+class TestSoup extends Healing(Map[String, Int](), 1, 3, 10):
+  override val name: String = "Soup"
+  override val description: String = "Tasty soup."
+
 class TestHelmet extends Armor(Head):
   val name = "helmet"
   val description = "a basic helmet"
@@ -117,20 +121,21 @@ class LogTest:
   val unit3 = Units(bonk)
   val unit4 = Units(ghost)
   val units = Vector(unit1, unit2, unit3, unit4)
-  val group = Group(Vector(unit2, unit4),Agressive,Enemy)
+  val group = Group(Vector(unit2, unit4, unit3),Agressive,Enemy)
   var ai = false
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0)
+                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0, 0)
 
   unit1.setTeam(Player)
-  unit3.setTeam(Player)
+  unit3.setTeam(Enemy)
   unit2.setTeam(Enemy)
   unit4.setTeam(Enemy)
   def dmace = BluntFile("d_mace")
   def wclub = BluntFile("w_club")
   def testspell = TestSpell()
   def testmed = TestMedkit()
+  def testsoup = TestSoup()
 
   def resetFighters() =
     units.foreach(_.healDamage(100))
@@ -148,7 +153,7 @@ class LogTest:
     itemi.equip()
     itemi2.equip()
     itemi3.equip()
-    itemi4.equip()
+    //itemi4.equip()
     itemi5.equip()
     //unit1.inventory.swap(invi, 0, 0)
     unit1.inventory.add(Some(itemi))
@@ -158,6 +163,7 @@ class LogTest:
     unit2.inventory.add(Some(itemi2))
     unit2.inventory.add(Some(itemi3))
     unit3.inventory.add(Some(itemi4))
+    unit3.inventory.add(Some(testsoup))
     unit4.inventory.add(Some(itemi5))
  
     //unit2.inventory.swap(invi2, 0, 0)
@@ -204,7 +210,7 @@ class LogTest:
     grid.occupiables(17).addOccupant(unit4)
 
     field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), "win", 3)
+                     new Organization(Vector(), Vector(), storage), "win", 3, 0)
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -436,7 +442,7 @@ def test() =
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
                          new Organization(Vector(), Vector(), invi5),
-                         "win", 1)
+                         "win", 1, 0)
     field.movementRangeTiles(unit1)
 
   def fileTest() =

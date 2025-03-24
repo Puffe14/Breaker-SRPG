@@ -1,10 +1,14 @@
 package components
 
-case class Status(name: String, file: String):
+trait Status(name: String, file: String):
   def fileName = file
   def description = "a status effect"
   override def toString = name
 end Status
+
+
+class Confused extends Status("confused","status_confused"):
+  override def description = "The character is confused and acts at random."
 
 
 enum Part:

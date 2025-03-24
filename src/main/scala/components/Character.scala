@@ -34,8 +34,9 @@ class Character(
   def levelUp(): Map[String, Int] =
     val levelUpsMap = mutable.Map[String, Int]()
     val roll = Random().nextInt(100)
-    growths.keys.foreach(stat =>
-      val currentG = growths(stat)
+    val leveled = growths.toMap
+    leveled.keys.foreach(stat =>
+      val currentG = leveled(stat)
       if roll < currentG then
         val up = (currentG-1)/100 + 1
         levelUpsMap += (stat->up)

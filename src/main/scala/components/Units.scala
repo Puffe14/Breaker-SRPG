@@ -20,7 +20,9 @@ class Units(var character: Character):
   def name: String = character.name
   def weapon = unitsInventory.equippedWeapon
   def armor = unitsInventory.equippedArmors
+  def consumables = unitsInventory.consumables
   def medkit = unitsInventory.equippedMedkit
+  def usableMedkits = unitsInventory.medkit
   def unitClass = character.currentClass
   def types = unitClass.classType
   def inventory = unitsInventory
@@ -61,11 +63,15 @@ class Units(var character: Character):
     statusSet = statusSet + effect
   def healStatus(effect: Status) =
     statusSet = statusSet - effect
+  def hasStatus(effect: Status): Boolean =
+    status.exists(_.isInstanceOf[effect.type])
 
   //turn handling
   def endTurn() =
     moved = true
     acted = true
+  def cancelMove() =
+    moved = false
   def refresh() =
     moved = false
     acted = false

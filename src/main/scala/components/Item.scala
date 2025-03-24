@@ -20,22 +20,29 @@ trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: 
 
 end Consumable
 
+//!!! fix class types so no name = "" or description = ""
 
 //Provides HP up to max
-trait Healing(e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable:
+class Healing(e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable(e,u,l):
+  val name = ""
+  val description = ""
   def heal = amount
   override def utilize(unit: Units) =
     unit.healDamage(heal)
     use()
 
 //Gives a temporary boost on stat(s)
-trait Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable:
+class Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+  val name = ""
+  val description = ""
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addTemporaryStat(n(0), n(1)))
     use()
 
 //Gives a permanent increase to a stat
-trait Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable:
+class Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+  val name = ""
+  val description = ""
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addPermanent(n(0), n(1)))
     use()
@@ -132,6 +139,7 @@ trait Spell extends Weapon
 trait Medkit(amount: Int) extends Equipment:
   def heal = amount
   def intact = true
+  val range = (0, 1)
 
 
 

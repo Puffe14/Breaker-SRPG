@@ -8,7 +8,8 @@ class FieldMap(enemies: Vector[Group],
                grid: Grid,
                var player: Organization,
                clearCondition: String,
-               var rotation: Int):
+               var rotation: Int,
+               turnNumber: Int):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
   def groups: Vector[Group] = enemies ++ allies
@@ -26,7 +27,7 @@ class FieldMap(enemies: Vector[Group],
 
   def currentRotation = rotation
   def setRotation(newDir: Int) = rotation = newDir%4
-
+  def currentTurn = turnNumber
 
   //Methods for interfacing with units on field
 
@@ -54,6 +55,14 @@ class FieldMap(enemies: Vector[Group],
 
   def unitsOnTeam(team: Team) =
     allCharacters.filter(_.team == team)
+
+  def giveBonuses() =
+    theGrid.tilesWithUnits.foreach(t =>
+      t.occupantOnTile.foreach(u =>
+        u.nearbyBonuses
+      )
+    )
+
 
   //Methdos for determining which tiles a unit could occupy with current MOVE
 
@@ -119,10 +128,10 @@ class FieldMap(enemies: Vector[Group],
     )
     unitsFound
 
-  /**Checks who can be attacked on a particular location.
-   * Returns the unit and distance from checked tile.*/
-  def attackRangeUnitsAt(mover: Units, tile: Tile): Set[(Units,Int,Tile)] =
-    val (minR, maxR) = mover.Range
+  /** Checks who can be attacked on a particular location.
+   *  Returns the unit and distance from checked tile.    */
+  def attackRangeUnitsAt(mover: Units, tile: Tile, range: (Int, Int)): Set[(Units,Int,Tile)] =
+    val (minR, maxR) = range
     var unitsFound = Set[Units]()
     for i <- minR to maxR do
       unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet - mover
