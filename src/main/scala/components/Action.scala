@@ -20,6 +20,12 @@ end Move
 class EmptyAction extends Action:
   def play(): Vector[String] = Vector("Empty Action")
 
+class GameOver extends Action:
+  def play() = Vector("Game Over")
+
+class MapWon extends Action:
+  def play() = Vector("Victory")
+
 class Wait(unit: Units) extends Action:
   def play(): Vector[String] =
     unit.endTurn()

@@ -116,6 +116,7 @@ end testWall
 
 class LogTest:
   val game = Game()
+  game.battleStart()
   val unit1 = Units(cylna)
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
@@ -125,7 +126,7 @@ class LogTest:
   var ai = false
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(), Vector(), new Inventory(50)), "win", 0, 0)
+                       new Organization(Vector(), Vector(), new Inventory(50)), Survive(0), Vector(), 0, 0)
 
   unit1.setTeam(Player)
   unit3.setTeam(Enemy)
@@ -210,7 +211,7 @@ class LogTest:
     grid.occupiables(17).addOccupant(unit4)
 
     field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), "win", 3, 0)
+                     new Organization(Vector(), Vector(), storage), Route(Enemy), Vector(Route(Player)), 3, 0)
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -224,7 +225,7 @@ class LogTest:
         if game.stack.isEmpty && !game.enemyTurnOver then
           AIup()
         else
-          game.nextOnStack().play()
+          game.continue()
       case _ =>      fight.play()
 
 
@@ -283,8 +284,6 @@ class LogTest:
   def AIup(): Vector[String] =
     game.currentMap = Some(field)
     AI.game = game
-    AI.currentUnit = Some(unit2)
-    AI.currentGroup = Some(group)
     AI.continue(group)
     ai = true
     //println("Ai up "+game.stack.mkString(", "))
@@ -442,7 +441,7 @@ def test() =
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
                          new Organization(Vector(), Vector(), invi5),
-                         "win", 1, 0)
+                         Route(Enemy), Vector(Route(Player)), 1, 0)
     field.movementRangeTiles(unit1)
 
   def fileTest() =

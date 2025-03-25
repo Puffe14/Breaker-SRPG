@@ -7,7 +7,8 @@ class FieldMap(enemies: Vector[Group],
                allies: Vector[Group],
                grid: Grid,
                var player: Organization,
-               clearCondition: String,
+               clearCondition: Condition,
+               loseConditions: Vector[Condition],
                var rotation: Int,
                turnNumber: Int):
   def allCharacters: Vector[Units] =
@@ -17,11 +18,9 @@ class FieldMap(enemies: Vector[Group],
     player = org
   def setLeaders() = ()
   def isCleared: Boolean =
-    clearCondition match
-      case "defend" => false
-      case "defeat" => false
-      case "route"  => grid.unitsOnTiles.forall(_.team!=Enemy)
-      case _ => false
+    clearCondition.met(this)
+  def isLost: Boolean =
+    loseConditions.exists(_.met(this))
   def theGrid = grid
   def SAVEABLE: String = ""
 
@@ -56,12 +55,18 @@ class FieldMap(enemies: Vector[Group],
   def unitsOnTeam(team: Team) =
     allCharacters.filter(_.team == team)
 
+  
+  //Gives stat bonuses from tile, aura buffs, and debuffs
   def giveBonuses() =
     theGrid.tilesWithUnits.foreach(t =>
       t.occupantOnTile.foreach(u =>
         u.nearbyBonuses
       )
     )
+  
+  //Has to be able to this for current unit when moving without recalculating EVERYONE
+  def calculateBonus(unit: Units) =
+    unit
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE

@@ -1,5 +1,7 @@
 package components
 
+import game.AI
+
 
 class Game:
   var currentMapNumber: Int = 0
@@ -14,6 +16,11 @@ class Game:
 
   // ACTION STACK
 
+  def continue(): Vector[String] =
+    val ret = nextOnStack().play()
+    isBattleOver
+    ret
+
   def addToStack(act: Action) =
     stack = stack ++ Iterable(act)
 
@@ -23,6 +30,8 @@ class Game:
 
   def clearStack(): Unit =
     stack = Iterator()
+
+  // Actions available to a given unit
 
   def availableActions(unit: Units): Vector[Action] =
     currentMap match
@@ -55,17 +64,44 @@ class Game:
   def initialize() =
     ()
 
-  def handleTurn() =
+  /** Called when the turn is continuing. */
+  def handleTurn(): Unit =
+    //all groups on a particular side on the current map
     var groupsWithTurn: Vector[Group] = Vector()
-    currentMap.foreach(fm=> //all groups on a particular side on the current map
+    currentMap.foreach(fm=>
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
     )
+
+    //If the AI has no groups to control yet, give them all to the AI so it can handle them
+    if turnOf!=Team.Player && AI.groupsLeft.isEmpty then
+      AI.groupsLeft = groupsWithTurn.iterator
+
     //if the turn of the current team is over then change to the next teams turn.
     if groupsWithTurn.forall(_.doneActing) then
       turnOf = turnOf match
         case Team.Player => Team.Enemy
         case Team.Enemy => Team.Ally
         case Team.Ally => Team.Player
+      handleTurn() //If the turn is over, let the next ones act
+  end handleTurn
+
+  /** Checks whether if the battle is over or not */
+  def isBattleOver: Boolean =
+    var over = !midBattle
+    currentMap.foreach(fm =>
+      if fm.isLost then   //Priority lose so no "draws" after combat could happen
+        over = true
+        addToStack(GameOver())
+      if fm.isCleared then//If player beats the map
+        over = true
+        midBattle = false
+        addToStack(MapWon())
+        currentMapNumber+=1//Advance to next map
+    )
+    over
+
+  def battleStart() =
+    midBattle = true
 
 
   //Methods for creating actions
