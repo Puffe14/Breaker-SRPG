@@ -1,0 +1,225 @@
+package ui
+
+import components.*
+import game.*
+import scalafx.animation.AnimationTimer
+import scalafx.application.{JFXApp, JFXApp3}
+import scalafx.scene.Scene
+import scalafx.scene.canvas.*
+import scalafx.scene.image.*
+import scalafx.scene.layout.*
+import scalafx.scene.paint.Color.*
+import scalafx.scene.text.Font
+
+import java.io.FileInputStream
+import scala.collection.mutable
+
+val imagePath = "src/main/scala/resources/images/"
+val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field_gray.png")),
+                                new Image(new FileInputStream(imagePath + "field_movet.png")),
+                                new Image(new FileInputStream(imagePath + "field_red.png")),
+                                new Image(new FileInputStream(imagePath + "field_sand.png")),
+                                new Image(new FileInputStream(imagePath + "field_base.png")))
+val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
+                                new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
+                                new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
+                                new Image(new FileInputStream(imagePath + "warrior_hurt.png")),
+                                new Image(new FileInputStream(imagePath + "dead.png")))
+val imgDefKni: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "knight_idle.png")),
+                                new Image(new FileInputStream(imagePath + "knight_atk_1.png")),
+                                new Image(new FileInputStream(imagePath + "knight_atk_2.png")),
+                                new Image(new FileInputStream(imagePath + "knight_hurt.png")),
+                                new Image(new FileInputStream(imagePath + "dead.png")))
+val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_idle.png")),
+                                new Image(new FileInputStream(imagePath + "guy_atk_1.png")),
+                                new Image(new FileInputStream(imagePath + "guy_atk_2.png")),
+                                new Image(new FileInputStream(imagePath + "guy_hurt.png")),
+                                new Image(new FileInputStream(imagePath + "dead.png")))
+val idleImages = Map("cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
+                     "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
+                     "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")),
+                     "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
+val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
+val imageSets = Map("cylna" -> imgAtkWar,
+                    "wrys" -> imgDefKni,
+                    "bonk" -> imgAtkGuy,
+                    "ghost" -> imgAtkGuy)
+val iconImages =
+  Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
+      "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
+      "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")))
+
+
+
+object GUI extends JFXApp3:
+
+  val screenW = 600
+  val screenH = 450
+  var time = 0
+  val refreshFrame = 10
+
+  //"Camera" control variables
+  var drawScale = 3                                     //The scale of the pictures drawn
+  var middle = (screenW/drawScale, screenH/drawScale)   //The drawing location of the game map
+
+  // CONNECT TO GAME -------------------
+  val game = Game()
+  val test = LogTest()
+  test.setGrid()
+  test.resetFighters()
+  game.battleStart()
+  game.currentMap = Some(test.field)
+
+  // GRAPHICS AND INTERFACE ------------
+
+  //   ImageView methods
+
+  def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
+      val (lx, ly, lz) = loc
+      x = tilePosX(loc)
+      y = tilePosY(loc)
+      image = imgTiles(color)
+      scaleX = drawScale*32
+      scaleY = drawScale*32
+      smooth = false
+      viewOrder_(-lz.toDouble)
+
+  def unitImage(imgNum: Int, images: Seq[Image], xpos: Int, ypos: Int, zpos: Int, flip: Boolean) = new ImageView:
+      if flip then x = xpos + 16*drawScale else x = xpos
+      //x = xpos
+      val mirror = if flip then -1 else 1
+      y = ypos + 8*drawScale*zpos
+      image = images(imgNum)
+      scaleX = drawScale*32 * mirror
+      scaleY = drawScale*32
+      smooth = false
+      viewOrder_(-zpos.toDouble)
+
+  def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
+      x = tilePosX(loc)  -drawScale*8
+      y = tilePosY(loc)  -drawScale*8 + number*6*drawScale
+      image = iconImages(name)
+      scaleX = drawScale*8
+      scaleY = drawScale*6
+      viewOrder_(-loc(2).toDouble)
+
+
+  //   Larger methods
+
+  def drawField(g: GraphicsContext) =
+      val toDraw = mutable.Buffer[ImageView]()
+      game.allTiles         //Gather tiles to be drawn
+        .foreach(t =>
+          //img selection/* !!!
+          var tileInt = 0
+          val bottomInt = 4
+          if t.name == "w" then tileInt = 2
+          if t.name == "s" then tileInt = 3
+          //img selection*/
+          toDraw += tileImage(t.pos, tileInt)
+          //add bottoms
+          (1 to t.pos(2)).foreach(i =>
+            val bottomPos = (t.pos(0), t.pos(1), i-1)
+            toDraw += tileImage(bottomPos, bottomInt))
+        )
+      //Add the current units move tiles
+      game.currentMoveTiles
+        .foreach(t => toDraw += tileImage(t.pos, 1))
+      toDraw.foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
+
+  def drawUnits(g: GraphicsContext) =
+      val toDraw = mutable.Buffer[ImageView]()
+      game.allTilesWithUnits.foreach(t =>
+        t.occupantOnTile.foreach(u =>
+          //var tileInt = 0
+          val pos = t.pos
+          val flip = u.team != Team.Player
+          //println(u.name +" at "+pos)
+          val x = tilePosX(pos) + drawScale*8
+          val y = tilePosY(pos) - drawScale*12   - pos(2)*8*drawScale
+          val z = pos(2)
+          toDraw += unitImage(0, Seq(idleImages.getOrElse(u.name, deadImg)),x, y, z, flip)//status icons
+          for i <- u.statusList.indices do
+            toDraw += statusImage(pos,u.statusList(i),i)
+        )
+      )
+      toDraw.foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
+
+
+  // CONTROL
+
+  def cameraUp(increment: Int) = middle = (middle(0), middle(1)-increment)
+  def cameraDown(increment: Int) = middle = (middle(0), middle(1)+increment)
+  def cameraRight(increment: Int) = middle = (middle(0)+increment, middle(1))
+  def cameraLeft(increment: Int) = middle = (middle(0)-increment, middle(1))
+
+  def selectTile() =
+    hoverTile.foreach(game.selectTile(_))
+  def hoverTile: Option[Tile] =
+    game.tileAt(0,0)
+
+
+  // START -----------------------------
+
+  def start() =
+    //Create stage
+    stage = new JFXApp3.PrimaryStage:
+      title = "Breaker"
+      width = screenW
+      height = screenH
+
+    //Canvas init
+    val canvas = Canvas(screenW, screenH)
+    val bottomBox = HBox()
+    val g = canvas.graphicsContext2D
+
+    //Connect rest to root
+    val root = GridPane()
+    root.add(canvas, 1, 0)
+    val scene = Scene(parent = root)
+    stage.scene = scene
+
+    //Animation timer keeps track of the passage of time
+    val timer = AnimationTimer(t => {
+      if time % refreshFrame == 0 then
+        //Clean background!
+        g.fill = White // Set the fill color.
+        g.fillRect(0, 0, screenW, screenH) // Fill rectangle at (0, 0) with width 600 and height 450.
+
+        //Write nonsense
+        g.fill = Blue
+        g.font = Font(50) // Set text size
+        g.fillText("Hello canvas", 10, 100) // Fill text at (10, 100)
+
+        //Draw methods for groups of Images
+        drawField(g)
+        drawUnits(g)
+
+        //Keep game going on
+        game.handleTurn()
+        game.continue()
+        selectTile()
+    })
+    timer.start()
+
+
+  // USEFUL METHODS ---------------------
+  
+  def tilePosX(loc: (Int, Int, Int)): Int =
+      val (x,y,z) = loc
+      val dir = game.dir
+      if dir == 0 then       x*16*drawScale   - y*16*drawScale   + middle(0)
+      else if dir == 1 then  x*16*drawScale   + y*16*drawScale   + middle(0)
+      else if dir == 2 then -x*16*drawScale   + y*16*drawScale   + middle(0)
+      else if dir == 3 then -x*16*drawScale   - y*16*drawScale   + middle(0)
+      else 0
+
+  def tilePosY(loc: (Int, Int, Int)): Int =
+    val (x,y,z) = loc
+    val dir = game.dir
+    if dir == 0 then       x* 8*drawScale   + y*8*drawScale    + middle(1) - z*8*drawScale
+    else if dir == 1 then -x* 8*drawScale   + y*8*drawScale    + middle(1) - z*8*drawScale
+    else if dir == 2 then -x* 8*drawScale   - y*8*drawScale    + middle(1) - z*8*drawScale
+    else if dir == 3 then  x* 8*drawScale   - y*8*drawScale    + middle(1) - z*8*drawScale
+    else 0
+

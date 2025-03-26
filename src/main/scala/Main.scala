@@ -11,6 +11,7 @@ import scala.io.StdIn.readLine
 import java.io.FileInputStream
 import scala.collection.mutable
 import components.Team.*
+import game.*
 
 object Main extends JFXApp3:
 

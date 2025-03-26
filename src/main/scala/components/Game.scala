@@ -7,11 +7,57 @@ class Game:
   var currentMapNumber: Int = 0
   var currentMap: Option[FieldMap] = None
   var midBattle: Boolean = false
-  var turnOf: Team = Team.Player
+  var turnOf: Team = Team.Enemy
   var player: Option[Organization] = None
   var acting: Option[Units] = None
   var target: Option[Units] = None
   var stack: Iterator[Action] = Iterator()
+  var zoom: Int = 2
+  var direction: Int = 0
+
+  // CONTROLS
+
+  def turnWise() =
+    val newDir = (direction + 1)%4
+    currentMap.foreach(_.setRotation(newDir))
+    direction = newDir
+  def turnAnti() =
+    val newDir = ((direction - 1)%4+4)%4
+    currentMap.foreach(_.setRotation(newDir))
+    direction = newDir
+  def dir: Int = direction
+
+  def selectTile(tile: Tile) =
+    tile match
+      case o: Occupiable => acting = o.occupantOnTile
+      case _ =>
+
+
+  // RETURN VALUES
+
+  def allTiles: Vector[Tile] =
+    currentMap match
+      case Some(fm) => fm.theGrid.allTiles
+      case _ => Vector()
+
+  def currentMoveTiles: Set[Tile] =
+    currentMap match
+      case Some(fm) =>
+        acting match
+          case Some(unit) if !unit.moveOver =>
+            fm.movementRangeTiles(unit)
+          case _ => Set()
+      case _ => Set()
+
+  def allTilesWithUnits: Vector[Occupiable] =
+    currentMap match
+      case Some(fm) => fm.theGrid.tilesWithUnits
+      case _ => Vector()
+
+  def tileAt(x: Int, y: Int): Option[Tile] =
+    currentMap match
+      case Some(fm) => fm.theGrid.tileAt(x, y)
+      case _ => None
 
 
   // ACTION STACK
@@ -82,7 +128,8 @@ class Game:
         case Team.Player => Team.Enemy
         case Team.Enemy => Team.Ally
         case Team.Ally => Team.Player
-      handleTurn() //If the turn is over, let the next ones act
+      refreshAll()
+      //handleTurn() //If the turn is over, let the next ones act
   end handleTurn
 
   /** Checks whether if the battle is over or not */

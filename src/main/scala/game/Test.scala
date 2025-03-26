@@ -1,3 +1,5 @@
+package game
+
 import components.*
 import components.Behaviour.Agressive
 import components.Part.*
@@ -211,7 +213,7 @@ class LogTest:
     grid.occupiables(17).addOccupant(unit4)
 
     field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), Route(Enemy), Vector(Route(Player)), 3, 0)
+                     new Organization(Vector(), Vector(), storage), Route(Enemy), Vector(Route(Player)), 0, 0)
   end setGrid
 
   def log(which: String): Vector[String] =
