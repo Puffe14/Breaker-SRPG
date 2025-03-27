@@ -44,6 +44,11 @@ class Game:
   def cancel() =
     if      target.nonEmpty then target = None
     else if acting.nonEmpty then acting = None
+  
+  def deSelect() =
+    acting = None
+    target = None
+
 
   def unitToTile(o: Occupiable) =
     if currentMoveTiles.contains(o) then
@@ -160,6 +165,7 @@ class Game:
         case Team.Enemy => Team.Ally
         case Team.Ally => Team.Player
       refreshAll()
+      deSelect()
       //handleTurn() //If the turn is over, let the next ones act
   end handleTurn
 
@@ -217,6 +223,7 @@ class Game:
     currentMap.foreach(
       _.allCharacters.foreach(_.refresh())
     )
+    
 
   //TESTING
 
