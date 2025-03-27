@@ -14,6 +14,7 @@ class Move(unit: Units, fieldMap: FieldMap) extends Action:
       fieldMap.moveTo(unit,tile)
       msg = Vector(unit.name+" to "+tile.pos)
     )
+    unit.moves()
     msg
 end Move
 

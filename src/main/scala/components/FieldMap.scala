@@ -13,7 +13,7 @@ class FieldMap(enemies: Vector[Group],
                turnNumber: Int):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
-  def groups: Vector[Group] = enemies ++ allies
+  def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group)
   def setPlayer(org: Organization) =
     player = org
   def setLeaders() = ()

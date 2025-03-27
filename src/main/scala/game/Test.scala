@@ -128,7 +128,7 @@ class LogTest:
   var ai = false
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(), Vector(), new Inventory(50)), Survive(0), Vector(), 0, 0)
+                       new Organization(Vector(unit1), Vector(unit1), new Inventory(50), Player), Survive(0), Vector(), 0, 0)
 
   unit1.setTeam(Player)
   unit3.setTeam(Enemy)
@@ -212,8 +212,8 @@ class LogTest:
     grid.occupiables(1).addOccupant(unit3)
     grid.occupiables(17).addOccupant(unit4)
 
-    field = FieldMap(Vector(), Vector(), grid,
-                     new Organization(Vector(), Vector(), storage), Route(Enemy), Vector(Route(Player)), 0, 0)
+    field = FieldMap(Vector(group), Vector(), grid,
+                     new Organization(Vector(unit1), Vector(unit1), storage, Player), Route(Enemy), Vector(Route(Player)), 0, 0)
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -442,7 +442,7 @@ def test() =
 
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
-                         new Organization(Vector(), Vector(), invi5),
+                         new Organization(Vector(), Vector(), invi5, Player),
                          Route(Enemy), Vector(Route(Player)), 1, 0)
     field.movementRangeTiles(unit1)
 

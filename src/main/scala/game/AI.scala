@@ -41,6 +41,14 @@ object AI:
       case _ => Vector()
     addToStack(mongo)
 
+
+  def play() =
+    if (currentGroup.isEmpty || currentGroup.forall(_.doneActing)) && groupsLeft.nonEmpty then
+      currentGroup = Some(nextGroup())
+    if currentGroup.forall(_.doneActing) then
+      currentGroup = None
+    currentGroup.foreach(continue(_))
+
   //!!! could I add a way to track action priority based on if hp is critical or so on?
   /**Checks the best action for a unit*/
   def unitBestAction(u: Units): Action =

@@ -7,7 +7,7 @@ class Game:
   var currentMapNumber: Int = 0
   var currentMap: Option[FieldMap] = None
   var midBattle: Boolean = false
-  var turnOf: Team = Team.Enemy
+  var turnOf: Team = Team.Player
   var player: Option[Organization] = None
   var acting: Option[Units] = None
   var target: Option[Units] = None
@@ -29,9 +29,36 @@ class Game:
 
   def selectTile(tile: Tile) =
     tile match
-      case o: Occupiable => acting = o.occupantOnTile
+      //Beat-em-up
+      case o: Occupiable if target.nonEmpty => attack()
+      //Select target
+      case o: Occupiable if o.occupied && acting.nonEmpty =>
+        target = o.occupantOnTile
+      //Move acting unit to given tile
+      case o: Occupiable if acting.nonEmpty =>
+        unitToTile(o)
+      //Select a new acting unit
+      case o: Occupiable if o.occupantOnTile.forall(_.team==turnOf)=> acting = o.occupantOnTile
       case _ =>
 
+  def cancel() =
+    if      target.nonEmpty then target = None
+    else if acting.nonEmpty then acting = None
+
+  def unitToTile(o: Occupiable) =
+    if currentMoveTiles.contains(o) then
+      acting.foreach(move(_) match
+          case Some(move) =>
+            move.location = Some(o)
+            addToStack(move)
+          case None =>
+        )
+
+  def attack() =
+    acting.foreach(a=>
+      target.foreach(t=>
+      fight(a,t).foreach(addToStack(_)))
+    )
 
   // RETURN VALUES
 
@@ -119,8 +146,12 @@ class Game:
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them
-    if turnOf!=Team.Player && AI.groupsLeft.isEmpty then
-      AI.groupsLeft = groupsWithTurn.iterator
+    if turnOf!=Team.Player then
+      if AI.currentGroup.isEmpty && !groupsWithTurn.forall(_.doneActing) then
+        AI.game = this
+        AI.groupsLeft = groupsWithTurn.iterator
+      AI.play()
+
 
     //if the turn of the current team is over then change to the next teams turn.
     if groupsWithTurn.forall(_.doneActing) then
@@ -168,6 +199,18 @@ class Game:
       case Some(fm) => Some(Trade(u, i, s1, s2))
       case _ => None
 
+  def fight(u: Units, t: Units): Option[Combat] =
+    val range = unitToUnitDistance(u,t)
+    currentMap match
+      case Some(fm) => Some(Combat(u, t, range))
+      case _ => None
+
+
+  def unitToUnitDistance(u: Units, t: Units): Int =
+    var range = 0
+    currentMap.foreach(fm=>fm.tileOf(u).foreach(t1=>fm.tileOf(t)
+      .foreach(t2=> range = fm.theGrid.tileDistance(t1,t2))))
+    range
 
   def refreshAll() =
     clearStack()

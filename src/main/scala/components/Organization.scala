@@ -1,10 +1,13 @@
 package components
 
-class Organization(var members: Vector[Units], var deployed: Vector[Units], storage: Inventory):
+class Organization(var members: Vector[Units], var deployed: Vector[Units], storage: Inventory, side: Team):
 
   //Returns the vector including all members.
   def allMembers =
     members
+    
+  def group: Group =
+    Group(deployed,Behaviour.Control,side)
 
   //Returns the vector including all deployed.
   def allDeployed =

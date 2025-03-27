@@ -2,14 +2,17 @@ package ui
 
 import components.*
 import game.*
+import scalafx.event.*
 import scalafx.animation.AnimationTimer
 import scalafx.application.{JFXApp, JFXApp3}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.*
 import scalafx.scene.image.*
+import scalafx.scene.input.*
 import scalafx.scene.layout.*
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
+import scalafx.Includes._
 
 import java.io.FileInputStream
 import scala.collection.mutable
@@ -19,7 +22,8 @@ val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field
                                 new Image(new FileInputStream(imagePath + "field_movet.png")),
                                 new Image(new FileInputStream(imagePath + "field_red.png")),
                                 new Image(new FileInputStream(imagePath + "field_sand.png")),
-                                new Image(new FileInputStream(imagePath + "field_base.png")))
+                                new Image(new FileInputStream(imagePath + "field_base.png")),
+                                new Image(new FileInputStream(imagePath + "field_cursor.png")))
 val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
@@ -61,6 +65,11 @@ object GUI extends JFXApp3:
   //"Camera" control variables
   var drawScale = 3                                     //The scale of the pictures drawn
   var middle = (screenW/drawScale, screenH/drawScale)   //The drawing location of the game map
+  var mouseX = 0
+  var mouseY = 0
+  var cursorX = 0
+  var cursorY = 0
+  var text = "Hello canvas"
 
   // CONNECT TO GAME -------------------
   val game = Game()
@@ -93,7 +102,7 @@ object GUI extends JFXApp3:
       scaleX = drawScale*32 * mirror
       scaleY = drawScale*32
       smooth = false
-      viewOrder_(-zpos.toDouble)
+      viewOrder_(-zpos.toDouble-1)
 
   def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
       x = tilePosX(loc)  -drawScale*8
@@ -101,12 +110,12 @@ object GUI extends JFXApp3:
       image = iconImages(name)
       scaleX = drawScale*8
       scaleY = drawScale*6
-      viewOrder_(-loc(2).toDouble)
+      viewOrder_(-loc(2).toDouble-1)
 
 
   //   Larger methods
 
-  def drawField(g: GraphicsContext) =
+  def drawField =
       val toDraw = mutable.Buffer[ImageView]()
       game.allTiles         //Gather tiles to be drawn
         .foreach(t =>
@@ -125,9 +134,14 @@ object GUI extends JFXApp3:
       //Add the current units move tiles
       game.currentMoveTiles
         .foreach(t => toDraw += tileImage(t.pos, 1))
-      toDraw.foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
+      toDraw.toVector
 
-  def drawUnits(g: GraphicsContext) =
+  def drawCursor =
+    game.tileAt(cursorX, cursorY) match
+      case Some(tile) => Vector(tileImage(tile.pos,5))
+      case None => Vector()
+
+  def drawUnits =
       val toDraw = mutable.Buffer[ImageView]()
       game.allTilesWithUnits.foreach(t =>
         t.occupantOnTile.foreach(u =>
@@ -143,7 +157,11 @@ object GUI extends JFXApp3:
             toDraw += statusImage(pos,u.statusList(i),i)
         )
       )
-      toDraw.foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
+      toDraw.toVector
+
+  def drawAll(pics: Vector[ImageView], g: GraphicsContext) =
+    pics.sortBy(-_.viewOrder())
+        .foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
 
 
   // CONTROL
@@ -156,7 +174,15 @@ object GUI extends JFXApp3:
   def selectTile() =
     hoverTile.foreach(game.selectTile(_))
   def hoverTile: Option[Tile] =
-    game.tileAt(0,0)
+    /*val (x, y) = mouseAsPos
+    text = s"Pos $x, $y Mouse $mouseX, $mouseY"
+    game.tileAt(x,y)*/
+    val (x, y) = (cursorX, cursorY)
+    game.tileAt(x,y)
+
+  def setMouseLocation(event: MouseEvent) =
+    mouseX = event.x.toInt - middle(0)
+    mouseY = event.y.toInt - middle(1)
 
 
   // START -----------------------------
@@ -172,11 +198,13 @@ object GUI extends JFXApp3:
     val canvas = Canvas(screenW, screenH)
     val bottomBox = HBox()
     val g = canvas.graphicsContext2D
+    canvas.onMouseMoved = (event: MouseEvent) => setMouseLocation(event)
 
     //Connect rest to root
     val root = GridPane()
     root.add(canvas, 1, 0)
     val scene = Scene(parent = root)
+    scene.onKeyPressed =  (event: KeyEvent) => handlePress(event)
     stage.scene = scene
 
     //Animation timer keeps track of the passage of time
@@ -189,16 +217,15 @@ object GUI extends JFXApp3:
         //Write nonsense
         g.fill = Blue
         g.font = Font(50) // Set text size
-        g.fillText("Hello canvas", 10, 100) // Fill text at (10, 100)
+        g.fillText(text, 10, 100) // Fill text at (10, 100)
 
         //Draw methods for groups of Images
-        drawField(g)
-        drawUnits(g)
+        drawAll(drawField++drawUnits++drawCursor, g)
 
         //Keep game going on
         game.handleTurn()
-        game.continue()
-        selectTile()
+        while game.stack.hasNext do
+          game.continue()
     })
     timer.start()
 
@@ -223,3 +250,62 @@ object GUI extends JFXApp3:
     else if dir == 3 then  x* 8*drawScale   - y*8*drawScale    + middle(1) - z*8*drawScale
     else 0
 
+  def mouseAsPos: (Int, Int) =
+      val (x,y) = (mouseX/(drawScale*32), mouseY/(drawScale*16))
+      val dir = game.dir
+      if dir == 0 then      (Math.floor( (x + 2*y) / 2.0).toInt,
+                             Math.floor((-x + 2*y) / 2.0).toInt)
+      else if dir == 1 then (0, 0)//x*16*drawScale   + y*16*drawScale
+      else if dir == 2 then (0, 0)//-x*16*drawScale   + y*16*drawScale
+      else if dir == 3 then (0, 0)//-x*16*drawScale   - y*16*drawScale
+      else (0, 0)
+
+  def cursorUp() =
+    game.dir match
+      case 0 => cursorOnGridDown()
+      case 1 => cursorOnGridUp()
+      case 2 => cursorOnGridLeft()
+      case 3 => cursorOnGridRight()
+      case _ => ()
+  def cursorDown() =
+    game.dir match
+      case 0 => cursorOnGridUp()
+      case 1 => cursorOnGridDown()
+      case 2 => cursorOnGridLeft()
+      case 3 => cursorOnGridRight()
+      case _ => ()
+  def cursorRight() =
+    game.dir match
+      case 0 => cursorOnGridRight()
+      case 1 => cursorOnGridUp()
+      case 2 => cursorOnGridLeft()
+      case 3 => cursorOnGridDown()
+      case _ => ()
+  def cursorLeft() =
+    game.dir match
+      case 0 => cursorOnGridLeft()
+      case 1 => cursorOnGridUp()
+      case 2 => cursorOnGridLeft()
+      case 3 => cursorOnGridRight()
+      case _ => ()
+
+  def unSelect() =
+    game.cancel()
+
+  def cursorOnGridUp() =    cursorY += 1
+  def cursorOnGridDown() =  cursorY -= 1
+  def cursorOnGridRight() = cursorX += 1
+  def cursorOnGridLeft() =  cursorX -= 1
+
+  def handlePress(event: KeyEvent) =
+    event.code match
+      case KeyCode.W => cursorUp()
+      case KeyCode.A => cursorLeft()
+      case KeyCode.S => cursorDown()
+      case KeyCode.D => cursorRight()
+      case KeyCode.Enter => selectTile()
+      case KeyCode.Space => unSelect()
+      case KeyCode.Q => game.turnAnti()
+      case KeyCode.E => game.turnWise()
+      case _ =>
+    text = event.character.toString + s" Pos $cursorX, $cursorY. ${game.turnOf}"

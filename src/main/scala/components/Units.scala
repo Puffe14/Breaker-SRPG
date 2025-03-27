@@ -72,6 +72,8 @@ class Units(var character: Character):
     acted = true
   def cancelMove() =
     moved = false
+  def moves() =
+    moved = true
   def refresh() =
     moved = false
     acted = false
