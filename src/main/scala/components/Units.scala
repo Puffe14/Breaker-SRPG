@@ -17,6 +17,11 @@ class Units(var character: Character):
   var moved = false
   var acted = false
 
+  //GUI STUFF
+  var aniInt = 0
+  def setAniInt(int: Int) = aniInt = int
+  def frame = aniInt
+
   def name: String = character.name
   def weapon = unitsInventory.equippedWeapon
   def armor = unitsInventory.equippedArmors

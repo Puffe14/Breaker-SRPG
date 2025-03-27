@@ -30,7 +30,7 @@ class Game:
   def selectTile(tile: Tile) =
     tile match
       //Beat-em-up
-      case o: Occupiable if target.nonEmpty => attack()
+      case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) => attack()
       //Select target
       case o: Occupiable if o.occupied && acting.nonEmpty =>
         target = o.occupantOnTile
@@ -48,6 +48,10 @@ class Game:
   def deSelect() =
     acting = None
     target = None
+    
+  def clearPostAction() =
+    if acting.forall(_.turnOver) then
+      deSelect()
 
 
   def unitToTile(o: Occupiable) =
@@ -94,8 +98,13 @@ class Game:
 
   // ACTION STACK
 
-  def continue(): Vector[String] =
+  def continue(): Explain =
     val ret = nextOnStack().play()
+    isBattleOver
+    ret
+
+  def continueS(): Vector[String] =
+    val ret = nextOnStack().playS()
     isBattleOver
     ret
 
@@ -108,6 +117,7 @@ class Game:
 
   def clearStack(): Unit =
     stack = Iterator()
+
 
   // Actions available to a given unit
 
@@ -147,6 +157,7 @@ class Game:
     //all groups on a particular side on the current map
     var groupsWithTurn: Vector[Group] = Vector()
     currentMap.foreach(fm=>
+      fm.clearDead()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
     )
 
@@ -166,6 +177,7 @@ class Game:
         case Team.Ally => Team.Player
       refreshAll()
       deSelect()
+    clearPostAction()
       //handleTurn() //If the turn is over, let the next ones act
   end handleTurn
 

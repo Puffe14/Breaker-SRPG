@@ -2,6 +2,7 @@ package components
 
 import components.*
 import components.Part.AnyPart
+import components.Animation.*
 import game.Rules
 
 import scala.collection.mutable
@@ -30,6 +31,8 @@ import scala.util.Random
       if isEffective then damage *= rules.effectiveMultipllier
     )
     damage
+    
+val attackDuration = 30
 
 class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   val rules = Rules()
@@ -90,16 +93,18 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   //method for the performing attacks
   def attack(attacker: Units, defender: Units, weapon: Weapon) =
     val isHit = roll100 < attacker.HI - defender.AV //if the attack hits
-
+    explain.addAnimation(attacker,Attack,attackDuration)
     if isHit then
       val isCritical = roll100 < attacker.CR //if a critical hit is rolled
       var damage = predictDmg(attacker, defender)
       if isCritical then damage *= rules.critMultiplier
       defender.takeDamage(damage)
       log += (s"${attacker.name} hit ${defender.name} with $damage damage")
+      explain.addAnimation(defender,Hurt,attackDuration)
       weapon.spend(1)
     else
       log += (s"${attacker.name} misses ${defender.name}")
+      explain.addAnimation(defender,Evade,attackDuration)
   end attack
 
 
@@ -130,9 +135,10 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
 
   ////// plays out outcomes
 
-  def play(): Vector[String] =
+  def play(): Explain =
     resetLog()
     log += (s"${selectedUnit.name} attacks ${targetUnit.name}")
+    explain = Explain(s"${selectedUnit.name} attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
     log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
 
@@ -157,6 +163,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
     log += ("battle ends")
     selectedUnit.endTurn()
     log.toVector
+    explain
   end play
 
   override def toString =
@@ -250,14 +257,16 @@ class Skill(selectedUnit: Units, targetUnit: Units, range: Int) extends Combat(s
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
-  override def play(): Vector[String] =
+  override def play(): Explain =
     resetLog()
     log += (s"${selectedUnit.name} ${this.toString}s ${targetUnit.name}")
+    explain = Explain(s"${selectedUnit.name} ${this.toString}s ${targetUnit.name}")
     //selected treats target
     selectedAttemptSkill()
     log += ("battle ends")
     selectedUnit.endTurn()
     log.toVector
+    explain
 
   // eri skillit objekteiks???, trait hit skill / no hit or sommin
   def skill(attacker: Units, defender: Units) =
@@ -285,13 +294,15 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
     if isEffective then bonusHit += rules.skillBonusHitRateForEffective
     //checks if the attack hits, hitrate / ratio  - avoid + bonus
     val isHit = roll100 < attacker.HI / rules.skillHitRatePenaltyRatio - defender.AV + bonusHit
-
+    explain.addAnimation(attacker,Attack,attackDuration)
     //If the skill requires a hit check
     if isHit then
       skillEffect(attacker, defender)
       spend(attacker)
+      explain.addAnimation(defender,Hurt,attackDuration)
     else
       log += s"${attacker.name} misses ${defender.name}"
+      explain.addAnimation(defender,Evade,attackDuration)
 end RollSkill
 
 
@@ -300,6 +311,8 @@ class Heal(selectedUnit: Units, targetUnit: Units, range: Int, medkit: Medkit) e
     val damage = lowest(attacker.HL + medkit.heal, 0)
     log += (s"${attacker.name} heals ${defender.name} with $damage")
     defender.healDamage(damage)
+    explain.addAnimation(attacker,Attack,attackDuration)
+    explain.addAnimation(defender,Hurt,attackDuration)
 end Heal
 
 
@@ -307,15 +320,18 @@ class Treat(selectedUnit: Units, targetUnit: Units, range: Int, medkit: Medkit, 
   override def skillEffect(attacker: Units, defender: Units) =
     log += (s"${attacker.name} treats ${defender.name}'s $part")
     target.healWound(part)
+    explain.addAnimation(attacker,Attack,attackDuration)
+    explain.addAnimation(defender,Hurt,attackDuration)
 end Treat
 
 
 class Wound(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) extends RollSkill(selectedUnit, targetUnit, range):
-  override def play(): Vector[String] =
+  override def play(): Explain =
     resetLog()
     log += (s"${selectedUnit.name} wound attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
     log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+    explain = Explain(s"${selectedUnit.name} wound attacks ${targetUnit.name}")
 
     //selected attempts break first
     selectedAttemptSkill()
@@ -324,6 +340,7 @@ class Wound(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) exte
     log += ("battle ends")
     selectedUnit.endTurn()
     log.toVector
+    explain
 
   override def skillEffect(attacker: Units, defender: Units) =
     log += (s"${attacker.name} wounds ${defender.name}'s $part")
@@ -332,11 +349,12 @@ end Wound
 
 
 class Break(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) extends RollSkill(selectedUnit, targetUnit, range):
-  override def play(): Vector[String] =
+  override def play(): Explain =
     resetLog()
     log += (s"${selectedUnit.name} break attacks ${targetUnit.name}")
     log += (s"${selectedUnit.name} can $selectedCanAttack,  ${targetUnit.name} can $targetCanAttack")
     log += (s"${selectedUnit.name} left $selectedAttacks,  ${targetUnit.name} left $targetAttacks")
+    explain = Explain(s"${selectedUnit.name} break attacks ${targetUnit.name}")
 
     //selected attempts break first
     selectedAttemptSkill()
@@ -345,6 +363,7 @@ class Break(selectedUnit: Units, targetUnit: Units, range: Int, part: Part) exte
     log += ("battle ends")
     selectedUnit.endTurn()
     log.toVector
+    explain
 
   override def skillEffect(attacker: Units, defender: Units): Unit =
     log += (s"${attacker.name} breaks ${defender.name}'s $part")

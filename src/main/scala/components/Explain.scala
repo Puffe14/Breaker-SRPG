@@ -1,13 +1,15 @@
 package components
 
-class Explain:
-  val name: String = ""
+class Explain(val name: String = ""):
   var series: Vector[AniSeries] = Vector()
   var acts: Vector[Act] = Vector()
+  var totalTime = 0
 
   //Create a new act and add it to the list
-  def addAnimation(unit: Units, animation: Animation, time: Double) =
-    acts = acts.updated(acts.length, Act(unit, animation, time))
+  def addAnimation(unit: Units, animation: Animation, time: Int) =
+    val start = totalTime
+    totalTime += time
+    acts = acts ++ Vector(Act(unit, animation, start, totalTime))
 
   /*def addAnimation(unit: Units, animation: Animation) =
     //If this character doesn't have an animation yet
@@ -16,8 +18,11 @@ class Explain:
 end Explain
 
 
-class Act(unit: Units, animation: Animation, time: Double):
-  override def toString = unit.name + ": " + animation.toString + " at " + time
+class Act(unit: Units, animation: Animation, start: Int, end: Int):
+  def actor = unit
+  def frame = animation
+  def done(time: Int) = start + time > end
+  override def toString = unit.name + ": " + animation.toString + " at " + end
 
 
 class AniSeries(val unit: Units):
@@ -26,4 +31,4 @@ class AniSeries(val unit: Units):
 
 
 enum Animation:
-  case Attack, Critical, Evade, Miss, Hurt
+  case Attack, Critical, Evade, Miss, Hurt, Idle

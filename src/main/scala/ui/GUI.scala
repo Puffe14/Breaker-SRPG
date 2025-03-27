@@ -1,6 +1,7 @@
 package ui
 
 import components.*
+import components.Animation.*
 import game.*
 import scalafx.event.*
 import scalafx.animation.AnimationTimer
@@ -47,11 +48,23 @@ val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
 val imageSets = Map("cylna" -> imgAtkWar,
                     "wrys" -> imgDefKni,
                     "bonk" -> imgAtkGuy,
-                    "ghost" -> imgAtkGuy)
+                    "ghost" -> imgAtkGuy,
+                    "gonzales" -> imgAtkGuy)
 val iconImages =
   Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
       "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
       "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")))
+
+def animationToInt(animation: Animation) =
+  animation match
+    case Idle => 0
+    case Attack => 2
+    case Evade => 1
+    case Hurt => 3
+    case _ => 0
+
+def setAniInt(unit: Units, animation: Animation) =
+  unit.setAniInt(animationToInt(animation))
 
 
 
@@ -60,11 +73,13 @@ object GUI extends JFXApp3:
   val screenW = 600
   val screenH = 450
   var time = 0
+  var delta = 0
   val refreshFrame = 10
 
   //"Camera" control variables
   var drawScale = 3                                     //The scale of the pictures drawn
   var middle = (screenW/drawScale, screenH/drawScale)   //The drawing location of the game map
+  var cameraMoveIncrement = 5
   var mouseX = 0
   var mouseY = 0
   var cursorX = 0
@@ -80,6 +95,9 @@ object GUI extends JFXApp3:
   game.currentMap = Some(test.field)
 
   // GRAPHICS AND INTERFACE ------------
+
+    // Animation
+  var actList = Vector[Act]()
 
   //   ImageView methods
 
@@ -152,7 +170,7 @@ object GUI extends JFXApp3:
           val x = tilePosX(pos) + drawScale*8
           val y = tilePosY(pos) - drawScale*12   - pos(2)*8*drawScale
           val z = pos(2)
-          toDraw += unitImage(0, Seq(idleImages.getOrElse(u.name, deadImg)),x, y, z, flip)//status icons
+          toDraw += unitImage(u.frame, imageSets.getOrElse(u.name, Seq(deadImg)),x, y, z, flip)//status icons
           for i <- u.statusList.indices do
             toDraw += statusImage(pos,u.statusList(i),i)
         )
@@ -160,7 +178,7 @@ object GUI extends JFXApp3:
       toDraw.toVector
 
   def drawAll(pics: Vector[ImageView], g: GraphicsContext) =
-    pics.sortBy(-_.viewOrder())
+    pics.sortBy(i=>(-i.viewOrder(), i.y()))
         .foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
 
 
@@ -224,8 +242,15 @@ object GUI extends JFXApp3:
 
         //Keep game going on
         game.handleTurn()
-        while game.stack.hasNext do
-          game.continue()
+        while game.stack.hasNext && actList.isEmpty do
+          val explain = game.continue()
+          delta = 0
+          //Capture acts from explain
+          actList = explain.acts
+        game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
+        actList.foreach(a => setAniInt(a.actor, a.frame))
+        actList = actList.filterNot(_.done(delta))
+        delta+=1
     })
     timer.start()
 
@@ -263,15 +288,15 @@ object GUI extends JFXApp3:
   def cursorUp() =
     game.dir match
       case 0 => cursorOnGridDown()
-      case 1 => cursorOnGridUp()
-      case 2 => cursorOnGridLeft()
-      case 3 => cursorOnGridRight()
+      case 1 => cursorOnGridRight()
+      case 2 => cursorOnGridUp()
+      case 3 => cursorOnGridLeft()
       case _ => ()
   def cursorDown() =
     game.dir match
       case 0 => cursorOnGridUp()
-      case 1 => cursorOnGridDown()
-      case 2 => cursorOnGridLeft()
+      case 1 => cursorOnGridLeft()
+      case 2 => cursorOnGridDown()
       case 3 => cursorOnGridRight()
       case _ => ()
   def cursorRight() =
@@ -284,9 +309,9 @@ object GUI extends JFXApp3:
   def cursorLeft() =
     game.dir match
       case 0 => cursorOnGridLeft()
-      case 1 => cursorOnGridUp()
-      case 2 => cursorOnGridLeft()
-      case 3 => cursorOnGridRight()
+      case 1 => cursorOnGridDown()
+      case 2 => cursorOnGridRight()
+      case 3 => cursorOnGridUp()
       case _ => ()
 
   def unSelect() =
@@ -307,5 +332,9 @@ object GUI extends JFXApp3:
       case KeyCode.Space => unSelect()
       case KeyCode.Q => game.turnAnti()
       case KeyCode.E => game.turnWise()
+      case KeyCode.Down => cameraUp(cameraMoveIncrement)
+      case KeyCode.Right => cameraLeft(cameraMoveIncrement)
+      case KeyCode.Up => cameraDown(cameraMoveIncrement)
+      case KeyCode.Left => cameraRight(cameraMoveIncrement)
       case _ =>
-    text = event.character.toString + s" Pos $cursorX, $cursorY. ${game.turnOf}"
+    text = event.character + s" Pos $cursorX, $cursorY. ${game.turnOf}"

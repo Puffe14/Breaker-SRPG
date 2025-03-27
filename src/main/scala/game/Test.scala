@@ -123,6 +123,7 @@ class LogTest:
   val unit2 = Units(wrys)
   val unit3 = Units(bonk)
   val unit4 = Units(ghost)
+  val unit5 = Units(gonzales)
   val units = Vector(unit1, unit2, unit3, unit4)
   val group = Group(Vector(unit2, unit4, unit3),Agressive,Enemy)
   var ai = false
@@ -134,6 +135,7 @@ class LogTest:
   unit3.setTeam(Enemy)
   unit2.setTeam(Enemy)
   unit4.setTeam(Enemy)
+  unit5.setTeam(Player)
   def dmace = BluntFile("d_mace")
   def wclub = BluntFile("w_club")
   def testspell = TestSpell()
@@ -149,6 +151,7 @@ class LogTest:
     val itemi3 = TestHelmet()
     val itemi4 = testmed
     val itemi5 = testspell
+    val itemi6 = dmace
     val invi = Inventory(6)
     val invi2 = Inventory(6)
 
@@ -158,6 +161,7 @@ class LogTest:
     itemi3.equip()
     //itemi4.equip()
     itemi5.equip()
+    itemi6.equip()
     //unit1.inventory.swap(invi, 0, 0)
     unit1.inventory.add(Some(itemi))
     unit1.inventory.add(Some(dmace))
@@ -168,7 +172,8 @@ class LogTest:
     unit3.inventory.add(Some(itemi4))
     unit3.inventory.add(Some(testsoup))
     unit4.inventory.add(Some(itemi5))
- 
+    unit5.inventory.add(Some(itemi6))
+
     //unit2.inventory.swap(invi2, 0, 0)
   
   def setF12() =
@@ -211,24 +216,25 @@ class LogTest:
     grid.occupiables(5).addOccupant(unit2)
     grid.occupiables(1).addOccupant(unit3)
     grid.occupiables(17).addOccupant(unit4)
+    grid.occupiables(20).addOccupant(unit5)
 
     field = FieldMap(Vector(group), Vector(), grid,
-                     new Organization(Vector(unit1), Vector(unit1), storage, Player), Route(Enemy), Vector(Route(Player)), 0, 0)
+                     new Organization(Vector(unit1,unit5), Vector(unit1,unit5), storage, Player), Route(Enemy), Vector(Route(Player)), 0, 0)
   end setGrid
 
   def log(which: String): Vector[String] =
     which match
-      case "break" => Break(unit1,unit2,1,Head).play()
-      case "wound" => Wound(unit1,unit2,1,Head).play()
-      case "heal" =>  Heal(unit3,unit1,1,testmed).play()
-      case "treat" => Treat(unit3,unit2,1,testmed,Head).play()
+      case "break" => Break(unit1,unit2,1,Head).playS()
+      case "wound" => Wound(unit1,unit2,1,Head).playS()
+      case "heal" =>  Heal(unit3,unit1,1,testmed).playS()
+      case "treat" => Treat(unit3,unit2,1,testmed,Head).playS()
       case "ai" => AIup()
       case "pass" =>
         if game.stack.isEmpty && !game.enemyTurnOver then
           AIup()
         else
-          game.continue()
-      case _ =>      fight.play()
+          game.continueS()
+      case _ =>      fight.playS()
 
 
   def theField: FieldMap =
@@ -349,7 +355,7 @@ def test() =
       println("")
       println(fight.target)
       println("")
-      fight.play()
+      fight.playS()
       println("")
       println(fight.select.shortInfo)
       println("")
