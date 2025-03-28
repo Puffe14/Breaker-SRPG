@@ -21,7 +21,8 @@ end Explain
 class Act(unit: Units, animation: Animation, start: Int, end: Int):
   def actor = unit
   def frame = animation
-  def done(time: Int) = start + time > end
+  def done(time: Int) = time > end
+  def show(time: Int) = time > start
   override def toString = unit.name + ": " + animation.toString + " at " + end
 
 
@@ -31,4 +32,4 @@ class AniSeries(val unit: Units):
 
 
 enum Animation:
-  case Attack, Critical, Evade, Miss, Hurt, Idle
+  case Attack, Critical, Evade, Miss, Hurt, Idle, Stance

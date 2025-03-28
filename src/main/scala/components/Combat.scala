@@ -31,8 +31,8 @@ import scala.util.Random
       if isEffective then damage *= rules.effectiveMultipllier
     )
     damage
-    
-val attackDuration = 30
+
+val attackDuration = 20
 
 class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   val rules = Rules()
@@ -93,6 +93,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   //method for the performing attacks
   def attack(attacker: Units, defender: Units, weapon: Weapon) =
     val isHit = roll100 < attacker.HI - defender.AV //if the attack hits
+    explain.addAnimation(attacker,Stance,attackDuration/2)
     explain.addAnimation(attacker,Attack,attackDuration)
     if isHit then
       val isCritical = roll100 < attacker.CR //if a critical hit is rolled
@@ -294,6 +295,7 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
     if isEffective then bonusHit += rules.skillBonusHitRateForEffective
     //checks if the attack hits, hitrate / ratio  - avoid + bonus
     val isHit = roll100 < attacker.HI / rules.skillHitRatePenaltyRatio - defender.AV + bonusHit
+    explain.addAnimation(attacker,Stance,attackDuration/2)
     explain.addAnimation(attacker,Attack,attackDuration)
     //If the skill requires a hit check
     if isHit then

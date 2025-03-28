@@ -59,6 +59,7 @@ def animationToInt(animation: Animation) =
   animation match
     case Idle => 0
     case Attack => 2
+    case Stance => 1
     case Evade => 1
     case Hurt => 3
     case _ => 0
@@ -241,15 +242,17 @@ object GUI extends JFXApp3:
         drawAll(drawField++drawUnits++drawCursor, g)
 
         //Keep game going on
-        game.handleTurn()
+        if actList.isEmpty then game.handleTurn()
         while game.stack.hasNext && actList.isEmpty do
           val explain = game.continue()
           delta = 0
           //Capture acts from explain
           actList = explain.acts
         game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
-        actList.foreach(a => setAniInt(a.actor, a.frame))
+        actList.filter(_.show(delta)).foreach(a => setAniInt(a.actor, a.frame))
         actList = actList.filterNot(_.done(delta))
+        if delta == 120 then
+          1+1
         delta+=1
     })
     timer.start()

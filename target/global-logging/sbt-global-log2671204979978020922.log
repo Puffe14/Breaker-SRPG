@@ -1,0 +1,90 @@
+[debug] > Exec(;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("C:/Users/Omistaja/AppData/Local/Temp/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveSourceClassifiers");apply -cp "C:/Users/Omistaja/AppData/Roaming/JetBrains/IdeaIC2024.2/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.3/2024.2.2/sbt-structure-extractor-2024.2.2.jar" "org.jetbrains.sbt.CreateTasks" "sbt.jetbrains.LogDownloadArtifacts";preferScala2;*/*:dumpStructure, Some(dd84f7a0-4363-4103-9e92-764783bbe24f), Some(CommandSource(console0)))
+[debug] > Exec(set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("C:/Users/Omistaja/AppData/Local/Temp/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveSourceClassifiers"), None, Some(CommandSource(console0)))
+[info] Defining Global / sbtStructureOptions, Global / sbtStructureOutputFile and 1 others.
+[info] The new values will be used by cleanKeepGlobs
+[info] 	Run `last` for details.
+[debug] Defining 
+[debug] 	Global / sbtStructureOptions
+[debug] 	Global / sbtStructureOutputFile
+[debug] 	history
+[debug] 	shellPrompt
+[debug] 
+[debug] The new values will be used by 
+[debug] 	cleanKeepGlobs
+[info] Reapplying settings...
+[info] set current project to Breaker (in build file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/)
+[debug] > Exec(apply -cp "C:/Users/Omistaja/AppData/Roaming/JetBrains/IdeaIC2024.2/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.3/2024.2.2/sbt-structure-extractor-2024.2.2.jar" "org.jetbrains.sbt.CreateTasks" "sbt.jetbrains.LogDownloadArtifacts", None, Some(CommandSource(console0)))
+[info] Applying State transformations org.jetbrains.sbt.CreateTasks, sbt.jetbrains.LogDownloadArtifacts from C:/Users/Omistaja/AppData/Roaming/JetBrains/IdeaIC2024.2/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.3/2024.2.2/sbt-structure-extractor-2024.2.2.jar
+[info] Reapplying settings...
+[info] set current project to Breaker (in build file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/)
+[info] Reapplying settings...
+[info] set current project to Breaker (in build file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/)
+[debug] > Exec(preferScala2, None, Some(CommandSource(console0)))
+[debug] > Exec(*/*:dumpStructure, None, Some(CommandSource(console0)))
+[debug] Evaluating tasks: Global / dumpStructure
+[warn] sbt 0.13 shell syntax is deprecated; use slash syntax instead: Global / dumpStructure
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.3.5/scala3-sbt-bridge-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.3.5/scala3-sbt-bridge-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.3.5/scala3-sbt-bridge-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.3.5/scala3-sbt-bridge-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5.pom
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5.pom
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5.jar
+[info] downloading https://repo1.maven.org/maven2/org/jline/jline-terminal-jni/3.27.1/jline-terminal-jni-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/jline/jline-native/3.27.1/jline-native-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/jline/jline-reader/3.27.1/jline-reader-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/jline/jline-terminal/3.27.1/jline-terminal-3.27.1-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/jline/jline-terminal-jni/3.27.1/jline-terminal-jni-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/jline/jline-reader/3.27.1/jline-reader-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.5/scala3-library_3-3.3.5-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-tasty-inspector_3/3.3.5/scala3-tasty-inspector_3-3.3.5-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/jline/jline-terminal/3.27.1/jline-terminal-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/jline/jline-native/3.27.1/jline-native-3.27.1-sources.jar
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-interfaces/3.3.5/scala3-interfaces-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/modules/scala-asm/9.7.0-scala-2/scala-asm-9.7.0-scala-2-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/tasty-core_3/3.3.5/tasty-core_3-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/3.3.5/scala3-compiler_3-3.3.5-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.15/scala-library-2.13.15-sources.jar
+[info] downloaded https://repo1.maven.org/maven2/org/scala-lang/scaladoc_3/3.3.5/scaladoc_3-3.3.5-sources.jar
+[info] Writing structure to C:\Users\Omistaja\AppData\Local\Temp\sbt-structure.xml...
+[info] Done.
+[success] Total time: 33 s, completed 7.2.2025 klo 17.43.09
+[debug] > Exec(shell, None, None)
