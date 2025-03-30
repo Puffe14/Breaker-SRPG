@@ -6,7 +6,8 @@ import components.Animation.*
 trait Action:
   var location: Option[Tile] = None
   var explain: Explain = Explain("")
-  def playS(): Vector[String] = Vector(play().name)
+  var actLength: Int = 30
+  def playS(): Vector[String] = Vector(explain.name)
   def play(): Explain
 end Action
 
@@ -35,7 +36,7 @@ end Move
 class Wait(unit: Units) extends Action:
   def play(): Explain =
     explain = Explain(unit.name + " waited")
-    explain.addAnimation(unit,Evade,1)
+    explain.addAnimation(unit,Evade,actLength)
     unit.endTurn()
     explain
 end Wait
@@ -45,7 +46,7 @@ class Trade(unit: Units, inventory: Inventory, slot1: Int, slot2: Int) extends A
     val slots1 = unit.inventory.items
     val slots2 = inventory.items
     explain = Explain("swapped "+slots1(slot1)+" and "+slots2(slot2))
-    explain.addAnimation(unit,Hurt,1)
+    explain.addAnimation(unit,Hurt,actLength)
     unit.inventory.swap(inventory,slot1,slot2)
     explain
 end Trade
@@ -53,7 +54,7 @@ end Trade
 class Use(unit: Units, item: Consumable) extends Action:
   def play(): Explain =
     explain = Explain(unit.name + " used " + item.name)
-    explain.addAnimation(unit,Hurt,1)
+    explain.addAnimation(unit,Hurt,actLength)
     unit.useItem(item)
     unit.endTurn()
     explain

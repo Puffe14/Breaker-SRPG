@@ -178,9 +178,16 @@ object GUI extends JFXApp3:
       )
       toDraw.toVector
 
-  def drawAll(pics: Vector[ImageView], g: GraphicsContext) =
+  def drawAllMap(pics: Vector[ImageView], g: GraphicsContext) =
     pics.sortBy(i=>(-i.viewOrder(), i.y()))
         .foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
+
+  def drawMenus(menus: Vector[Menu], g: GraphicsContext) =
+    val windows = menus.map(MenuWindow(_)) // Make menu window objects
+    var offset = 0 // Offset from previous menu window
+    for i <- windows do
+      i.draw(g, offset)        // Then draw the menus
+      offset = i.width+i.pad   // Set seperation to the next menu
 
 
   // CONTROL
@@ -236,10 +243,12 @@ object GUI extends JFXApp3:
         //Write nonsense
         g.fill = Blue
         g.font = Font(50) // Set text size
-        g.fillText(text, 10, 100) // Fill text at (10, 100)
+        g.fillText(text, 250, 50) // Fill text at (10, 100)
 
         //Draw methods for groups of Images
-        drawAll(drawField++drawUnits++drawCursor, g)
+        drawAllMap(drawField++drawUnits++drawCursor, g)
+        //Draw "UI" on top
+        drawMenus(game.menus, g)
 
         //Keep game going on
         if actList.isEmpty then game.handleTurn()
@@ -251,8 +260,6 @@ object GUI extends JFXApp3:
         game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
         actList.filter(_.show(delta)).foreach(a => setAniInt(a.actor, a.frame))
         actList = actList.filterNot(_.done(delta))
-        if delta == 120 then
-          1+1
         delta+=1
     })
     timer.start()
@@ -326,18 +333,26 @@ object GUI extends JFXApp3:
   def cursorOnGridLeft() =  cursorX -= 1
 
   def handlePress(event: KeyEvent) =
-    event.code match
-      case KeyCode.W => cursorUp()
-      case KeyCode.A => cursorLeft()
-      case KeyCode.S => cursorDown()
-      case KeyCode.D => cursorRight()
-      case KeyCode.Enter => selectTile()
-      case KeyCode.Space => unSelect()
-      case KeyCode.Q => game.turnAnti()
-      case KeyCode.E => game.turnWise()
-      case KeyCode.Down => cameraUp(cameraMoveIncrement)
-      case KeyCode.Right => cameraLeft(cameraMoveIncrement)
-      case KeyCode.Up => cameraDown(cameraMoveIncrement)
-      case KeyCode.Left => cameraRight(cameraMoveIncrement)
-      case _ =>
+    if game.inMenu then
+      event.code match
+        case KeyCode.W => game.menuUp()
+        case KeyCode.S => game.menuDown()
+        case KeyCode.Enter => game.menuPick()
+        case KeyCode.Space => game.menuBack()
+        case _ =>
+    else
+      event.code match
+        case KeyCode.W => cursorUp()
+        case KeyCode.A => cursorLeft()
+        case KeyCode.S => cursorDown()
+        case KeyCode.D => cursorRight()
+        case KeyCode.Enter => selectTile()
+        case KeyCode.Space => unSelect()
+        case KeyCode.Q => game.turnAnti()
+        case KeyCode.E => game.turnWise()
+        case KeyCode.Down => cameraUp(cameraMoveIncrement)
+        case KeyCode.Right => cameraLeft(cameraMoveIncrement)
+        case KeyCode.Up => cameraDown(cameraMoveIncrement)
+        case KeyCode.Left => cameraRight(cameraMoveIncrement)
+        case _ =>
     text = event.character + s" Pos $cursorX, $cursorY. ${game.turnOf}"

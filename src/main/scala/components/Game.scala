@@ -14,6 +14,7 @@ class Game:
   var stack: Iterator[Action] = Iterator()
   var zoom: Int = 2
   var direction: Int = 0
+  var openMenus: Vector[Menu] = Vector()
 
   // CONTROLS
 
@@ -29,6 +30,9 @@ class Game:
 
   def selectTile(tile: Tile) =
     tile match
+      //If the character is selected again during the turn
+      case o: Occupiable if acting == o.occupantOnTile =>
+        menuPick()
       //Beat-em-up
       case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) => attack()
       //Select target
@@ -42,13 +46,14 @@ class Game:
       case _ =>
 
   def cancel() =
-    if      target.nonEmpty then target = None
+    if   openMenus.nonEmpty then menuBack()
+    else if target.nonEmpty then target = None
     else if acting.nonEmpty then acting = None
   
   def deSelect() =
     acting = None
     target = None
-    
+
   def clearPostAction() =
     if acting.forall(_.turnOver) then
       deSelect()
@@ -235,7 +240,48 @@ class Game:
     currentMap.foreach(
       _.allCharacters.foreach(_.refresh())
     )
-    
+
+ 
+  //MANU HANDLING
+
+  def handleMenu() =
+    openMenus.lastOption.foreach {
+      case m: AttackMenu =>
+        m.setSubMenus(Vector())
+        addMenu(m)
+      case m: WoundMenu =>
+      case m: InventoryMenu =>
+        m.createSubMenus(this)
+        addMenu(m)
+      case m: ItemMenu =>
+        m.createSubMenus(this)
+        addMenu(m)
+      case m: WaitMenu =>
+      case _ =>
+    }
+
+  def addMenu(menu: Menu) =
+    openMenus = openMenus.appended(menu)
+
+  def menuPick() =
+    if openMenus.nonEmpty then
+      addMenu(openMenus.last.pick)
+    else
+      val menu: Menu = ActionsMenu()
+      menu.subMenus = Vector(AttackMenu(),WoundMenu(),InventoryMenu(),WaitMenu())
+      addMenu(menu)
+    handleMenu()
+
+  def menuBack() =
+    openMenus = openMenus.take(openMenus.length-1)
+  def menuUp() =
+    openMenus.last.selectorUp()
+  def menuDown() =
+    openMenus.last.selectorDown()
+  //If the player is in a menu
+  def inMenu = openMenus.nonEmpty
+  def menus = openMenus
+
 
   //TESTING
 
