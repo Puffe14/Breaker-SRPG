@@ -174,9 +174,9 @@ end Combat
 
 
 
-class Forecast(a: Units, b: Units, aAtkNum: Int, bAtkNum: Int, skill: Int, speed: Int):
+class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: Int, speed: Int):
   //Provides all calculated results for outside use.
-
+  
   //predicted dmg
   val aDmg = predictDmg(a, b)
   val bDmg = predictDmg(b, a)

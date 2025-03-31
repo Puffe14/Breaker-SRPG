@@ -7,6 +7,7 @@ trait Item {
   val name: String
   val description: String
   def describe = name +": "+this.description
+  def shouldRemove = false
 }
 
 trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: Int) extends Item:
@@ -17,7 +18,9 @@ trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: 
     uses += 1
   def isEmpty: Boolean =
     uses >= limit
-
+  override def shouldRemove = isEmpty
+  override def toString: String =
+    s"$name (${limit-uses}/$limit)"
 end Consumable
 
 //!!! fix class types so no name = "" or description = ""
@@ -58,6 +61,7 @@ trait Equipment extends Item:
 
   //Method fo all equipment that returns wheter they are broken or not.
   def intact: Boolean
+  override def shouldRemove = !intact
 
   //Handle being equipped
   def isEquipped: Boolean = equipped
@@ -123,9 +127,10 @@ trait Weapon extends Equipment:
         s"$name: $description"
 
   override def toString: String =
+    val equipState = if equipped then "* " else ""
     durability match
       case Some(maxDurability) =>
-        s"$name (${maxDurability-spent}/$maxDurability)"
+        equipState+s"$name (${maxDurability-spent}/$maxDurability)"
       case None =>
         s"$name"
 
@@ -157,6 +162,10 @@ trait Armor(part: Part) extends Equipment:
   def break() =
     broken = true
     equipped = false
+
+  override def toString =
+    val equipState = if equipped then "*" else ""
+    s"$equipState $name"
 
 end Armor
 

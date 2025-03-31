@@ -11,10 +11,15 @@ class Game:
   var player: Option[Organization] = None
   var acting: Option[Units] = None
   var target: Option[Units] = None
+  var inspected: Option[Units] = None
+  var bout: Option[Combat] = None
+  var forecast: Option[Forecast] = None
+  var part: Part = Part.Head
   var stack: Iterator[Action] = Iterator()
   var zoom: Int = 2
   var direction: Int = 0
   var openMenus: Vector[Menu] = Vector()
+  var selectorMenus: Vector[InstantMenu] = Vector()
 
   // CONTROLS
 
@@ -38,6 +43,7 @@ class Game:
       //Select target
       case o: Occupiable if o.occupied && acting.nonEmpty =>
         target = o.occupantOnTile
+        //forecast = Some(fight())
       //Move acting unit to given tile
       case o: Occupiable if acting.nonEmpty =>
         unitToTile(o)
@@ -45,8 +51,21 @@ class Game:
       case o: Occupiable if o.occupantOnTile.forall(_.team==turnOf)=> acting = o.occupantOnTile
       case _ =>
 
+  def inspectTile(tile: Tile) =
+    tile match
+      case o: Occupiable if o.occupied => inspected = o.occupantOnTile
+      case _ =>
+
+  def targetPart = part
+  def setTarget(newTarget: Option[Units]) = target = newTarget
+  def targetor: Option[Tile] =
+    target match
+      case Some(u) => tileOf(u)
+      case None => None
+
   def cancel() =
-    if   openMenus.nonEmpty then menuBack()
+    if inspected.nonEmpty then inspected = None
+    else if   openMenus.nonEmpty then menuBack()
     else if target.nonEmpty then target = None
     else if acting.nonEmpty then acting = None
   
@@ -57,6 +76,12 @@ class Game:
   def clearPostAction() =
     if acting.forall(_.turnOver) then
       deSelect()
+
+  def clearMenuWhenActed() =
+    if stack.nonEmpty then
+      openMenus = Vector()
+      setSelectMenus(Vector())
+      forecast = None
 
 
   def unitToTile(o: Occupiable) =
@@ -100,6 +125,11 @@ class Game:
       case Some(fm) => fm.theGrid.tileAt(x, y)
       case _ => None
 
+  def tileOf(u: Units): Option[Tile] =
+    currentMap match
+      case Some(fm) => fm.tileOf(u)
+      case _ => None
+
 
   // ACTION STACK
 
@@ -115,6 +145,9 @@ class Game:
 
   def addToStack(act: Action) =
     stack = stack ++ Iterable(act)
+
+  def addOptionToStack(act: Option[Action]) =
+    act.foreach(addToStack(_))
 
   def nextOnStack(): Action =
     if stack.nonEmpty then stack.next()
@@ -154,6 +187,13 @@ class Game:
           .toVector //to vector
         combats ++ heals ++ uses
 
+  def attackRangeUnitsFor(unit: Units): Vector[Units] =
+    var guys = Vector[Units]()
+    currentMap.foreach(fm=>fm.tileOf(unit)
+              .foreach(tl=> guys = fm.attackRangeUnitsAt(unit,tl,unit.Range)
+                                   .map(_(0)).toVector))
+    guys
+
   def initialize() =
     ()
 
@@ -183,6 +223,7 @@ class Game:
       refreshAll()
       deSelect()
     clearPostAction()
+    clearMenuWhenActed()
       //handleTurn() //If the turn is over, let the next ones act
   end handleTurn
 
@@ -212,10 +253,11 @@ class Game:
       case Some(fm) => Some(Move(u, fm))
       case _ => None
 
+  def wait(u: Units): Option[Wait] =
+    Some(Wait(u))
+
   def use(u: Units, c: Consumable): Option[Use] =
-    currentMap match
-      case Some(fm) => Some(Use(u, c))
-      case _ => None
+    Some(Use(u, c))
 
   def trade(u: Units, i: Inventory, s1: Int, s2: Int): Option[Trade] =
     currentMap match
@@ -228,6 +270,45 @@ class Game:
       case Some(fm) => Some(Combat(u, t, range))
       case _ => None
 
+    // Acting actions
+
+  def actingUse(item: Item) =
+    acting.foreach(u=>
+      val act = item match
+        case c: Consumable => use(u, c)
+        case _ => None
+      addOptionToStack(act)
+    )
+
+  def actingToggleEquip(item: Item) =
+    acting.foreach(u=>
+      u.toggleEquip(item)
+    )
+
+  def actingEquip(item: Item) =
+    acting.foreach(u=>
+      u.toggleEquip(item)
+    )
+
+  def actingDiscard(item: Item) =
+    acting.foreach(u=>
+      u.discard(item)
+    )
+
+  def actingWait() =
+    acting.foreach(u=>
+      addOptionToStack(wait(u))
+    )
+
+
+  def setBout(combat: Option[Combat]) =
+    bout = combat
+  def performBout() =
+    addOptionToStack(bout)
+  def setForecast() =
+    forecast = bout match
+      case Some(combat) => Some(combat.forecast)
+      case None => None
 
   def unitToUnitDistance(u: Units, t: Units): Int =
     var range = 0
@@ -245,42 +326,66 @@ class Game:
   //MANU HANDLING
 
   def handleMenu() =
-    openMenus.lastOption.foreach {
-      case m: AttackMenu =>
-        m.setSubMenus(Vector())
-        addMenu(m)
-      case m: WoundMenu =>
-      case m: InventoryMenu =>
-        m.createSubMenus(this)
-        addMenu(m)
-      case m: ItemMenu =>
-        m.createSubMenus(this)
-        addMenu(m)
-      case m: WaitMenu =>
-      case _ =>
-    }
+    openMenus.lastOption.foreach(m=>
+      m.createSubMenus(this)
+      if stack.nonEmpty && openMenus.length != 1 then addMenu(m)
+      if openMenus.length>1 then
+        openMenus(1) match
+          case m: TargetMenu => bout = m.combat(this)
+          case _ =>
+    )
+    openMenus.foreach(_.createSubMenus(this)) //update
 
   def addMenu(menu: Menu) =
     openMenus = openMenus.appended(menu)
+  def setSelectMenus(menus: Vector[InstantMenu]) =
+    selectorMenus = menus
+    selectorMenus.foreach(_.createSubMenus(this))
 
   def menuPick() =
     if openMenus.nonEmpty then
       addMenu(openMenus.last.pick)
     else
       val menu: Menu = ActionsMenu()
-      menu.subMenus = Vector(AttackMenu(),WoundMenu(),InventoryMenu(),WaitMenu())
       addMenu(menu)
     handleMenu()
 
   def menuBack() =
     openMenus = openMenus.take(openMenus.length-1)
+    selectorMenus = Vector()
+    forecast = None
+    target = None
+    bout = None
   def menuUp() =
-    openMenus.last.selectorUp()
+    openMenus.last match
+      case m: InstantMenu => m.selectUpEffect(this)
+      case m: Menu => m.selectorUp()
   def menuDown() =
-    openMenus.last.selectorDown()
+    openMenus.last match
+      case m: InstantMenu => m.selectDownEffect(this)
+      case m: Menu => m.selectorDown()
+  def menuSUp() =
+    selectorMenus.head match
+      case m: InstantMenu => m.selectUpEffect(this)
+      case m: Menu => m.selectorUp()
+  def menuSDown() =
+    selectorMenus.head match
+      case m: InstantMenu => m.selectDownEffect(this)
+      case m: Menu => m.selectorDown()
+  def menuSLeft() =
+    selectorMenus.last match
+      case m: InstantMenu => m.selectUpEffect(this)
+      case m: Menu => m.selectorUp()
+  def menuSRight() =
+    selectorMenus.last match
+      case m: InstantMenu => m.selectDownEffect(this)
+      case m: Menu => m.selectorDown()
   //If the player is in a menu
   def inMenu = openMenus.nonEmpty
   def menus = openMenus
+
+
+  def setTargetedPart(tPart: Part) = part = tPart
 
 
   //TESTING

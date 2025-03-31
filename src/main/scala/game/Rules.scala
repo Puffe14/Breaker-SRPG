@@ -1,4 +1,5 @@
 package game
+import components.*
 
 class Rules {
   //limits for difference based activations in combat
@@ -13,4 +14,6 @@ class Rules {
   //bonus
   val skillBonusHitRateForEffective = 20
   val skillHitRatePenaltyRatio = 2
+  //parts
+  val allParts = Set(Part.Head, Part.Torso, Part.Arms, Part.Legs)
 }

@@ -14,8 +14,9 @@ class Occupiable(file: String,
                 ) extends Tile(file, name):
   var occupant: Option[Units] = None
   val atk: Int = 0
-  val dodge:Int = 0
-  val protection: Int = 0
+  val avoid:Int = 0
+  val physical: Int = 0
+  val magical: Int = 0
   val hpEffect: Int = 0
   var reduction: Map[String, Int] = Map()
 
@@ -36,6 +37,14 @@ class Occupiable(file: String,
     occupant = None
     occupant
   def occupantOnTile = occupant
+  def statsVector =
+    Vector(
+      ("AT",atk),
+      ("AV",avoid),
+      ("PD",physical),
+      ("MD",magical),
+      ("Heal",hpEffect)
+    )
 end Occupiable
 
 class Unoccupiable(file: String, name: String, val canFlyOver: Boolean) extends Tile(file, name):

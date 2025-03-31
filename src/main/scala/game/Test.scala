@@ -141,6 +141,7 @@ class LogTest:
   def testspell = TestSpell()
   def testmed = TestMedkit()
   def testsoup = TestSoup()
+  def testhelmet = TestHelmet()
 
   def resetFighters() =
     units.foreach(_.healDamage(100))
@@ -167,12 +168,16 @@ class LogTest:
     unit1.inventory.add(Some(dmace))
     unit1.inventory.add(Some(wclub))
     unit1.inventory.add(Some(testspell))
+    unit1.inventory.add(Some(testsoup))
     unit2.inventory.add(Some(itemi2))
     unit2.inventory.add(Some(itemi3))
     unit3.inventory.add(Some(itemi4))
     unit3.inventory.add(Some(testsoup))
     unit4.inventory.add(Some(itemi5))
     unit5.inventory.add(Some(itemi6))
+    unit5.inventory.add(Some(testsoup))
+    unit5.inventory.add(Some(testhelmet))
+
 
     //unit2.inventory.swap(invi2, 0, 0)
   

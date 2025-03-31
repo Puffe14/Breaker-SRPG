@@ -3,6 +3,7 @@ import components.Part.Head
 import components.Team.Ally
 import game.Rules
 val rules = Rules()
+val parts = rules.allParts
 
 class Units(var character: Character):
   val unitsInventory = Inventory(rules.unitInventoryLimit)
@@ -27,6 +28,9 @@ class Units(var character: Character):
   def armor = unitsInventory.equippedArmors
   def consumables = unitsInventory.consumables
   def medkit = unitsInventory.equippedMedkit
+  def usableWeapons = unitsInventory.weapons
+  def usableWeaponsAt(distance: Int) =
+    unitsInventory.weapons.filter(w => w.range(0)>=distance && w.range(1)<=distance)
   def usableMedkits = unitsInventory.medkit
   def unitClass = character.currentClass
   def types = unitClass.classType
@@ -58,6 +62,10 @@ class Units(var character: Character):
 
   def wounds: Set[Part] =
     woundsTaken
+  def woundableParts: Set[Part] =
+    parts--breakableParts--wounds
+  def breakableParts: Set[Part] =
+    armor.map(_.bodyPart).toSet
   def takeWound(wound: Part) =
     woundsTaken = woundsTaken + wound
   def healWound(wound: Part) =
@@ -146,14 +154,26 @@ class Units(var character: Character):
 
   def useItem(item: Consumable) =
     item.utilize(this)
+    inventory.clean()
 
   def equip(item: Item) =
     item match
       case weapon: Weapon =>
-        unitsInventory.equipWeapon(weapon)
+        unitsInventory.equipWeapon(weapon, false)
       case armor: Armor =>
-        unitsInventory.equipArmor(armor)
+        unitsInventory.equipArmor(armor, false)
       case _ =>
+
+  def toggleEquip(item: Item) =
+    item match
+      case weapon: Weapon =>
+        unitsInventory.equipWeapon(weapon, true)
+      case armor: Armor =>
+        unitsInventory.equipArmor(armor, true)
+      case _ =>
+
+  def discard(item: Item) =
+    unitsInventory.remove(Some(item))
 
   def loot: Vector[Item] =
     unitsInventory.equippedArmors
@@ -214,7 +234,7 @@ class Units(var character: Character):
   //Combat skill
   def SK: Int =
     unitsInventory.equippedWeapon.foreach(n =>
-      return skl - n.weight + bonus("SK")
+      return skl - n.weight/3 + bonus("SK")
     )
     0
 
@@ -249,10 +269,42 @@ class Units(var character: Character):
   def HL: Int =
     mag/3 + skl/2
 
+
   def shortInfo =
     name + s" $HP/$MaxHP\n" +
     " Weapon: " + weapon.getOrElse("None").toString
-  
+
+  def hpMhp = s"$HP/$MaxHP"
+  def lvl = character.level
+  def exp = character.exp
+  def lvlExp = s"LVL: $lvl, EXP: $exp"
+
+  def statsStaticVector: Vector[(String, Int)] =
+    Vector(
+      ("str", str),
+      ("mag", mag),
+      ("skl", skl),
+      ("spd", spd),
+      ("dfn", dfn),
+      ("res", res)
+    )
+  def statsPersonalsVector: Vector[(String, Int)] =
+      statsStaticVector ++ Vector(("mhp ", MaxHP))
+  def statsUnitVector: Vector[(String, Int)] =
+       Vector(("move", MOVE), ("jump", JUMP))++statsStaticVector
+  def statsCombatVector: Vector[(String, Int)] =
+    Vector(
+      ("AT", AT),
+      ("HI", HI),
+      ("CR", CR),
+      ("AS", AS),
+      ("SK", SK),
+      ("PD", PD),
+      ("MD", MD),
+      ("AV", AV),
+      ("CA", CA)
+    )
+
   override def toString =
     name + s" $HP/$MaxHP  MV: $MOVE\n" +
     " Combat:\n" + s"  AT: $AT, HI: $HI, CR: $CR \n  AS: $AS, SK: $SK \n  PD: $PD, MD: $MD, AV: $AV, CA: $CA \n" +

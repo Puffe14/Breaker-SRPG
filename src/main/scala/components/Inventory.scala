@@ -6,13 +6,20 @@ class Inventory(slotCount: Int):
   //Creates the slots for the inventory, filled with None.
   private var slots: Vector[Option[Item]] = Vector.fill(slotCount)(None)
 
-  //Moves all non-empty slots to the top of the inventory slots.
+  /** Moves all non-empty slots to the top of the inventory slots. */
   private def definedToTop() =
     val itemsDefined = slots.filter(_.isDefined)
     val unDefined = slots.filter(_.isEmpty)
     slots = itemsDefined ++ unDefined
 
-  //Removes an item from the inventory.
+
+  def clean() =
+    slots.foreach(i =>
+      if i.forall(_.shouldRemove) then
+        remove(i)
+    )
+
+  /** Removes an item from the inventory. */
   def remove(item: Option[Item]): Option[Item] =
     item match
       case Some(foundItem) if slots.contains(item) =>
@@ -25,7 +32,7 @@ class Inventory(slotCount: Int):
     slots.foreach(removed += remove(_))
     removed.toVector
   
-  //Adds an item to the inventory. Returns false if there are no slots to fill.
+  /** Adds an item to the inventory. Returns false if there are no slots to fill. */
   def add(item: Option[Item]): Boolean =
     if slots.contains(None) then
       slots = slots.updated(slots.indexOf(None), item)
@@ -134,14 +141,16 @@ class Inventory(slotCount: Int):
 
   //---------------------
 
-  def equipWeapon(weapon: Weapon) =
-    equippedWeapon.foreach(_.unequip())
-    weapon.equip()
-  
-  def equipArmor(armor: Armor) =
+  def equipWeapon(weapon: Weapon, toggle: Boolean) =
+    equippedWeapon.foreach(w=> if w!=weapon then w.unequip())
+    if toggle then weapon.toggleEquip()
+    else weapon.equip()
+
+  def equipArmor(armor: Armor, toggle: Boolean) =
     //unequips any armor piece that fits on the same part of the body
-    equippedArmors.filter(_.partName == armor.partName).foreach(_.unequip())
-    armor.equip()
+    equippedArmors.filter(a => a.bodyPart == armor.bodyPart && a!=armor).foreach(_.unequip())
+    if toggle then armor.toggleEquip()
+    else armor.equip()
 
   //----------------------
 

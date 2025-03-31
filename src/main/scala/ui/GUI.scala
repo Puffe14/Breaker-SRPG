@@ -2,6 +2,7 @@ package ui
 
 import components.*
 import components.Animation.*
+import components.Team.Enemy
 import game.*
 import scalafx.event.*
 import scalafx.animation.AnimationTimer
@@ -13,7 +14,7 @@ import scalafx.scene.input.*
 import scalafx.scene.layout.*
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
-import scalafx.Includes._
+import scalafx.Includes.*
 
 import java.io.FileInputStream
 import scala.collection.mutable
@@ -24,7 +25,10 @@ val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field
                                 new Image(new FileInputStream(imagePath + "field_red.png")),
                                 new Image(new FileInputStream(imagePath + "field_sand.png")),
                                 new Image(new FileInputStream(imagePath + "field_base.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor.png")))
+                                new Image(new FileInputStream(imagePath + "field_cursor.png")),
+                                new Image(new FileInputStream(imagePath + "field_cursor_player.png")),
+                                new Image(new FileInputStream(imagePath + "field_cursor_enemy.png")),
+                                new Image(new FileInputStream(imagePath + "field_cursor_ally.png")))
 val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
@@ -160,6 +164,17 @@ object GUI extends JFXApp3:
       case Some(tile) => Vector(tileImage(tile.pos,5))
       case None => Vector()
 
+  def drawTargetor =
+    game.targetor match
+      case Some(tile) if game.openMenus.length>1 =>
+        var color = 5
+        if game.target.forall(_.team==Team.Player) then color = 6
+        if game.target.forall(_.team==Team.Enemy) then color = 7
+        if game.target.forall(_.team==Team.Ally) then color = 8
+        Vector(tileImage(tile.pos,color))
+      case Some(_) => Vector()
+      case _ => Vector()
+
   def drawUnits =
       val toDraw = mutable.Buffer[ImageView]()
       game.allTilesWithUnits.foreach(t =>
@@ -183,11 +198,26 @@ object GUI extends JFXApp3:
         .foreach(t => g.drawImage(t.image(), t.x(),t.y(),t.scaleX(),t.scaleY()))
 
   def drawMenus(menus: Vector[Menu], g: GraphicsContext) =
-    val windows = menus.map(MenuWindow(_)) // Make menu window objects
+    val windows = menus.map(MenuWindow(_)).filterNot(_.hidden) // Make menu window objects
     var offset = 0 // Offset from previous menu window
     for i <- windows do
       i.draw(g, offset)        // Then draw the menus
-      offset = i.width+i.pad   // Set seperation to the next menu
+      offset += i.width+i.pad   // Set seperation to the next menu
+    offset = 0
+    // show tile being hovered
+    hoverTile.foreach(TileWindow(_).draw(g, 0))
+    // show who is being inspected
+    game.inspected.foreach(u=>
+      val window = CharacterWindow(u)
+      window.draw(g, 310)
+    )
+    game.forecast.foreach(u=>
+      ForecastWindow(u).draw(g, 50)
+    )
+    val selectorWindows = game.selectorMenus.map(LeftRightMenuWindow(_))
+    for i <- selectorWindows do
+      i.draw(g, offset+100, 100)
+      offset += i.width+i.pad
 
 
   // CONTROL
@@ -205,6 +235,8 @@ object GUI extends JFXApp3:
     game.tileAt(x,y)*/
     val (x, y) = (cursorX, cursorY)
     game.tileAt(x,y)
+  def inspectTile() =
+    hoverTile.foreach(game.inspectTile(_))
 
   def setMouseLocation(event: MouseEvent) =
     mouseX = event.x.toInt - middle(0)
@@ -246,12 +278,13 @@ object GUI extends JFXApp3:
         g.fillText(text, 250, 50) // Fill text at (10, 100)
 
         //Draw methods for groups of Images
-        drawAllMap(drawField++drawUnits++drawCursor, g)
+        drawAllMap(drawField++drawUnits++drawCursor++drawTargetor, g)
         //Draw "UI" on top
         drawMenus(game.menus, g)
 
         //Keep game going on
-        if actList.isEmpty then game.handleTurn()
+        if actList.isEmpty && !game.isBattleOver then game.handleTurn()
+        text = s"Pos $cursorX, $cursorY. ${game.turnOf}"
         while game.stack.hasNext && actList.isEmpty do
           val explain = game.continue()
           delta = 0
@@ -327,13 +360,28 @@ object GUI extends JFXApp3:
   def unSelect() =
     game.cancel()
 
+  //Zoom control
+  def zoomIn() =
+    drawScale+=1
+  def zoomOut() =
+    drawScale-=1
+
   def cursorOnGridUp() =    cursorY += 1
   def cursorOnGridDown() =  cursorY -= 1
   def cursorOnGridRight() = cursorX += 1
   def cursorOnGridLeft() =  cursorX -= 1
 
   def handlePress(event: KeyEvent) =
-    if game.inMenu then
+    if game.selectorMenus.nonEmpty then
+      event.code match
+        case KeyCode.W => game.menuSUp()
+        case KeyCode.S => game.menuSDown()
+        case KeyCode.A => game.menuSLeft()
+        case KeyCode.D => game.menuSRight()
+        case KeyCode.Enter => game.menuPick()
+        case KeyCode.Space => game.menuBack()
+        case _ =>
+    else if game.inMenu then
       event.code match
         case KeyCode.W => game.menuUp()
         case KeyCode.S => game.menuDown()
@@ -347,12 +395,14 @@ object GUI extends JFXApp3:
         case KeyCode.S => cursorDown()
         case KeyCode.D => cursorRight()
         case KeyCode.Enter => selectTile()
+        case KeyCode.Tab => inspectTile()
         case KeyCode.Space => unSelect()
         case KeyCode.Q => game.turnAnti()
         case KeyCode.E => game.turnWise()
+        case KeyCode.Z => zoomIn()
+        case KeyCode.X => zoomOut()
         case KeyCode.Down => cameraUp(cameraMoveIncrement)
         case KeyCode.Right => cameraLeft(cameraMoveIncrement)
         case KeyCode.Up => cameraDown(cameraMoveIncrement)
         case KeyCode.Left => cameraRight(cameraMoveIncrement)
         case _ =>
-    text = event.character + s" Pos $cursorX, $cursorY. ${game.turnOf}"
