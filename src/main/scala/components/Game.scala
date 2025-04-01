@@ -35,11 +35,15 @@ class Game:
 
   def selectTile(tile: Tile) =
     tile match
+      //If the character is selected again and its not their turn
+      case o: Occupiable if acting.nonEmpty && acting.forall(_.team!=turnOf) =>
+        acting = None
       //If the character is selected again during the turn
       case o: Occupiable if acting == o.occupantOnTile =>
         menuPick()
       //Beat-em-up
-      case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) => attack()
+      case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) && targetInRangeOfActor =>
+        attack()
       //Select target
       case o: Occupiable if o.occupied && acting.nonEmpty =>
         target = o.occupantOnTile
@@ -48,7 +52,9 @@ class Game:
       case o: Occupiable if acting.nonEmpty =>
         unitToTile(o)
       //Select a new acting unit
-      case o: Occupiable if o.occupantOnTile.forall(_.team==turnOf)=> acting = o.occupantOnTile
+      case o: Occupiable =>
+        acting = o.occupantOnTile
+        inspected = None
       case _ =>
 
   def inspectTile(tile: Tile) =
@@ -193,6 +199,12 @@ class Game:
               .foreach(tl=> guys = fm.attackRangeUnitsAt(unit,tl,unit.Range)
                                    .map(_(0)).toVector))
     guys
+  def medRangeUnitsFor(unit: Units): Vector[Units] =
+    var guys = Vector[Units]()
+    currentMap.foreach(fm=>fm.tileOf(unit)
+              .foreach(tl=> unit.medkit.foreach(medkit => guys = fm.attackRangeUnitsAt(unit,tl,medkit.range)
+                                   .map(_(0)).toVector)))
+    guys
 
   def initialize() =
     ()
@@ -203,6 +215,7 @@ class Game:
     var groupsWithTurn: Vector[Group] = Vector()
     currentMap.foreach(fm=>
       fm.clearDead()
+      fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
     )
 
@@ -287,7 +300,7 @@ class Game:
 
   def actingEquip(item: Item) =
     acting.foreach(u=>
-      u.toggleEquip(item)
+      u.equip(item)
     )
 
   def actingDiscard(item: Item) =
@@ -315,6 +328,16 @@ class Game:
     currentMap.foreach(fm=>fm.tileOf(u).foreach(t1=>fm.tileOf(t)
       .foreach(t2=> range = fm.theGrid.tileDistance(t1,t2))))
     range
+
+  def targetInRangeOfActor =
+    var inRange = false
+    acting.foreach(a=>
+      target.foreach(t=>
+        a.weapon.foreach(w=>
+              val range = unitToUnitDistance(a,t)
+              if range >= w.range(0) && range <= w.range(1) then inRange = true
+            )))
+    inRange
 
   def refreshAll() =
     clearStack()
@@ -344,7 +367,12 @@ class Game:
 
   def menuPick() =
     if openMenus.nonEmpty then
-      addMenu(openMenus.last.pick)
+      val latest = openMenus.last
+      latest match
+        case m: ConfirmMenu => addMenu(latest.pick)
+        case _ =>
+          if latest.subMenus.nonEmpty then addMenu(latest.pick)
+          else println("EMPTY MENU SUBS")
     else
       val menu: Menu = ActionsMenu()
       addMenu(menu)

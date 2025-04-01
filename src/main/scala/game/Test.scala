@@ -76,6 +76,8 @@ class TestMedkit extends Medkit(10):
   val bonusToStats = Map[String, Int]()
   val description = "test medkit"
   val name = "testmeds"
+  val durability = Some(20)
+  var spent = 0
 
 class TestSoup extends Healing(Map[String, Int](), 1, 3, 10):
   override val name: String = "Soup"
@@ -95,8 +97,10 @@ val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" 
 val testStrongMap = Map("hitpoints" -> 25, "strength" -> 5, "magic" -> 1, "skill" ->0, "speed" ->0, "defence" -> 5, "resistance" -> 1, "movement" -> 1)
 val testSpiritMap = Map("hitpoints" -> 8, "strength" -> 1, "magic" -> 5, "skill" ->0, "speed" ->0, "defence" -> 0, "resistance" -> 5, "movement" -> 1)
 val testZeroMap = Map("hitpoints" -> 0, "strength" -> 0, "magic" -> 0, "skill" -> 0, "speed" -> 0, "defence" -> 0, "resistance" -> 0, "movement" -> 0)
+val testOneMap = Map("AT" -> 1, "AV" -> 5, "HI" -> 10)
+val testMinusMap = Map("AT" -> -1, "AV" -> -5, "HI" -> -10)
 val test100Map = Map("hitpoints" -> 100, "strength" -> 100, "magic" -> 100, "skill" -> 100, "speed" -> 100, "defence" -> 100, "resistance" -> 100)
-val testClass = new Class("test", 1, Vector("test"),testStatMap,testStatMap,testZeroMap,testZeroMap)
+val testClass = new Class("test", 1, Vector("test"),testStatMap,testStatMap,testOneMap,testMinusMap)
 
 val cylna =     new Character("cylna", testClass, Vector(),1,0,test100Map,testStrongMap)
 val bonk =      new Character("bonk", testClass, Vector(),1,0,testStatMap,testStatMap)
@@ -108,6 +112,7 @@ class testGrass(file: String, name: String) extends Occupiable(file, name):
 end testGrass
 
 class testSand(file: String, name: String) extends Occupiable(file, name):
+  override val avoid = -15
   reduction = Map("test" -> 2)
 end testSand
 
@@ -177,6 +182,7 @@ class LogTest:
     unit5.inventory.add(Some(itemi6))
     unit5.inventory.add(Some(testsoup))
     unit5.inventory.add(Some(testhelmet))
+    unit5.inventory.add(Some(testmed))
 
 
     //unit2.inventory.swap(invi2, 0, 0)

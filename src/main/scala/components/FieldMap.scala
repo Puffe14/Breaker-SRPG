@@ -16,7 +16,9 @@ class FieldMap(enemies: Vector[Group],
   def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group)
   def setPlayer(org: Organization) =
     player = org
-  def setLeaders() = ()
+  def setLeaders() =
+    val leadGroups = groups.filter(_.side==Enemy)
+    leadGroups.foreach(_.setLeader())
   def isCleared: Boolean =
     clearCondition.met(this)
   def isLost: Boolean =
@@ -60,13 +62,23 @@ class FieldMap(enemies: Vector[Group],
   def giveBonuses() =
     theGrid.tilesWithUnits.foreach(t =>
       t.occupantOnTile.foreach(u =>
-        u.nearbyBonuses
+        calculateBonus(u, t)
       )
     )
-  
+
   //Has to be able to this for current unit when moving without recalculating EVERYONE
-  def calculateBonus(unit: Units) =
-    unit
+  def calculateBonus(unit: Units, tile: Occupiable) =
+    unit.resetNearbyBonus()
+    val bonus = mutable.Map[String, Int]()
+    def addToStat(which: String, amount: Int) =
+      val newTotal = bonus.getOrElse(which, 0) + amount
+      bonus += (which -> newTotal)
+    tile.statsMap.foreach((a,b)=>addToStat(a,b))
+    val units = statusRangeUnitsFor(unit)
+    unit.leader.foreach(l => if units.contains(l) then rules.leaderBonus.foreach((a,b)=>addToStat(a,b)))
+    units.filter(_.team==unit.team).foreach(_.givenNearbyBuffs.foreach((a,b)=>addToStat(a,b)))
+    units.filter(_.team!=unit.team).foreach(_.givenNearbyDebuffs.foreach((a,b)=>addToStat(a,b)))
+    unit.setNearbyBonus(bonus.toMap)
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE
@@ -130,6 +142,16 @@ class FieldMap(enemies: Vector[Group],
     locationTile.foreach( t =>
       for i <- minR to maxR do
         unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - mover
+    )
+    unitsFound
+
+  def statusRangeUnitsFor(selected: Units): Set[Units] =
+    val locationTile = tileOf(selected)
+    val (minR, maxR) = (1, 2)
+    var unitsFound = Set[Units]()
+    locationTile.foreach( t =>
+      for i <- minR to maxR do
+        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - selected
     )
     unitsFound
 

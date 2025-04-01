@@ -14,6 +14,9 @@ class Group(var members: Vector[Units], var behaviour: Behaviour,
     behaviour = newBehaviour
   def metCondition() =
     conditionMet = true
+  def setLeader() =
+    val leader = members.maxByOption(_.lvl)
+    members.foreach(m => m.setLeader(leader))
 end Group
 
 

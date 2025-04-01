@@ -30,6 +30,7 @@ class Move(unit: Units, fieldMap: FieldMap) extends Action:
       msg = Vector(unit.name+" to "+tile.pos)
     )
     unit.moves()
+    fieldMap.giveBonuses()
     Explain(msg.mkString)
 end Move
 

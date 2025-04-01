@@ -105,7 +105,7 @@ class Inventory(slotCount: Int):
     }
     weaponInSlots
 
-  def medkit: Vector[Medkit] =
+  def medkits: Vector[Medkit] =
     //fromSlots(Vector[Medkit]())
     val slotted = items.flatten
     var medInSlots: Vector[Medkit] = Vector()
@@ -145,6 +145,11 @@ class Inventory(slotCount: Int):
     equippedWeapon.foreach(w=> if w!=weapon then w.unequip())
     if toggle then weapon.toggleEquip()
     else weapon.equip()
+
+  def equipMedkit(medkit: Medkit, toggle: Boolean) =
+    equippedMedkit.foreach(w=> if w!=medkit then w.unequip())
+    if toggle then medkit.toggleEquip()
+    else medkit.equip()
 
   def equipArmor(armor: Armor, toggle: Boolean) =
     //unequips any armor piece that fits on the same part of the body

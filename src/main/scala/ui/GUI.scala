@@ -19,6 +19,7 @@ import scalafx.Includes.*
 import java.io.FileInputStream
 import scala.collection.mutable
 
+// !!! EI TÄMMÖSTÄ
 val imagePath = "src/main/scala/resources/images/"
 val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field_gray.png")),
                                 new Image(new FileInputStream(imagePath + "field_movet.png")),
@@ -57,7 +58,12 @@ val imageSets = Map("cylna" -> imgAtkWar,
 val iconImages =
   Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
       "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
-      "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")))
+      "wound torso" -> new Image(new FileInputStream(imagePath + "wound body.png")),
+      "wound legs" -> new Image(new FileInputStream(imagePath + "wound legs.png")),
+      "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")),
+      "armor torso" -> new Image(new FileInputStream(imagePath + "armor body.png")),
+      "armor arms" -> new Image(new FileInputStream(imagePath + "armor arms.png")),
+      "armor legs" -> new Image(new FileInputStream(imagePath + "armor legs.png")))
 
 def animationToInt(animation: Animation) =
   animation match
@@ -205,18 +211,21 @@ object GUI extends JFXApp3:
       offset += i.width+i.pad   // Set seperation to the next menu
     offset = 0
     // show tile being hovered
-    hoverTile.foreach(TileWindow(_).draw(g, 0))
+    val dontHideHoverMenus = game.forecast.isEmpty
+    if dontHideHoverMenus then
+      hoverTile.foreach(TileWindow(_).draw(g, 0))
     // show who is being inspected
     game.inspected.foreach(u=>
       val window = CharacterWindow(u)
       window.draw(g, 310)
     )
+    
     game.forecast.foreach(u=>
       ForecastWindow(u).draw(g, 50)
     )
     val selectorWindows = game.selectorMenus.map(LeftRightMenuWindow(_))
     for i <- selectorWindows do
-      i.draw(g, offset+100, 100)
+      i.draw(g, offset+100, 380)
       offset += i.width+i.pad
 
 
@@ -274,7 +283,7 @@ object GUI extends JFXApp3:
 
         //Write nonsense
         g.fill = Blue
-        g.font = Font(50) // Set text size
+        g.font = Font(30) // Set text size
         g.fillText(text, 250, 50) // Fill text at (10, 100)
 
         //Draw methods for groups of Images
@@ -388,7 +397,7 @@ object GUI extends JFXApp3:
         case KeyCode.Enter => game.menuPick()
         case KeyCode.Space => game.menuBack()
         case _ =>
-    else
+    else if game.turnOf == Team.Player && actList.isEmpty then
       event.code match
         case KeyCode.W => cursorUp()
         case KeyCode.A => cursorLeft()

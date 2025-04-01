@@ -30,6 +30,7 @@ class MenuWindow(menu: Menu) extends Window:
     val fm = font+margin
     val pos = menu.select+1
     val height = pad * 2 + (menu.itemTitles.length+1) * fm
+    //val width = width//pad * 2 + menu.itemTitles.maxBy(_.length).length*6
 
     //Create background!
     g.fill = Gray // Set the fill color.
@@ -60,16 +61,24 @@ class ForecastWindow(fc: Forecast) extends Window:
   override val height = 150
   def draw(g: GraphicsContext, offset: Int) =
     val xo = x + offset
-    val yp = 400
+    val yp = 300
     val fm = font+margin
 
     //Create background!
     g.fill = Gray // Set the fill color.
-    g.fillRect(xo, yp, width, height)
+    //g.fillRect(xo, yp, width, height)
 
     //Face off character windows
-    MiniUnitWindow(fc.a).draw(g, 100, 200, fc.a.hpMhp, fc.aDmg, fc.aHit, fc.aCrit)
-    MiniUnitWindow(fc.b).draw(g, 300, 200, fc.b.hpMhp, fc.bDmg, fc.bHit, fc.bCrit)
+    MiniUnitWindow(fc.a).draw(g, 100, 220, fc.a.hpMhp, fc.aDmg, fc.aHit, fc.aCrit)
+    MiniUnitWindow(fc.b).draw(g, 300, 220, fc.b.hpMhp, fc.bDmg, fc.bHit, fc.bCrit)
+    val direction = fc.arrow match
+      case 1 => "->->"
+      case 0 => "<-"
+      case _ => "->"
+    //How many attacks and in what order?
+    g.fill = Purple
+    g.font = Font(font)
+    g.fillText(s"x${fc.aAtks} $direction x${fc.bAtks}", 240, 260)
 
 end ForecastWindow
 
@@ -184,7 +193,7 @@ class LeftRightMenuWindow(menu: Menu) extends Window:
         menu.subMenus(menu.select).title
       else
         "None"
-    
+
     g.fill = Blue
     g.font = Font(font)
     g.fillText(article, xo+pad,yo+pad)

@@ -145,6 +145,20 @@ trait Medkit(amount: Int) extends Equipment:
   def heal = amount
   def intact = true
   val range = (0, 1)
+  var spent: Int
+  val durability: Option[Int]
+  
+  //Cause the medkit to lose durability by increasing the amount spent.
+  def spend(durabilityLoss: Int) =
+    spent += durabilityLoss
+  override def toString: String =
+    val equipState = if equipped then "* " else ""
+    durability match
+      case Some(maxDurability) =>
+        equipState+s"$name (${maxDurability-spent}/$maxDurability)"
+      case None =>
+        s"$name"
+
 
 
 

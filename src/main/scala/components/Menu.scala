@@ -12,6 +12,7 @@ trait Menu:
   def createSubMenus(game: Game) =
     subMenus = Vector()
   def itemTitles: Vector[String] =
+    if selector > subMenus.length then selector = subMenus.length-1
     subMenus.map(_.title)
 
   /** Decides what happens when the menu item is picked. */
@@ -47,14 +48,14 @@ class ConfirmMenu extends Menu:
 
 class UnitMenu(actor: Units, targets: Vector[Units]) extends Menu:
   val title = "Unit"
-  override def createSubMenus(game: Game) =
-    setSubMenus(targets.map(CombatMenu(actor,_)))
+  override def createSubMenus(game: Game) =  ()
+    // !!! unused? setSubMenus(targets.map(CombatMenu(actor,_,this)))
 
-class CombatMenu(actor: Units, target: Units) extends ConfirmMenu:
+class CombatMenu(actor: Units, target: Units, previous: TargetMenu) extends ConfirmMenu:
   def targetUnit = target
   override def createSubMenus(game: Game) =
     setSubMenus(Vector(BoutMenu()))
-    game.setSelectMenus(Vector(WeaponsMenu(actor, target),PartsMenu(actor, target)))
+    previous.setSelect(game, actor, target)
     game.setForecast()
 
 class BoutMenu extends ConfirmMenu:
@@ -71,36 +72,34 @@ end ForecastMenu*/
 
 trait InstantMenu extends ConfirmMenu:
   def selectUpEffect(game: Game) =
-    effect(game)
     selectorUp()
-  def selectDownEffect(game: Game) =
     effect(game)
+  def selectDownEffect(game: Game) =
     selectorDown()
+    effect(game)
 end InstantMenu
 
-class WeaponsMenu(actor: Units, target: Units) extends InstantMenu:
-  override val title = "Weapons"
+class EquipsMenu(equips: Vector[Equipment]) extends InstantMenu:
+  override val title = "Equips"
   override def createSubMenus(game: Game) =
-    val distance = game.unitToUnitDistance(actor, target)
-    setSubMenus(actor.usableWeaponsAt(distance)
-                     .map(WeaponMenu(_)))
+    setSubMenus(equips.map(EquipmentMenu(_)))
   override def effect(game: Game) =
     subMenus(select).effect(game)
+    game.setForecast()
 
-class WeaponMenu(weapon: Weapon) extends Menu:
-  override val title = weapon.name
+class EquipmentMenu(equipment: Equipment) extends Menu:
+  override val title = equipment.name
   override def effect(game: Game) =
-    game.actingEquip(weapon)
+    game.actingEquip(equipment)
 
 
-class PartsMenu(actor: Units, target: Units) extends InstantMenu:
+class PartsMenu(parts: Vector[Part]) extends InstantMenu:
   override val title = "Parts"
   override def createSubMenus(game: Game) =
-    val distance = game.unitToUnitDistance(actor, target)
-    setSubMenus(target.woundableParts
-                      .map(PartMenu(_)).toVector)
+    setSubMenus(parts.map(PartMenu(_)).toVector)
   override def effect(game: Game) =
     subMenus(select).effect(game)
+    game.setForecast()
 
 class PartMenu(part: Part) extends InstantMenu:
   override val title = part.name
@@ -114,13 +113,27 @@ trait TargetMenu extends InstantMenu:
   override def createSubMenus(game: Game) =
     game.acting.foreach(actor =>
       val targetables = game.attackRangeUnitsFor(actor)
-      setSubMenus(targetables.map(CombatMenu(actor,_))))
+      setSubMenus(filtered(targetables).map(CombatMenu(actor,_,this))))
     effect(game)
   override def effect(game: Game) =
     this.subMenus(select) match
       case m: CombatMenu =>
         game.setTarget(Some(m.targetUnit))
       case _ =>
+  def filtered(before: Vector[Units]): Vector[Units] = before
+  /** Sets games select menus to the correct ones. Weapon/medkit + part */
+  def setSelect(game: Game, actor: Units, target: Units): Unit
+
+  // helper functions
+  def EquipsForWeapons(actor: Units, distance: Int) =
+    EquipsMenu(actor.usableWeaponsAt(distance))
+
+  def EquipsForMedkits(actor: Units, distance: Int) =
+    EquipsMenu(actor.usableMedkitsAt(distance))
+
+  def PartsVulnerable(target: Units) = PartsMenu(target.woundableParts.toVector)
+  def PartsBreakable(target: Units) = PartsMenu(target.breakableParts.toVector)
+  def PartsWounded(target: Units) = PartsMenu(target.wounds.toVector)
 
 class AttackMenu extends TargetMenu:
   override val title = "Attack"
@@ -133,35 +146,106 @@ class AttackMenu extends TargetMenu:
       )
     )
     found
+  def setSelect(game: Game, actor: Units, target: Units) =
+    // can use the weapons at particular distance
+    val distance = game.unitToUnitDistance(actor, target)
+    game.setSelectMenus(Vector(EquipsForWeapons(actor,distance)))
+
 class WoundMenu extends TargetMenu:
   override val title: String = "Wound"
-    def combat(game: Game): Option[Combat] =
-      var found: Option[Combat] = None
-        game.acting.foreach(a=>
-          game.target.foreach(t=>
-            val range = game.unitToUnitDistance(a,t)
-            found = Some(Wound(a,t,range,game.targetPart))
-          )
+  def combat(game: Game): Option[Combat] =
+    var found: Option[Combat] = None
+      game.acting.foreach(a=>
+        game.target.foreach(t=>
+          val range = game.unitToUnitDistance(a,t)
+          found = Some(Wound(a,t,range,game.targetPart))
         )
-      found
+      )
+    found
+  def setSelect(game: Game, actor: Units, target: Units) =
+    val distance = game.unitToUnitDistance(actor, target)
+    game.setSelectMenus(Vector(EquipsForWeapons(actor, distance),PartsVulnerable(target)))
+  override def filtered(before: Vector[Units]) =
+    before.filter(_.woundableParts.nonEmpty)
+
+class BreakMenu extends TargetMenu:
+  override val title: String = "Break"
+  def combat(game: Game): Option[Combat] =
+    var found: Option[Combat] = None
+      game.acting.foreach(a=>
+        game.target.foreach(t=>
+          val range = game.unitToUnitDistance(a,t)
+          found = Some(Break(a,t,range,game.targetPart))
+        )
+      )
+    found
+  def setSelect(game: Game, actor: Units, target: Units) =
+    val distance = game.unitToUnitDistance(actor, target)
+    game.setSelectMenus(Vector(EquipsForWeapons(actor, distance),PartsBreakable(target)))
+  override def filtered(before: Vector[Units]) =
+    before.filter(_.breakableParts.nonEmpty)
+
 class HealMenu extends TargetMenu:
   override val title: String = "Heal"
-    def combat(game: Game): Option[Combat] =
-      var found: Option[Combat] = None
-        game.acting.foreach(a=>
-          game.target.foreach(t=>
-            a.medkit.foreach(m=>
-              val range = game.unitToUnitDistance(a,t)
-              found = Some(Heal(a,t,range,m))
-            )
+  override def createSubMenus(game: Game) =
+    game.acting.foreach(actor =>
+      val targetables = game.medRangeUnitsFor(actor)
+      setSubMenus(filtered(targetables).map(CombatMenu(actor,_,this))))
+    effect(game)
+  def combat(game: Game): Option[Combat] =
+    var found: Option[Combat] = None
+      game.acting.foreach(a=>
+        game.target.foreach(t=>
+          a.medkit.foreach(m=>
+            val range = game.unitToUnitDistance(a,t)
+            found = Some(Heal(a,t,range,m))
           )
         )
-      found
+      )
+    found
+  def setSelect(game: Game, actor: Units, target: Units) =
+    val distance = game.unitToUnitDistance(actor, target)
+    game.setSelectMenus(Vector(EquipsForMedkits(actor, distance)))
+
+class TreatMenu extends TargetMenu:
+  override val title: String = "Treat"
+  override def createSubMenus(game: Game) =
+    game.acting.foreach(actor =>
+      val targetables = game.medRangeUnitsFor(actor)
+      setSubMenus(filtered(targetables).map(CombatMenu(actor,_,this))))
+    effect(game)
+  def combat(game: Game): Option[Combat] =
+    var found: Option[Combat] = None
+      game.acting.foreach(a=>
+        game.target.foreach(t=>
+          a.medkit.foreach(m=>
+            val range = game.unitToUnitDistance(a,t)
+            found = Some(Treat(a,t,range,m,game.targetPart))
+          )
+        )
+      )
+    found
+  def setSelect(game: Game, actor: Units, target: Units) =
+      val distance = game.unitToUnitDistance(actor, target)
+      game.setSelectMenus(Vector(EquipsForMedkits(actor, distance),PartsWounded(target)))
+  override def filtered(before: Vector[Units]) =
+    before.filter(_.wounds.nonEmpty)
 
 class ActionsMenu extends Menu:
   val title: String = "Actions"
   override def createSubMenus(game: Game) =
-    setSubMenus(Vector(AttackMenu(),WoundMenu(),HealMenu(),InventoryMenu(),WaitMenu()))
+    var collector = Vector[Menu]()
+    def atc(menu: Menu) = collector = collector.appended(menu)
+    game.acting.foreach(actor =>
+      if game.attackRangeUnitsFor(actor).nonEmpty then
+        atc(AttackMenu())
+        atc(WoundMenu())
+        atc(BreakMenu())
+      if game.medRangeUnitsFor(actor).nonEmpty then
+        atc(HealMenu())
+        atc(TreatMenu())
+    )
+    setSubMenus(collector ++ Vector(InventoryMenu(),WaitMenu()))
 
 class WaitMenu extends ConfirmMenu:
   override val title: String = "Wait"

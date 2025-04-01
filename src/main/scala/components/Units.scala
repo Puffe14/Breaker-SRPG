@@ -7,13 +7,13 @@ val parts = rules.allParts
 
 class Units(var character: Character):
   val unitsInventory = Inventory(rules.unitInventoryLimit)
-  var leader: Option[Unit] = None
+  var unitsLeader: Option[Units] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[Part] = Set()
   var statusSet: Set[Status] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
-  var team: Team = Ally
+  var side: Team = Ally
   
   var moved = false
   var acted = false
@@ -28,14 +28,21 @@ class Units(var character: Character):
   def armor = unitsInventory.equippedArmors
   def consumables = unitsInventory.consumables
   def medkit = unitsInventory.equippedMedkit
+  def leader = unitsLeader
+  def team = side
+
   def usableWeapons = unitsInventory.weapons
+  def usableMedkits = unitsInventory.medkits
   def usableWeaponsAt(distance: Int) =
-    unitsInventory.weapons.filter(w => w.range(0)>=distance && w.range(1)<=distance)
-  def usableMedkits = unitsInventory.medkit
+    usableWeapons.filter(w => w.range(0)<=distance && w.range(1)>=distance)
+  def usableMedkitsAt(distance: Int) =
+    usableMedkits.filter(m => m.range(0)<=distance && m.range(1)>=distance)
+
   def unitClass = character.currentClass
   def types = unitClass.classType
   def inventory = unitsInventory
-  def setTeam(newTeam: Team) = team = newTeam
+  def setTeam(newTeam: Team) = side = newTeam
+  def setLeader(newLeader: Option[Units]) = unitsLeader = newLeader
 
   //Check if the unit has been killed.
   def isDead = !isAlive
@@ -101,6 +108,8 @@ class Units(var character: Character):
   //Set based on fieldmap locations
   def setNearbyBonus(newBonus: Map[String, Int]) =
     nearbyBonuses = newBonus
+  def resetNearbyBonus() = setNearbyBonus(Map())
+
 
   def reduceTemporary() =
     //increases negative stats and reduces positive ones
@@ -160,6 +169,8 @@ class Units(var character: Character):
     item match
       case weapon: Weapon =>
         unitsInventory.equipWeapon(weapon, false)
+      case medkit: Medkit =>
+        unitsInventory.equipMedkit(medkit, false)
       case armor: Armor =>
         unitsInventory.equipArmor(armor, false)
       case _ =>
@@ -168,6 +179,8 @@ class Units(var character: Character):
     item match
       case weapon: Weapon =>
         unitsInventory.equipWeapon(weapon, true)
+      case medkit: Medkit =>
+        unitsInventory.equipMedkit(medkit, true)
       case armor: Armor =>
         unitsInventory.equipArmor(armor, true)
       case _ =>

@@ -45,6 +45,13 @@ class Occupiable(file: String,
       ("MD",magical),
       ("Heal",hpEffect)
     )
+  def statsMap =
+    Map(
+      ("AT"->atk),
+      ("AV"->avoid),
+      ("PD"->physical),
+      ("MD"->magical)
+    )
 end Occupiable
 
 class Unoccupiable(file: String, name: String, val canFlyOver: Boolean) extends Tile(file, name):
