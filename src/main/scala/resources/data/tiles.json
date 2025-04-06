@@ -1,0 +1,13 @@
+{
+  "gray_field": {
+    "name": "grass",
+    "photoFile": "field_gray",
+    "position": [0,0,0]
+  },
+
+  "sand_field": {
+    "name": "sand",
+    "photoFile": "field_sand",
+    "position": [0,0,0]
+  }
+}

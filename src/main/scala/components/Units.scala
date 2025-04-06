@@ -224,9 +224,9 @@ class Units(var character: Character):
   //Attack depends on if weapon is magical or physical
   def AT: Int =
     unitsInventory.equippedWeapon match
-      case Some(magical) if magical.typing == "magic" =>
+      case Some(magical) if magical.dmgtyping == "magic" =>
          magical.power + mag + bonus("AT")
-      case Some(physical) if physical.typing == "force" =>
+      case Some(physical) if physical.dmgtyping == "force" =>
          physical.power + str + bonus("AT")
       case _ => 0
 

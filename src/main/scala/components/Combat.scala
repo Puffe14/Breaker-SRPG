@@ -24,9 +24,9 @@ import scala.util.Random
     attacker.weapon.foreach( weapon =>
       val isEffective = //if the attackers weapon has an effectiveness against defenders type
          defender.types.exists(weapon.effective.contains(_))
-      if      weapon.typing == "force" then
+      if      weapon.dmgtyping == "force" then
         damage = lowest(attacker.AT - defender.PD, 0)
-      else if weapon.typing == "magic" then
+      else if weapon.dmgtyping == "magic" then
         damage = lowest(attacker.AT - defender.MD, 0)
       if isEffective then damage *= rules.effectiveMultipllier
     )
@@ -229,9 +229,9 @@ class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: In
     attacker.weapon.foreach( weapon =>
       val isEffective = //if the attackers weapon has an effectiveness against defenders type
          defender.types.exists(weapon.effective.contains(_))
-      if      weapon.typing == "force" then
+      if      weapon.dmgtyping == "force" then
         damage = lowest(attacker.AT - defender.PD, 0)
-      else if weapon.typing == "magic" then
+      else if weapon.dmgtyping == "magic" then
         damage = lowest(attacker.AT - defender.MD, 0)
       if isEffective then damage *= rules.effectiveMultipllier
     )

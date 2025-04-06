@@ -1,6 +1,7 @@
 package components
 import upickle.default.*
-import os.*
+import os.{RelPath, pwd}
+import os.read as or
 
 
 trait Item {
@@ -26,26 +27,26 @@ end Consumable
 //!!! fix class types so no name = "" or description = ""
 
 //Provides HP up to max
-class Healing(e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable(e,u,l):
-  val name = ""
-  val description = ""
+case class Healing(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int, var amount: Int) extends Consumable(e,u,l):
+  val name = itemName
+  val description = itemDescription
   def heal = amount
   override def utilize(unit: Units) =
     unit.healDamage(heal)
     use()
 
 //Gives a temporary boost on stat(s)
-class Booster(e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
-  val name = ""
-  val description = ""
+class Booster(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+  val name = itemName
+  val description = itemDescription
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addTemporaryStat(n(0), n(1)))
     use()
 
 //Gives a permanent increase to a stat
-class Brand(e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
-  val name = ""
-  val description = ""
+class Brand(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+  val name = itemName
+  val description = itemDescription
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addPermanent(n(0), n(1)))
     use()
@@ -82,6 +83,7 @@ trait Weapon extends Equipment:
   val durability: Option[Int]
   var spent: Int
   val quick: Boolean
+  val wpnType: String
   val dmgType: String
 
   //Direct combat stats.
@@ -112,7 +114,8 @@ trait Weapon extends Equipment:
   def weight: Int = givenWeight
   def bonus: Map[String, Int] =     bonusToStats
   def effective: Map[String, Int] = effectiveAgainst
-  def typing: String = dmgType
+  def dmgtyping: String = dmgType
+  def wpntyping: String = wpnType
 
   //Cause the weapon to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
@@ -136,11 +139,16 @@ trait Weapon extends Equipment:
 
 end Weapon
 
-trait Sharp extends Weapon
-trait Blunt extends Weapon
-trait Long extends Weapon
-trait Ranged extends Weapon
-trait Spell extends Weapon
+trait Sharp extends Weapon:
+  override val wpnType: String = "Sharp"
+trait Blunt extends Weapon:
+  override val wpnType: String = "Blunt"
+trait Long extends Weapon:
+  override val wpnType: String = "Long"
+trait Ranged extends Weapon:
+  override val wpnType: String = "Ranged"
+trait Spell extends Weapon:
+  override val wpnType: String = "Spell"
 trait Medkit(amount: Int) extends Equipment:
   def heal = amount
   def intact = true
@@ -178,35 +186,78 @@ trait Armor(part: Part) extends Equipment:
     equipped = false
 
   override def toString =
-    val equipState = if equipped then "*" else ""
-    s"$equipState $name"
+    val equipState = if equipped then "* " else ""
+    s"$equipState$name"
 
 end Armor
 
 
-case class BluntFile(filename: String) extends Blunt derives ReadWriter:
-  val wdata = ItemWeapon.getItem(filename)
-  val name = wdata("name").str
-  val description = wdata("description").str
-  val durability: Option[Int] = wdata("durability").str.toIntOption
-  val rank: String = wdata("rank").str
-  var spent: Int = wdata("spent").str.toInt
-  val quick: Boolean = wdata("quick").str == "true"
-  val dmgType: String = wdata("type").str
-  val givenPower: Int = upickle.default.read[Int](wdata("power"))
-  val givenHit: Int = wdata("hit").str.toInt
-  val givenCrit: Int = wdata("crit").str.toInt
-  val givenRange: (Int, Int) = (1, 1)
-  val givenWeight: Int = wdata("weight").str.toInt
-  val effectiveAgainst: Map[String, Int] = Map() //wdata("effective")
-  val bonusToStats: Map[String, Int] = Map()
-end BluntFile
+case class WeaponFile(filename: String) extends Weapon derives ReadWriter:
+  val wdata = ItemHandler.getItem(filename)
+  val name = read[String](wdata("name"))
+  val description = read[String](wdata("description"))
+  val durability: Option[Int] = Some(read[Int](wdata("durability")))
+  val rank: String = read[String](wdata("rank"))
+  var spent: Int = read[Int](wdata("spent"))
+  val quick: Boolean = read[Boolean](wdata("quick"))
+  val dmgType: String = wdata("dmgtype").str
+  val wpnType: String = wdata("wpntype").str
+  val givenPower: Int = read[Int](wdata("power"))
+  val givenHit: Int = read[Int](wdata("hit"))
+  val givenCrit: Int = read[Int](wdata("crit"))
+  val givenRange: (Int, Int) = read[(Int,Int)](wdata("range"))
+  val givenWeight: Int = read[Int](wdata("weight"))
+  val effectiveAgainst: Map[String, Int] = read[Map[String, Int]](wdata("effective"))
+  val bonusToStats: Map[String, Int] = read[Map[String, Int]](wdata("bonus"))
+end WeaponFile
 
 /**/
 
-object ItemWeapon:
+object ItemHandler:
   def getData(weaponType: String) =
-    ujson.read(os.read(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
   def getItem(filename: String) =
     val data = getData("")
     data(filename)
+
+  def getConsumables =
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
+  var lastData = getConsumables
+  var dataType = "healings"
+  def getConsumablesData =
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
+
+  // return all the classes to be created
+  def create: Map[String, Item] =
+    val itemFilenames = lastData.obj.keys
+    val nameToItem = for name <- itemFilenames yield
+     name -> itemRead(name)
+    nameToItem.toMap
+
+  // From the last getData, read the particular map and create a Character based on it.
+  def itemRead(filename: String): Item =
+    val dt = lastData(filename)
+    // Create new instance of the class
+    read[String](dt("typing")) match
+      case "Healing" =>
+        new Healing(read[String](dt("name")),
+                read[String](dt("description")),
+                read[Map[String,Int]](dt("effect")),
+                read[Int](dt("uses")),
+                read[Int](dt("limit")),
+                read[Int](dt("amount"))
+        )
+      case "Brand" =>
+        new Brand(read[String](dt("name")),
+                  read[String](dt("description")),
+                  read[Map[String,Int]](dt("effect")),
+                  read[Int](dt("uses")),
+                  read[Int](dt("limit"))
+            )
+      case "Booster" =>
+        new Booster(read[String](dt("name")),
+                  read[String](dt("description")),
+                  read[Map[String,Int]](dt("effect")),
+                  read[Int](dt("uses")),
+                  read[Int](dt("limit"))
+            )

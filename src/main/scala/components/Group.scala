@@ -17,6 +17,8 @@ class Group(var members: Vector[Units], var behaviour: Behaviour,
   def setLeader() =
     val leader = members.maxByOption(_.lvl)
     members.foreach(m => m.setLeader(leader))
+  def reduceTemporary() =
+    members.foreach(_.reduceTemporary())
 end Group
 
 

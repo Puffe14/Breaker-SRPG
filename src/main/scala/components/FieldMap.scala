@@ -1,5 +1,5 @@
 package components
-import components.Team.Enemy
+import components.Team.*
 
 import scala.collection.mutable
 

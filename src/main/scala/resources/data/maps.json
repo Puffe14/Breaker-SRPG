@@ -1,0 +1,37 @@
+{
+  "1": {
+    "enemies": [],
+    "allies": [],
+    "grid": {
+      "tiles": [],
+      "row": 0,
+      "column": 0,
+      "elevation": []
+    },
+    "clear": {
+      "title": "survive",
+      "limit": 5
+    },
+    "lose": [],
+    "rotation": 0,
+    "turnNumber": 1,
+  },
+
+  "2": {
+    "enemies": [],
+    "allies": [],
+    "grid": {
+      "tiles": [],
+      "row": 0,
+      "column": 0,
+      "elevation": []
+    },
+    "clearCondition": {
+      "title": "route",
+      "team": "enemy"
+    },
+    "loseConditions": [],
+    "rotation": 2,
+    "turnNumber": 1,
+  }
+}

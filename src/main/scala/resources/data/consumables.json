@@ -1,0 +1,27 @@
+{
+  "bread" : {
+    "typing": "Healing",
+    "name": "bread",
+    "description": "yummy",
+    "effect": {},
+    "uses": 0,
+    "limit": 3,
+    "amount": 7
+  },
+  "star_fragment" : {
+    "typing": "Brand",
+    "name": "star fragment",
+    "description": "Gives new power.",
+    "effect": {"hitpoints":  4},
+    "uses": 0,
+    "limit": 1
+  },
+  "stellar_incence" : {
+    "typing": "Booster",
+    "name": "stellar insence",
+    "description": "Temporarily boosts concentration.",
+    "effect": {"magic":  3},
+    "uses": 0,
+    "limit": 2
+  }
+}

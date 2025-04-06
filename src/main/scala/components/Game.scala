@@ -209,6 +209,7 @@ class Game:
   def initialize() =
     IOHandler.buildClasses()
     IOHandler.buildCharacters()
+    IOHandler.buildItems()
 
   /** Called when the turn is continuing. */
   def handleTurn(): Unit =
@@ -218,6 +219,7 @@ class Game:
       fm.clearDead()
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
+      groupsWithTurn.foreach(_.reduceTemporary())
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them

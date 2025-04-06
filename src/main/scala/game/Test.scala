@@ -79,9 +79,7 @@ class TestMedkit extends Medkit(10):
   val durability = Some(20)
   var spent = 0
 
-class TestSoup extends Healing(Map[String, Int](), 1, 3, 10):
-  override val name: String = "Soup"
-  override val description: String = "Tasty soup."
+class TestSoup extends Healing("Soup", "Tasty soup.", Map[String, Int](), 1, 3, 10)
 
 class TestHelmet extends Armor(Head):
   val name = "helmet"
@@ -89,8 +87,8 @@ class TestHelmet extends Armor(Head):
   val bonusToStats = Map("defence" -> 20)
 
 
-val club = BluntFile("w_club")
-val mace = BluntFile("d_mace")
+val club = WeaponFile("w_club")
+val mace = WeaponFile("d_mace")
 
 val testStatMap = Map("hitpoints" -> 55, "strength" -> 1, "magic" -> 1, "skill" -> 1, "speed" -> 1, "defence" -> 1, "resistance" -> 1, "movement" -> 3, "jump" -> 2)
 val testFastMap = Map("hitpoints" -> 24, "strength" -> 1, "magic" -> 1, "skill" ->10, "speed" ->12, "defence" -> 1, "resistance" -> 1, "movement" -> 1)
@@ -141,8 +139,8 @@ class LogTest:
   unit2.setTeam(Enemy)
   unit4.setTeam(Enemy)
   unit5.setTeam(Player)
-  def dmace = BluntFile("d_mace")
-  def wclub = BluntFile("w_club")
+  def dmace = WeaponFile("d_mace")
+  def wclub = WeaponFile("w_club")
   def testspell = TestSpell()
   def testmed = TestMedkit()
   def testsoup = TestSoup()
@@ -184,6 +182,9 @@ class LogTest:
     unit5.inventory.add(Some(testhelmet))
     unit5.inventory.add(Some(testmed))
     unit1.character = DataLibrary.characters("Cylna")
+    unit1.inventory.add(DataLibrary.items.get("stellar_incence"))
+    unit5.inventory.add(DataLibrary.items.get("star_fragment"))
+    unit1.inventory.add(DataLibrary.items.get("bread"))
     unit1.character.swapClass(DataLibrary.classes("wilder"))
     unit2.character.swapClass(DataLibrary.classes("rider"))
     unit3.character.swapClass(DataLibrary.classes("singer"))
