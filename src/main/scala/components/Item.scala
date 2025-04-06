@@ -193,7 +193,7 @@ case class BluntFile(filename: String) extends Blunt derives ReadWriter:
   var spent: Int = wdata("spent").str.toInt
   val quick: Boolean = wdata("quick").str == "true"
   val dmgType: String = wdata("type").str
-  val givenPower: Int = wdata("power").str.toInt
+  val givenPower: Int = upickle.default.read[Int](wdata("power"))
   val givenHit: Int = wdata("hit").str.toInt
   val givenCrit: Int = wdata("crit").str.toInt
   val givenRange: (Int, Int) = (1, 1)

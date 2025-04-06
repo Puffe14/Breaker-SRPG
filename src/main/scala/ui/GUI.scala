@@ -45,12 +45,12 @@ val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_i
                                 new Image(new FileInputStream(imagePath + "guy_atk_2.png")),
                                 new Image(new FileInputStream(imagePath + "guy_hurt.png")),
                                 new Image(new FileInputStream(imagePath + "dead.png")))
-val idleImages = Map("cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
+val idleImages = Map("Cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                      "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
                      "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")),
                      "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
-val imageSets = Map("cylna" -> imgAtkWar,
+val imageSets = Map("Cylna" -> imgAtkWar,
                     "wrys" -> imgDefKni,
                     "bonk" -> imgAtkGuy,
                     "ghost" -> imgAtkGuy,
@@ -100,6 +100,7 @@ object GUI extends JFXApp3:
   // CONNECT TO GAME -------------------
   val game = Game()
   val test = LogTest()
+  game.initialize()
   test.setGrid()
   test.resetFighters()
   game.battleStart()

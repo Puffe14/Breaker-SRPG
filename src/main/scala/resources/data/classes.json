@@ -1,0 +1,203 @@
+{
+  "wilder": {
+    "name": "wilder",
+    "level": 1,
+    "type": ["breaker"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 5,
+      "strength": 2,
+      "magic": 0,
+      "skill": 1,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 0},
+    "growth": {
+      "hitpoints": 15,
+      "strength": 15,
+      "magic": 0,
+      "skill": 15,
+      "speed": 5,
+      "defence": 10,
+      "resistance": 0
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "slicer": {
+    "name": "slicer",
+    "level": 1,
+    "type": ["wounder"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 3,
+      "strength": 1,
+      "magic": 0,
+      "skill": 2,
+      "speed": 2,
+      "defence": 0,
+      "resistance": 1},
+    "growth": {
+      "hitpoints": 5,
+      "strength": 10,
+      "magic": 0,
+      "skill": 10,
+      "speed": 15,
+      "defence": 0,
+      "resistance": 0
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "taker": {
+    "name": "taker",
+    "level": 1,
+    "type": [],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 1,
+      "strength": 1,
+      "magic": 0,
+      "skill": 2,
+      "speed": 1,
+      "defence": 0,
+      "resistance": 2
+    },
+    "growth": {
+      "hitpoints": 5,
+      "strength": 10,
+      "magic": 15,
+      "skill": 10,
+      "speed": 5,
+      "defence": 0,
+      "resistance": 10
+    },
+    "buffs": {},
+    "debuffs": {
+      "strength": -1,
+      "magic": -1,
+      "defence": -1,
+      "resistance": 1
+    }
+  },
+
+  "singer": {
+    "name": "singer",
+    "level": 1,
+    "type": [],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 3,
+      "strength": 1,
+      "magic": 0,
+      "skill": 1,
+      "speed": 2,
+      "defence": 0,
+      "resistance": 1
+    },
+    "growth": {
+      "hitpoints": 0,
+      "strength": 10,
+      "magic": 15,
+      "skill": 5,
+      "speed": 15,
+      "defence": 5,
+      "resistance": 10
+    },
+    "buffs": {
+      "strength": 1,
+      "magic": 1,
+      "speed": 1
+    },
+    "debuffs": {}
+  },
+
+  "channeler": {
+    "name": "channeler",
+    "level": 1,
+    "type": [],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 2,
+      "strength": 0,
+      "magic": 3,
+      "skill": 2,
+      "speed": 1,
+      "defence": 2,
+      "resistance": 0
+    },
+    "growth": {
+      "hitpoints": 0,
+      "strength": 5,
+      "magic": 20,
+      "skill": 15,
+      "speed": 5,
+      "defence": 15,
+      "resistance": 5
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "rider": {
+    "name": "rider",
+    "level": 1,
+    "type": ["mounted"],
+    "stats": {
+      "movement": 5,
+      "jump": 1,
+      "hitpoints": 5,
+      "strength": 3,
+      "magic": 0,
+      "skill": 3,
+      "speed": 1,
+      "defence": 3,
+      "resistance": 0},
+    "growth": {
+      "hitpoints": 25,
+      "strength": 20,
+      "magic": 0,
+      "skill": 15,
+      "speed": 10,
+      "defence": 20,
+      "resistance": 0
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "flier": {
+    "name": "flier",
+    "level": 1,
+    "type": ["flier"],
+    "stats": {
+      "movement": 4,
+      "jump": 4,
+      "hitpoints": 3,
+      "strength": 3,
+      "magic": 0,
+      "skill": 2,
+      "speed": 3,
+      "defence": 2,
+      "resistance": 0
+    },
+    "growth": {
+      "hitpoints": 15,
+      "strength": 15,
+      "magic": 0,
+      "skill": 10,
+      "speed": 20,
+      "defence": 10,
+      "resistance": 0
+    },
+    "buffs": {},
+    "debuffs": {}
+  }
+}

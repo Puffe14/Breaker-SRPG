@@ -1,0 +1,79 @@
+{
+  "Cylna": {
+    "name": "Cylna",
+    "class": "wilder",
+    "classes": ["wilder"],
+    "level": 2,
+    "exp": 0,
+    "stats": {
+      "hitpoints": 15,
+      "strength": 6,
+      "magic": 0,
+      "skill": 5,
+      "speed": 5,
+      "defence": 3,
+      "resistance": 0
+    },
+    "growth": {
+      "hitpoints": 35,
+      "strength": 35,
+      "magic": 0,
+      "skill": 25,
+      "speed": 30,
+      "defence": 20,
+      "resistance": 0
+    }
+  },
+
+  "Lairaea": {
+    "name": "Lairaea",
+    "class": "slicer",
+    "classes": ["slicer"],
+    "level": 2,
+    "exp": 0,
+    "stats": {
+      "hitpoints": 13,
+      "strength": 6,
+      "magic": 0,
+      "skill": 4,
+      "speed": 8,
+      "defence": 2,
+      "resistance": 2
+    },
+    "growth": {
+      "hitpoints": 25,
+      "strength": 30,
+      "magic": 15,
+      "skill": 30,
+      "speed": 35,
+      "defence": 10,
+      "resistance": 10
+    }
+  },
+
+  "Geblah": {
+    "name": "Geblah",
+    "class": "singer",
+    "classes": ["singer"],
+    "level": 1,
+    "exp": 0,
+    "stats": {
+      "hitpoints": 9,
+      "strength": 4,
+      "magic": 2,
+      "skill": 4,
+      "speed": 6,
+      "defence": 1,
+      "resistance": 2
+    },
+    "growth": {
+      "hitpoints": 25,
+      "strength": 20,
+      "magic": 30,
+      "skill": 20,
+      "speed": 35,
+      "defence": 10,
+      "resistance": 20
+    }
+  }
+}

@@ -1,7 +1,7 @@
 package game
 
 import components.*
-import components.Behaviour.Agressive
+import components.Behaviour.*
 import components.Part.*
 import components.Team.*
 import game.*
@@ -183,7 +183,12 @@ class LogTest:
     unit5.inventory.add(Some(testsoup))
     unit5.inventory.add(Some(testhelmet))
     unit5.inventory.add(Some(testmed))
-
+    unit1.character = DataLibrary.characters("Cylna")
+    unit1.character.swapClass(DataLibrary.classes("wilder"))
+    unit2.character.swapClass(DataLibrary.classes("rider"))
+    unit3.character.swapClass(DataLibrary.classes("singer"))
+    unit4.character.swapClass(DataLibrary.classes("flier"))
+    unit5.character.swapClass(DataLibrary.classes("taker"))
 
     //unit2.inventory.swap(invi2, 0, 0)
   

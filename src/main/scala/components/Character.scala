@@ -1,4 +1,8 @@
 package components
+import game.DataLibrary
+import upickle.default.*
+import os.{RelPath, pwd}
+import os.read as or
 
 import scala.collection.mutable
 import scala.util.Random
@@ -66,6 +70,40 @@ class Character(
   def move:Int = currentClass.move
   def jump:Int = currentClass.jump
 end Character
+
+
+
+
+
+object CharacterHandler:
+  var lastData = getData
+  def getData = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/characters.json")))
+
+  // return all the classes to be created
+  def create: Map[String, Character] =
+    val classFilenames = lastData.obj.keys
+    val nameToCharacter = for name <- classFilenames yield
+     name -> characterRead(name)
+    nameToCharacter.toMap
+
+  // From the last getData, read the particular map and create a Character based on it.
+  def characterRead(filename: String): Character =
+    val dt = lastData(filename)
+    val classLibrary = DataLibrary.classes
+    // Get class from data library and possible class list as well
+    val characterClass = classLibrary(read[String](dt("class")))
+    val characterClassOptions = read[Vector[String]](dt("classes")).map(classLibrary(_))
+    // Create new instance of the class
+    new Character(read[String](dt("name")),
+                  characterClass,
+                  characterClassOptions,
+                  read[Int](dt("level")),
+                  read[Int](dt("exp")),
+                  read[Map[String,Int]](dt("growth")),
+                  read[Map[String,Int]](dt("stats"))
+        )
+
+
 
 
 

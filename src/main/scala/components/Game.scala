@@ -1,6 +1,6 @@
 package components
-
 import game.AI
+import game.IOHandler
 
 
 class Game:
@@ -207,7 +207,8 @@ class Game:
     guys
 
   def initialize() =
-    ()
+    IOHandler.buildClasses()
+    IOHandler.buildCharacters()
 
   /** Called when the turn is continuing. */
   def handleTurn(): Unit =
