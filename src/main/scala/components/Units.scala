@@ -6,7 +6,7 @@ val rules = Rules()
 val parts = rules.allParts
 
 class Units(var character: Character):
-  val unitsInventory = Inventory(rules.unitInventoryLimit)
+  var unitsInventory = Inventory(rules.unitInventoryLimit)
   var unitsLeader: Option[Units] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[Part] = Set()

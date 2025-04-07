@@ -10,7 +10,8 @@ class FieldMap(enemies: Vector[Group],
                clearCondition: Condition,
                loseConditions: Vector[Condition],
                var rotation: Int,
-               turnNumber: Int):
+               var turnNumber: Int,
+               deployment: Vector[(Int,Int)]):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
   def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group)
@@ -57,7 +58,21 @@ class FieldMap(enemies: Vector[Group],
   def unitsOnTeam(team: Team) =
     allCharacters.filter(_.team == team)
 
-  
+  def deploymentTiles: Vector[Occupiable] =
+    deployment.flatMap((x, y) => grid.tileAt(x, y))
+              .collect { case a: Occupiable => a }
+
+  def deployPlayer() =
+    val tiles = deploymentTiles
+    val deployed = player.deployed.take(tiles.size)
+    for i <- deployed.indices do
+      tiles(i).addOccupant(deployed(i))
+      deployed(i).setTeam(Player)
+
+  // Current turn number goes up
+  def tickTurn() =
+    turnNumber+=1
+
   //Gives stat bonuses from tile, aura buffs, and debuffs
   def giveBonuses() =
     theGrid.tilesWithUnits.foreach(t =>
@@ -65,6 +80,7 @@ class FieldMap(enemies: Vector[Group],
         calculateBonus(u, t)
       )
     )
+
 
   //Has to be able to this for current unit when moving without recalculating EVERYONE
   def calculateBonus(unit: Units, tile: Occupiable) =

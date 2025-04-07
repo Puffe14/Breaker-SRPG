@@ -3,6 +3,8 @@ import game.DataLibrary
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
+import ujson.Value.Value
+import upickle.core.LinkedHashMap
 
 
 trait Item {
@@ -195,8 +197,8 @@ trait Armor(part: Part) extends Equipment:
 end Armor
 
 
-case class WeaponFile(filename: String) extends Weapon derives ReadWriter:
-  val wdata = ItemHandler.getItem(filename)
+case class WeaponFile(filename: String) extends Weapon:
+  val wdata = ItemHandler.getWeaponsData(filename)
   val name = read[String](wdata("name"))
   val description = read[String](wdata("description"))
   val durability: Option[Int] = Some(read[Int](wdata("durability")))
@@ -229,16 +231,26 @@ object ItemHandler:
   var dataType = "healings"
   def getConsumablesData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
+  def getWeaponsData =
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
 
   // return all the classes to be created
   def create: Map[String, Item] =
-    val itemFilenames = lastData.obj.keys
+    lastData = getConsumables
+    var itemFilenames = lastData.obj.keys
     val nameToItem = for name <- itemFilenames yield
-     name -> itemRead(name)
-    nameToItem.toMap
+     name -> consumableRead(name)
+    lastData = getWeaponsData
+    itemFilenames = lastData.obj.keys
+    val nameToWeapon = for name <- itemFilenames yield
+     name -> weaponRead(name)
+    (nameToItem++nameToWeapon).toMap
 
-  // From the last getData, read the particular map and create a Character based on it.
-  def itemRead(filename: String): Item =
+  def weaponRead(filename: String): Equipment =
+    WeaponFile(filename)
+
+  // From the last getData, read the particular map and create an item based on it.
+  def consumableRead(filename: String): Item =
     val dt = lastData(filename)
     // Create new instance of the class
     read[String](dt("typing")) match

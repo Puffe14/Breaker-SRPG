@@ -12,7 +12,7 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
      Some(tiles(atPos))
     else None
 
-  def givePostitionToTiles() =
+  def givePositionToTiles() =
     var i = 0
     if tiles.size == elevation.size then
       while i < row*column do

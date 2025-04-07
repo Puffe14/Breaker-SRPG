@@ -1,10 +1,9 @@
 package components
-import game.AI
-import game.IOHandler
+import game.{AI, DataLibrary, IOHandler}
 
 
 class Game:
-  var currentMapNumber: Int = 0
+  var currentMapNumber: Int = 1
   var currentMap: Option[FieldMap] = None
   var midBattle: Boolean = false
   var turnOf: Team = Team.Player
@@ -211,12 +210,17 @@ class Game:
     IOHandler.buildCharacters()
     IOHandler.buildItems()
     IOHandler.buildTiles()
+    IOHandler.buildFieldMaps()
 
   /** Called when the turn is continuing. */
   def handleTurn(): Unit =
     //all groups on a particular side on the current map
     var groupsWithTurn: Vector[Group] = Vector()
     currentMap.foreach(fm=>
+      player.foreach(p => if fm.player!=p then
+        fm.setPlayer(p)
+        fm.deployPlayer()
+      )
       fm.clearDead()
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
@@ -234,9 +238,9 @@ class Game:
     //if the turn of the current team is over then change to the next teams turn.
     if groupsWithTurn.forall(_.doneActing) then
       turnOf = turnOf match
-        case Team.Player => Team.Enemy
+        case Team.Player =>Team.Enemy
         case Team.Enemy => Team.Ally
-        case Team.Ally => Team.Player
+        case Team.Ally =>  turnCountUp(); Team.Player
       refreshAll()
       deSelect()
     clearPostAction()
@@ -256,12 +260,15 @@ class Game:
         midBattle = false
         addToStack(MapWon())
         currentMapNumber+=1//Advance to next map
+        currentMap = DataLibrary.maps.get(currentMapNumber.toString)
     )
     over
 
   def battleStart() =
     midBattle = true
 
+  def turnCountUp() =
+    currentMap.foreach(_.tickTurn())
 
   //Methods for creating actions
 

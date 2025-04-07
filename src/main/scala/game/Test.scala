@@ -132,13 +132,14 @@ class LogTest:
   var ai = false
   var fight = Combat(Units(bonk), Units(bonk), 1)
   var field = FieldMap(Vector(), Vector(), new Grid(Vector(),0,0,Vector()),
-                       new Organization(Vector(unit1), Vector(unit1), new Inventory(50), Player), Survive(0), Vector(), 0, 0)
+                       new Organization(Vector(unit1), Vector(unit1), new Inventory(50), Player), Survive(0), Vector(), 0, 0, Vector())
 
   unit1.setTeam(Player)
   unit3.setTeam(Enemy)
   unit2.setTeam(Enemy)
   unit4.setTeam(Enemy)
   unit5.setTeam(Player)
+
   def dmace = WeaponFile("d_mace")
   def wclub = WeaponFile("w_club")
   def testspell = TestSpell()
@@ -190,7 +191,8 @@ class LogTest:
     unit3.character.swapClass(DataLibrary.classes("singer"))
     unit4.character.swapClass(DataLibrary.classes("flier"))
     unit5.character.swapClass(DataLibrary.classes("taker"))
-
+    unit1.unitsInventory = ItemHandler.inventoryRead(unit1.name)
+    
     //unit2.inventory.swap(invi2, 0, 0)
   
   def setF12() =
@@ -229,7 +231,7 @@ class LogTest:
       gTile, gTile, gTile, gTile, gTile, gTile), 4, 6,
       Vector(1,1,0,0,1,0,0,0,0,0,0,0,2,2,3,0,0,0,0,0,0,0,0,0)) //Vector(1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0)
 
-    grid.givePostitionToTiles()
+    grid.givePositionToTiles()
     grid.occupiables.head.addOccupant(unit1)
     grid.occupiables(5).addOccupant(unit2)
     grid.occupiables(1).addOccupant(unit3)
@@ -237,7 +239,8 @@ class LogTest:
     grid.occupiables(20).addOccupant(unit5)
 
     field = FieldMap(Vector(group), Vector(), grid,
-                     new Organization(Vector(unit1,unit5), Vector(unit1,unit5), storage, Player), Route(Enemy), Vector(Route(Player)), 0, 0)
+                     new Organization(Vector(unit1,unit5), Vector(unit1,unit5),
+                       storage, Player), Route(Enemy), Vector(Route(Player)), 0, 0, Vector((0,0)))
   end setGrid
 
   def log(which: String): Vector[String] =
@@ -442,8 +445,8 @@ def test() =
 
     val grid =  Grid(Vector(tile1, tile2, tile3, tile4, tile5, tile6, tile7, tile8, tile9, tile10, tile11, tile12), 4, 3, Vector(0,0,1,1,0,2,0,0,1,1,0,2))
     val grid2 = Grid(Vector(), 3, 2, Vector(0,1,3,2,1,1))
-    grid.givePostitionToTiles()
-    grid2.givePostitionToTiles()
+    grid.givePositionToTiles()
+    grid2.givePositionToTiles()
     println(grid.tileAt(0,1))
     println("tile positions 3,2")
     grid2.visibleTiles(0).foreach(n=>println(n.pos))
@@ -467,7 +470,7 @@ def test() =
     grid.allTiles.collect { case a: Occupiable => a }.head.addOccupant(unit1)
     val field = FieldMap(Vector(), Vector(), grid,
                          new Organization(Vector(), Vector(), invi5, Player),
-                         Route(Enemy), Vector(Route(Player)), 1, 0)
+                         Route(Enemy), Vector(Route(Player)), 1, 0, Vector())
     field.movementRangeTiles(unit1)
 
   def fileTest() =

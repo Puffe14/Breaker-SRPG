@@ -22,7 +22,9 @@ object IOHandler:
     DataLibrary.setCharacters(CharacterHandler.create)
 
   // Needs Group, Condition, Grid, Units
-  def buildFieldMaps() = ()
+  def buildFieldMaps() =
+    val mapData = MapHandler.getData
+    DataLibrary.setMaps(MapHandler.create)
 
 end IOHandler
 
@@ -43,5 +45,9 @@ object DataLibrary:
   var tiles: Map[String, Tile] = Map()
   def setTiles(tileMap: Map[String, Tile]) =
     tiles = tileMap
+
+  var maps: Map[String, FieldMap] = Map()
+  def setMaps(fmapMap: Map[String, FieldMap]) =
+    maps = fmapMap
 
 end DataLibrary

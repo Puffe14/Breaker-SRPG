@@ -3,40 +3,42 @@
     "enemies": [],
     "allies": [],
     "grid": {
-      "tiles": [],
-      "row": 0,
-      "column": 0,
-      "elevation": []
+      "tiles": ["sand_field","sand_field","sand_field","sand_field"],
+      "row": 2,
+      "column": 2,
+      "elevation": [0,1,0,1]
     },
     "clear": {
       "title": "survive",
-      "limit": 5
+      "limit": 3
     },
     "lose": [],
+    "deploy": [[0,0],[0,1],[1,0]],
     "rotation": 0,
     "turnNumber": 1,
     "units": [
-      ["bonk",5,[0,1]],
+      ["bonk",5,[1,1]]
     ]
   },
 
   "2": {
     "enemies": [
       ["squire","medic","knight"]
-     ]
-    },
+     ],
     "allies": [],
     "grid": {
-      "tiles": [],
-      "row": 0,
-      "column": 0,
-      "elevation": []
+      "tiles": ["gray_field","gray_field","gray_field","sand_field"],
+      "row": 2,
+      "column": 2,
+      "elevation": [2,2,2,0]
     },
-    "clearCondition": {
-      "title": "route",
+    "clear": {
+      "title": "survive",
+      "limit": 5,
       "team": "enemy"
     },
-    "loseConditions": [],
+    "lose": [],
+    "deploy": [[0,0],[0,1],[1,0]],
     "rotation": 2,
     "turnNumber": 1
   }

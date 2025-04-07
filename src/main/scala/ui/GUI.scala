@@ -104,7 +104,9 @@ object GUI extends JFXApp3:
   test.setGrid()
   test.resetFighters()
   game.battleStart()
-  game.currentMap = Some(test.field)
+  game.currentMap = DataLibrary.maps.get(game.currentMapNumber.toString)
+  game.player = Some(new Organization(Vector(test.unit1), Vector(test.unit1), new Inventory(50), Team.Player))
+  //game.currentMap = Some(test.field)
 
   // GRAPHICS AND INTERFACE ------------
 
