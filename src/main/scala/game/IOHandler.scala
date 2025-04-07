@@ -8,9 +8,12 @@ object IOHandler:
     DataLibrary.setClasses(ClassHandler.create)
 
   def buildItems() =
-    val itemDara = ItemHandler.getData
+    val itemData = ItemHandler.getData
     DataLibrary.setItems(ItemHandler.create)
 
+  def buildTiles() =
+    val tileData = TileHandler.getData
+    DataLibrary.setTiles(TileHandler.create)
 
   // POST CLASS BUILDING
   //Read the classes (game term) from files and
@@ -36,4 +39,9 @@ object DataLibrary:
   var items: Map[String, Item] = Map()
   def setItems(itemMap: Map[String, Item]) =
     items = itemMap
+
+  var tiles: Map[String, Tile] = Map()
+  def setTiles(tileMap: Map[String, Tile]) =
+    tiles = tileMap
+
 end DataLibrary

@@ -153,7 +153,7 @@ object GUI extends JFXApp3:
           var tileInt = 0
           val bottomInt = 4
           if t.name == "w" then tileInt = 2
-          if t.name == "s" then tileInt = 3
+          if t.name == "s" || t.photoFile=="s" then tileInt = 3
           //img selection*/
           toDraw += tileImage(t.pos, tileInt)
           //add bottoms

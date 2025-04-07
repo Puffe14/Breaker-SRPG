@@ -1,4 +1,5 @@
 package components
+import game.DataLibrary
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
@@ -17,6 +18,8 @@ trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: 
   def utilize(unit: Units) = use()
   def use() =
     uses += 1
+  def setUses(u: Int) =
+    uses = u
   def isEmpty: Boolean =
     uses >= limit
   override def shouldRemove = isEmpty
@@ -261,3 +264,22 @@ object ItemHandler:
                   read[Int](dt("uses")),
                   read[Int](dt("limit"))
             )
+
+  def inventoryRead(unitName: String): Inventory =
+    val dt = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/inventories.json")))
+    //Put it in the slot based on name and set spent as previous uses
+    val itemMap = dt.obj
+    val allItems = DataLibrary.items
+    val itemsAndUses = read[Seq[(String, Int)]](itemMap(s"inventory_$unitName"))
+    val inventory = Inventory(itemsAndUses.size)
+    // Set the items from the inventory to the spent state and add them to it
+    itemsAndUses.map((item,uses)=>
+      val newItem = allItems(item)
+      newItem match
+        case w: Weapon => w.spend(uses)
+        case m: Medkit => m.spend(uses)
+        case c: Consumable => c.setUses(uses)
+        case _ =>
+      inventory.add(Some(newItem))
+    )
+    inventory

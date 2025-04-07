@@ -1,13 +1,33 @@
 {
-  "gray_field": {
-    "name": "grass",
-    "photoFile": "field_gray",
-    "position": [0,0,0]
+  "occupiables": {
+    "gray_field": {
+      "name": "grass",
+      "photo": "field_gray",
+      "effect": {},
+      "reduction": {}
+    },
+    "sand_field": {
+      "name": "sand",
+      "photo": "s",
+      "effect": {
+        "atk": -1,
+        "avoid": -10,
+        "physical": -1,
+        "magical": -1,
+        "hpEffect": 0
+      },
+      "reduction": {
+        "infantry": 2,
+        "mounted": 3
+      }
+    }
   },
 
-  "sand_field": {
-    "name": "sand",
-    "photoFile": "field_sand",
-    "position": [0,0,0]
+  "unoccupiables": {
+    "wall_field": {
+      "name": "wall",
+      "photo": "field_red",
+      "flyOver": false
+    }
   }
 }

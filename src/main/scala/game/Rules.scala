@@ -18,4 +18,5 @@ class Rules {
   val leaderBonus = Map[String, Int]("HI"->15,"AV"->15)
   //parts
   val allParts = Set(Part.Head, Part.Torso, Part.Arms, Part.Legs)
+  
 }

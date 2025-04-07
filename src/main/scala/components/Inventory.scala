@@ -57,7 +57,6 @@ class Inventory(slotCount: Int):
   def items: Vector[Option[Item]] =
     slots
 
-  
   def equippedWeapon: Option[Weapon] =
     items.foreach {
       //if an equipped weapon is found

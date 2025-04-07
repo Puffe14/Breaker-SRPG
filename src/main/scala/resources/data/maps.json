@@ -15,10 +15,16 @@
     "lose": [],
     "rotation": 0,
     "turnNumber": 1,
+    "units": [
+      ["bonk",5,[0,1]],
+    ]
   },
 
   "2": {
-    "enemies": [],
+    "enemies": [
+      ["squire","medic","knight"]
+     ]
+    },
     "allies": [],
     "grid": {
       "tiles": [],
@@ -32,6 +38,6 @@
     },
     "loseConditions": [],
     "rotation": 2,
-    "turnNumber": 1,
+    "turnNumber": 1
   }
 }

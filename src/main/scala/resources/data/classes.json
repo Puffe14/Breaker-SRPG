@@ -2,7 +2,7 @@
   "wilder": {
     "name": "wilder",
     "level": 1,
-    "type": ["breaker"],
+    "type": ["breaker","infantry"],
     "stats": {
       "movement": 3,
       "jump": 2,
@@ -29,7 +29,7 @@
   "slicer": {
     "name": "slicer",
     "level": 1,
-    "type": ["wounder"],
+    "type": ["wounder","infantry"],
     "stats": {
       "movement": 3,
       "jump": 2,
@@ -56,7 +56,7 @@
   "taker": {
     "name": "taker",
     "level": 1,
-    "type": [],
+    "type": ["infantry"],
     "stats": {
       "movement": 3,
       "jump": 2,
@@ -89,7 +89,7 @@
   "singer": {
     "name": "singer",
     "level": 1,
-    "type": [],
+    "type": ["infantry"],
     "stats": {
       "movement": 3,
       "jump": 2,
@@ -121,7 +121,7 @@
   "channeler": {
     "name": "channeler",
     "level": 1,
-    "type": [],
+    "type": ["infantry"],
     "stats": {
       "movement": 3,
       "jump": 2,

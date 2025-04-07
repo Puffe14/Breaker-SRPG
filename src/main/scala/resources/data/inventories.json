@@ -1,0 +1,13 @@
+{
+  "inventory_Cylna": [
+    ["bread",1],
+    ["d_mace",3]
+  ],
+  "inventory_Lairaea": [
+    ["bread",0],
+    ["d_mace",1]
+  ],
+  "inventory_squire": [
+    ["w_club",0]
+  ]
+}

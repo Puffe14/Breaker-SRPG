@@ -210,6 +210,7 @@ class Game:
     IOHandler.buildClasses()
     IOHandler.buildCharacters()
     IOHandler.buildItems()
+    IOHandler.buildTiles()
 
   /** Called when the turn is continuing. */
   def handleTurn(): Unit =

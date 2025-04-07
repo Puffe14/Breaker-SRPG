@@ -111,7 +111,7 @@ end testGrass
 
 class testSand(file: String, name: String) extends Occupiable(file, name):
   override val avoid = -15
-  reduction = Map("test" -> 2)
+  override val reduction = Map("test" -> 2)
 end testSand
 
 class testWall(file: String, name: String) extends Unoccupiable(file, name, false):
@@ -219,10 +219,11 @@ class LogTest:
     def gTile = testGrass("pöö","g")
     def wTile = testWall("wöö","w")
     def sTile = testSand("söö","s")
+    def nsTile = DataLibrary.tiles("sand_field")
 
     val storage = Inventory(50)
     val grid =  Grid(
-      Vector(gTile, gTile, wTile, gTile, sTile, gTile,
+      Vector(gTile, gTile, wTile, gTile, nsTile, gTile,
         gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile,
       gTile, gTile, gTile, gTile, gTile, gTile), 4, 6,
