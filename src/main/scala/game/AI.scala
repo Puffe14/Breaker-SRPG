@@ -53,6 +53,8 @@ object AI:
   /**Checks the best action for a unit*/
   def unitBestAction(u: Units): Action =
     var chosen: Vector[Action] = Vector()
+    // equip the first weapon&medkit, all armor in inventory
+    u.equipFirst()
     val availableActions = game.availableActions(u)
     //all possible combat scenarios
     val combats = availableActions

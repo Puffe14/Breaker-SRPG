@@ -191,7 +191,7 @@ class LogTest:
     unit3.character.swapClass(DataLibrary.classes("singer"))
     unit4.character.swapClass(DataLibrary.classes("flier"))
     unit5.character.swapClass(DataLibrary.classes("taker"))
-    unit1.unitsInventory = ItemHandler.inventoryRead(unit1.name)
+    //unit1.unitsInventory = ItemHandler.inventoryRead("inventory_"+unit1.name)
     
     //unit2.inventory.swap(invi2, 0, 0)
   

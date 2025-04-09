@@ -209,6 +209,7 @@ class Game:
     IOHandler.buildClasses()
     IOHandler.buildCharacters()
     IOHandler.buildItems()
+    IOHandler.buildInventory()
     IOHandler.buildTiles()
     IOHandler.buildFieldMaps()
 

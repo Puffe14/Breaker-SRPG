@@ -48,13 +48,15 @@ val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_i
 val idleImages = Map("Cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                      "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
                      "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")),
-                     "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
+                     "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
+                     "Geblah" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
 val imageSets = Map("Cylna" -> imgAtkWar,
                     "wrys" -> imgDefKni,
                     "bonk" -> imgAtkGuy,
                     "ghost" -> imgAtkGuy,
-                    "gonzales" -> imgAtkGuy)
+                    "gonzales" -> imgAtkGuy,
+                    "Geblah" -> imgAtkGuy)
 val iconImages =
   Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
       "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),

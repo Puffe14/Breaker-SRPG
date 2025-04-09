@@ -9,5 +9,11 @@
   ],
   "inventory_squire": [
     ["w_club",0]
+  ],
+  "inventory_bonk": [
+    ["w_club",0]
+  ],
+  "inventory_Geblah": [
+    ["w_club",0]
   ]
 }

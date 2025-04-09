@@ -119,12 +119,7 @@ object MapHandler:
     val mapnames = maps.keys
     val nameToMap = for name <- mapnames yield
       val fmap = maps(name)
-      //Create enemy units
-      read[Seq[Seq[String]]](fmap("enemies"))
-      val enemies = Vector()
-      //Create ally units
-      read[Seq[String]](fmap("allies"))
-      val allies = Vector()
+
       //Create grid
       val gridMap = fmap("grid").obj
        // Get the tiles
@@ -135,6 +130,26 @@ object MapHandler:
                       read[Vector[Int]](gridMap("elevation"))
                  )
       grid.givePositionToTiles()
+
+      val unitsInfo = read[Vector[(String,Int,(Int,Int))]](fmap("units"))
+
+      def makeGroup(memberNames: Vector[String], team: Team): Group =
+        Group(memberNames.map(makeUnit(_)), Behaviour.Agressive, team, false)
+      def makeUnit(unitName: String): Units =
+        val unit = Units(DataLibrary.characters(unitName), DataLibrary.inventories("inventory_"+unitName))
+        unitsInfo.find((a,b,c)=> a == unitName) // find out if they have a set place on the map
+                 .foreach((a,b,c) =>
+                    grid.addUnitAt(unit, c) // Place the character on the map
+                    unit.takeDamage(b)      // Harm them enough
+        )
+        unit
+
+      //Create enemy units
+      val enemyList = read[Vector[Vector[String]]](fmap("enemies"))
+      val enemies = enemyList.map(makeGroup(_, Team.Enemy))
+      //Create ally units
+      read[Seq[String]](fmap("allies"))
+      val allies = Vector()
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
       val loseConditions = Vector()
@@ -154,9 +169,11 @@ object MapHandler:
                        turn,
                        deployment
               )
+
     nameToMap.toMap
 
   def readCondition(map: LinkedHashMap[String, Value]) =
     read[String](map("title")) match
       case "survive" => Survive(read[Int](map("limit")))
       case _ => Route(Team.Enemy)
+

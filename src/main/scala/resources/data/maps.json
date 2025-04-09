@@ -1,6 +1,6 @@
 {
   "1": {
-    "enemies": [],
+    "enemies": [["Geblah"]],
     "allies": [],
     "grid": {
       "tiles": ["sand_field","sand_field","sand_field","sand_field"],
@@ -17,13 +17,13 @@
     "rotation": 0,
     "turnNumber": 1,
     "units": [
-      ["bonk",5,[1,1]]
+      ["Geblah",5,[1,1]]
     ]
   },
 
   "2": {
     "enemies": [
-      ["squire","medic","knight"]
+      []
      ],
     "allies": [],
     "grid": {
@@ -40,6 +40,7 @@
     "lose": [],
     "deploy": [[0,0],[0,1],[1,0]],
     "rotation": 2,
-    "turnNumber": 1
+    "turnNumber": 1,
+    "units": []
   }
 }

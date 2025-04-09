@@ -12,6 +12,7 @@ trait Item {
   val description: String
   def describe = name +": "+this.description
   def shouldRemove = false
+  def copyMe: Item = this
 }
 
 trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: Int) extends Item:
@@ -39,22 +40,25 @@ case class Healing(itemName: String, itemDescription: String, e: Map[String, Int
   override def utilize(unit: Units) =
     unit.healDamage(heal)
     use()
+  override def copyMe: Item = this.copy(itemName = itemName)
 
 //Gives a temporary boost on stat(s)
-class Booster(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+case class Booster(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
   val name = itemName
   val description = itemDescription
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addTemporaryStat(n(0), n(1)))
     use()
+  override def copyMe: Item = this.copy(itemName = itemName)
 
 //Gives a permanent increase to a stat
-class Brand(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
+case class Brand(itemName: String, itemDescription: String, e: Map[String, Int], u: Int, l: Int) extends Consumable(e,u,l):
   val name = itemName
   val description = itemDescription
   override def utilize(unit: Units) =
     effects.foreach(n => unit.addPermanent(n(0), n(1)))
     use()
+  override def copyMe: Item = this.copy(itemName = itemName)
 
 
 trait Equipment extends Item:
@@ -160,7 +164,7 @@ trait Medkit(amount: Int) extends Equipment:
   val range = (0, 1)
   var spent: Int
   val durability: Option[Int]
-  
+
   //Cause the medkit to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
     spent += durabilityLoss
@@ -180,7 +184,7 @@ trait Armor(part: Part) extends Equipment:
   //case Helmet(""), Body, Arms, Legs
   def partName = part.toString
   def bodyPart = part
-  
+
   private var broken = false
 
   override def intact =
@@ -214,6 +218,7 @@ case class WeaponFile(filename: String) extends Weapon:
   val givenWeight: Int = read[Int](wdata("weight"))
   val effectiveAgainst: Map[String, Int] = read[Map[String, Int]](wdata("effective"))
   val bonusToStats: Map[String, Int] = read[Map[String, Int]](wdata("bonus"))
+  override def copyMe: Item = this.copy(filename = filename)
 end WeaponFile
 
 /**/
@@ -233,13 +238,17 @@ object ItemHandler:
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
   def getWeaponsData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+  def getInventoryData =
+     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/inventories.json")))
 
   // return all the classes to be created
   def create: Map[String, Item] =
+    // cnsm
     lastData = getConsumables
     var itemFilenames = lastData.obj.keys
     val nameToItem = for name <- itemFilenames yield
      name -> consumableRead(name)
+    // wpns
     lastData = getWeaponsData
     itemFilenames = lastData.obj.keys
     val nameToWeapon = for name <- itemFilenames yield
@@ -248,6 +257,14 @@ object ItemHandler:
 
   def weaponRead(filename: String): Equipment =
     WeaponFile(filename)
+
+  // return all the classes to be created
+  def createInventory: Map[String, Inventory] =
+    lastData = getInventoryData
+    val invFilenames = lastData.obj.keys
+    val nameToItem = for name <- invFilenames yield
+     name -> inventoryRead(name)
+    nameToItem.toMap
 
   // From the last getData, read the particular map and create an item based on it.
   def consumableRead(filename: String): Item =
@@ -277,16 +294,16 @@ object ItemHandler:
                   read[Int](dt("limit"))
             )
 
-  def inventoryRead(unitName: String): Inventory =
-    val dt = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/inventories.json")))
+  def inventoryRead(inventoryName: String): Inventory =
+    val dt = lastData
     //Put it in the slot based on name and set spent as previous uses
-    val itemMap = dt.obj
+    val inventoryMap = dt.obj
     val allItems = DataLibrary.items
-    val itemsAndUses = read[Seq[(String, Int)]](itemMap(s"inventory_$unitName"))
+    val itemsAndUses = read[Seq[(String, Int)]](inventoryMap(s"$inventoryName")) //"inventory_$unitName"
     val inventory = Inventory(itemsAndUses.size)
     // Set the items from the inventory to the spent state and add them to it
     itemsAndUses.map((item,uses)=>
-      val newItem = allItems(item)
+      val newItem = allItems(item).copyMe
       newItem match
         case w: Weapon => w.spend(uses)
         case m: Medkit => m.spend(uses)

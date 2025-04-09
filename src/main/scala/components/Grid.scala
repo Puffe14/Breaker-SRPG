@@ -34,7 +34,13 @@ class Grid(tiles: Vector[Tile], row: Int, column: Int, elevation: Vector[Int]):
   def unitsFromTiles(tileList: Vector[Tile]): Vector[Units] =
     tileList.collect{case a: Occupiable => a}.filter(_.occupied).flatMap(_.occupantOnTile)
 
-  
+  def addUnitAt(unit: Units, coords: (Int, Int)) =
+    val tile = tileAt(coords(0), coords(1))
+    tile match
+      case Some(o: Occupiable) =>
+        o.addOccupant(unit)
+      case _ => println(s"$tile cannot be occupied")
+
   def neighbors(chosenTile: Tile): Vector[Tile] =
     val x = chosenTile.pos(0)
     val y = chosenTile.pos(1)

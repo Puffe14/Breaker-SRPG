@@ -11,6 +11,10 @@ object IOHandler:
     val itemData = ItemHandler.getData
     DataLibrary.setItems(ItemHandler.create)
 
+  def buildInventory() =
+    val itemData = ItemHandler.getInventoryData
+    DataLibrary.setInventories(ItemHandler.createInventory)
+
   def buildTiles() =
     val tileData = TileHandler.getData
     DataLibrary.setTiles(TileHandler.create)
@@ -41,6 +45,10 @@ object DataLibrary:
   var items: Map[String, Item] = Map()
   def setItems(itemMap: Map[String, Item]) =
     items = itemMap
+
+  var inventories: Map[String, Inventory] = Map()
+  def setInventories(inventoryMap: Map[String, Inventory]) =
+    inventories = inventoryMap
 
   var tiles: Map[String, Tile] = Map()
   def setTiles(tileMap: Map[String, Tile]) =

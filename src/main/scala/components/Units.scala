@@ -5,8 +5,7 @@ import game.Rules
 val rules = Rules()
 val parts = rules.allParts
 
-class Units(var character: Character):
-  var unitsInventory = Inventory(rules.unitInventoryLimit)
+class Units(var character: Character, val unitsInventory: Inventory = Inventory(rules.unitInventoryLimit)):
   var unitsLeader: Option[Units] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[Part] = Set()
@@ -184,6 +183,11 @@ class Units(var character: Character):
       case armor: Armor =>
         unitsInventory.equipArmor(armor, true)
       case _ =>
+
+  def equipFirst() =
+    usableWeapons.headOption.foreach(equip(_))
+    usableMedkits.headOption.foreach(equip(_))
+    unitsInventory.armors.foreach(equip(_))
 
   def discard(item: Item) =
     unitsInventory.remove(Some(item))
