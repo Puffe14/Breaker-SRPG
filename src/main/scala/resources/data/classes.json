@@ -283,5 +283,35 @@
     "ranks": {},
     "buffs": {},
     "debuffs": {}
+  },
+  "warrior": {
+    "name": "warrior",
+    "level": 1,
+    "type": ["breaker","infantry"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 8,
+      "strength": 1,
+      "magic": 0,
+      "skill": 2,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 0
+    },
+    "growth": {
+      "hitpoints": 15,
+      "strength": 15,
+      "magic": 0,
+      "skill": 15,
+      "speed": 5,
+      "defence": 10,
+      "resistance": 0
+    },
+    "ranks": {
+      "Blunt":4
+    },
+    "buffs": {},
+    "debuffs": {}
   }
 }

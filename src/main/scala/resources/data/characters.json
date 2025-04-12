@@ -232,8 +232,8 @@
   },
   "Warrior": {
     "name": "Warrior",
-    "class": "wilder",
-    "classes": ["wilder"],
+    "class": "warrior",
+    "classes": ["warrior"],
     "level": 2,
     "exp": 0,
     "stats": {

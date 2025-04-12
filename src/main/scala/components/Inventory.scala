@@ -158,6 +158,11 @@ class Inventory(slotCount: Int):
 
   //----------------------
 
+  def listItems: Vector[String] =
+    items.map {
+      case Some(i) => i.toString
+      case None => "empty"
+    }
 
   override def toString =
     items.map {

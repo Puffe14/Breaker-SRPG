@@ -3,6 +3,9 @@ package components
 
 class Group(var members: Vector[Units], var behaviour: Behaviour,
             var side: Team, var conditionMet: Boolean = false):
+  // On group creation
+  members.foreach(_.setTeam(side))
+
   def haveNotActed =
     members.filterNot(m=>m.turnOver||m.isDead)
   def doneActing =

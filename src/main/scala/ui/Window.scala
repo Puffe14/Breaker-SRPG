@@ -150,9 +150,10 @@ class CharacterWindow(unit: Units) extends Window:
     g.fillRect(xo, y, width, height)
 
     // Vector text
-    val title = unit.name + " " + unit.HP + "/" + unit.MaxHP
+    val title = unit.name + " " + unit.HP + "/" + unit.MaxHP + "\n class: " + unit.unitClass.className
     val combVek = unit.statsCombatVector.map((a,b)=>s"$a: $b").sliding(2,2).toVector
     val unitVek = unit.statsUnitVector.map((a,b)=>s"$a: $b").sliding(2,2).toVector
+    val invVek = unit.inventory.listItems.sliding(2,2).toVector
 
     val teamColor = unit.team match
       case Team.Player => Blue
@@ -160,18 +161,19 @@ class CharacterWindow(unit: Units) extends Window:
       case Team.Ally => Green
 
     // Write nonsense
-    def pairbunch(vek: Vector[Vector[String]], fontsDown: Int) =
+    def pairbunch(vek: Vector[Vector[String]], fontsDown: Int, fontDivider: Int) =
       for i <- vek.indices do
         for j <- vek(i).indices do
           g.fill = Blue
-          g.font = Font(font) // Set text size
+          g.font = Font(font/fontDivider) // Set text size
           g.fillText(vek(i)(j), xo+pad+width/2*j, y+pad-margin + font + fm*(i+fontsDown))
 
     g.fill = teamColor
     g.font = Font(font)
     g.fillText(title, xo+pad, y+pad-margin + font)
-    pairbunch(combVek,2)
-    pairbunch(unitVek,8)
+    pairbunch(combVek,3,1)
+    pairbunch(unitVek,9,1)
+    pairbunch(invVek,14,2)
 
 end CharacterWindow
 
