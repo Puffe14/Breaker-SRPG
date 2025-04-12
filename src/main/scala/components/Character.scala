@@ -7,6 +7,15 @@ import os.read as or
 import scala.collection.mutable
 import scala.util.Random
 
+
+
+
+
+
+
+
+
+
 class Character(
    //character parameters
    val myName: String,
@@ -21,6 +30,7 @@ class Character(
   def swapClass(newClass: Class) =
     currentClass = newClass
 
+  //!!! to an event that give message as a legible string
   //Increase experience and handle if reaches lvlup
   def expTrack(increase: Int): Vector[String] =
     val message: mutable.Buffer[String] = mutable.Buffer()

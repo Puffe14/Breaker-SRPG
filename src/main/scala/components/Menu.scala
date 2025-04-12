@@ -239,8 +239,8 @@ class ActionsMenu extends Menu:
     game.acting.foreach(actor =>
       if game.attackRangeUnitsFor(actor).nonEmpty then
         atc(AttackMenu())
-        atc(WoundMenu())
-        atc(BreakMenu())
+        if actor.types.contains("wounder") then atc(WoundMenu())
+        if actor.types.contains("breaker") then atc(BreakMenu())
       if game.medRangeUnitsFor(actor).nonEmpty then
         atc(HealMenu())
         atc(TreatMenu())

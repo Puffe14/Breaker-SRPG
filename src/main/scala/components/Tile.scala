@@ -136,11 +136,13 @@ object MapHandler:
       def makeGroup(memberNames: Vector[String], team: Team): Group =
         Group(memberNames.map(makeUnit(_)), Behaviour.Agressive, team, false)
       def makeUnit(unitName: String): Units =
-        val unit = Units(DataLibrary.characters(unitName), DataLibrary.inventories("inventory_"+unitName))
+        val unit = Units(DataLibrary.characters(unitName),                // Find the character
+                         DataLibrary.inventories("inventory_"+unitName))  // Find the inventory
         unitsInfo.find((a,b,c)=> a == unitName) // find out if they have a set place on the map
                  .foreach((a,b,c) =>
                     grid.addUnitAt(unit, c) // Place the character on the map
                     unit.takeDamage(b)      // Harm them enough
+                    unit.equipFirst()       // Equip the weapon on their first slot
         )
         unit
 
@@ -148,15 +150,15 @@ object MapHandler:
       val enemyList = read[Vector[Vector[String]]](fmap("enemies"))
       val enemies = enemyList.map(makeGroup(_, Team.Enemy))
       //Create ally units
-      read[Seq[String]](fmap("allies"))
-      val allies = Vector()
+      //val allyList = read[Vector[Vector[String]]](fmap("allies"))
+      val allies = Vector() //allyList.map(makeGroup(_, Team.Ally))
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
       val loseConditions = Vector()
       // dummy player
       val dummyplayer = Organization(Vector(),Vector(),Inventory(0),Team.Player)
       val rotation = read[Int](fmap("rotation"))
-      val turn = 1
+      val turn = read[Int](fmap("turnNumber"))
       val deployment = read[Vector[(Int,Int)]](fmap("deploy"))
       // Finally create the FieldMap itself
       name -> FieldMap(enemies,
@@ -169,11 +171,11 @@ object MapHandler:
                        turn,
                        deployment
               )
-
     nameToMap.toMap
+
 
   def readCondition(map: LinkedHashMap[String, Value]) =
     read[String](map("title")) match
       case "survive" => Survive(read[Int](map("limit")))
+      case "kill" => Kill(read[Vector[String]](map("target")))
       case _ => Route(Team.Enemy)
-

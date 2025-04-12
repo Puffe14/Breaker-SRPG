@@ -6,6 +6,25 @@
       "effect": {},
       "reduction": {}
     },
+    "bgf": {
+      "name": "blue grass",
+      "photo": "field_bluegrass",
+      "effect": {},
+      "reduction": {}
+    },
+    "tar": {
+      "name": "tar",
+      "photo": "field_tar",
+      "effect": {
+        "avoid": -30,
+        "physical": -3,
+        "magical": -3,
+        "hpEffect": -5},
+      "reduction": {
+        "infantry": 2,
+        "mounted": 3
+      }
+    },
     "sand_field": {
       "name": "sand",
       "photo": "s",

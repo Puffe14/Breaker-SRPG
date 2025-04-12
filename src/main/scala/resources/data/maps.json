@@ -1,5 +1,5 @@
 {
-  "1": {
+  "2": {
     "enemies": [["Geblah"]],
     "allies": [],
     "grid": {
@@ -21,7 +21,53 @@
     ]
   },
 
-  "2": {
+
+  "1": {
+    "enemies": [
+      ["Ghulam","Medic","Warrior","Swordsman"],
+      ["Slingman"]
+     ],
+    "allies": [],
+    "grid": {
+      "tiles": ["bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","bgf","tar","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","tar","tar","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","tar","tar","bgf",
+                "bgf","bgf","bgf","bgf","bgf","bgf","bgf","tar","tar",
+                "bgf","tar","tar","bgf","bgf","bgf","bgf","bgf","bgf",
+                "bgf","bgf","tar","tar","bgf","bgf","bgf","bgf","bgf"],
+      "row": 9,
+      "column": 9,
+      "elevation": [4,4,3,3,2,2,0,0,0,
+                    4,4,3,3,2,1,0,0,0,
+                    4,4,4,4,3,2,0,0,0,
+                    4,4,3,0,0,0,0,0,0,
+                    4,4,3,0,0,0,0,0,0,
+                    3,3,0,0,0,0,0,0,0,
+                    4,3,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0]
+    },
+    "clear": {
+      "title": "kill",
+      "target": ["Ghulam"]
+    },
+    "lose": [],
+    "deploy": [[4,8],[5,8],[6,8],[7,8],[8,8]],
+    "rotation": 2,
+    "turnNumber": 1,
+    "units": [
+      ["Ghulam",0,[0,0]],
+      ["Medic",0,[0,1]],
+      ["Warrior",0,[2,0]],
+      ["Swordsman",0,[2,1]],
+      ["Slingman",0,[1,5]]
+    ]
+  },
+
+  "3": {
     "enemies": [
       []
      ],
@@ -34,8 +80,7 @@
     },
     "clear": {
       "title": "survive",
-      "limit": 5,
-      "team": "enemy"
+      "limit": 3
     },
     "lose": [],
     "deploy": [[0,0],[0,1],[1,0]],

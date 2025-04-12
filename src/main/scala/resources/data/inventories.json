@@ -5,15 +5,39 @@
   ],
   "inventory_Lairaea": [
     ["bread",0],
-    ["d_mace",1]
-  ],
-  "inventory_squire": [
-    ["w_club",0]
-  ],
-  "inventory_bonk": [
-    ["w_club",0]
+    ["i_sword",0]
   ],
   "inventory_Geblah": [
+    ["dagger",0],
+    ["s_sling",0]
+  ],
+  "inventory_Faga": [
+    ["bread",0],
+    ["i_sword",0]
+  ],
+
+  "inventory_Warrior": [
     ["w_club",0]
+  ],
+  "inventory_Swordsman": [
+    ["dagger",0],
+    ["i_sword",0]
+  ],
+  "inventory_Slingman": [
+    ["far_sling",0]
+  ],
+  "inventory_Medic": [
+  ],
+  "inventory_Archer": [
+    ["bamboo_bow",0]
+  ],
+  "inventory_Lochagos": [
+    ["bread",0],
+    ["d_mace",0],
+    ["i_lance",0]
+  ],
+  "inventory_Ghulam": [
+    ["bamboo_bow",0],
+    ["i_lance",0]
   ]
 }

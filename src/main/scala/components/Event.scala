@@ -11,10 +11,10 @@ trait Condition:
   var field: Option[FieldMap] = None
   def met(fieldMap: FieldMap): Boolean
 
-//Met when these characters are dead
-class Kill(targets: Vector[Units]) extends Condition:
+//Met when the characters with target names are dead
+class Kill(targets: Vector[String]) extends Condition:
   def met(fieldMap: FieldMap): Boolean =
-    targets.forall(!fieldMap.allCharacters.contains(_))
+    targets.forall(name => fieldMap.allCharacters.forall(c=>c.name!=name))
 
 //Remove ALL characters on a particular team on map.
 class Route(targetTeam: Team) extends Condition:

@@ -29,7 +29,9 @@ val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field
                                 new Image(new FileInputStream(imagePath + "field_cursor.png")),
                                 new Image(new FileInputStream(imagePath + "field_cursor_player.png")),
                                 new Image(new FileInputStream(imagePath + "field_cursor_enemy.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor_ally.png")))
+                                new Image(new FileInputStream(imagePath + "field_cursor_ally.png")),
+                                new Image(new FileInputStream(imagePath + "field_tar.png")),
+                                new Image(new FileInputStream(imagePath + "field_bluegrass.png")))
 val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
@@ -45,12 +47,28 @@ val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_i
                                 new Image(new FileInputStream(imagePath + "guy_atk_2.png")),
                                 new Image(new FileInputStream(imagePath + "guy_hurt.png")),
                                 new Image(new FileInputStream(imagePath + "dead.png")))
+def boutImgSeq(name: String): Seq[Image] = Seq(new Image(new FileInputStream(imagePath + name + "_idle.png")),
+                                              new Image(new FileInputStream(imagePath + name + "_atk_1.png")),
+                                              new Image(new FileInputStream(imagePath + name + "_atk_2.png")),
+                                              new Image(new FileInputStream(imagePath + name + "_hurt.png")),
+                                              new Image(new FileInputStream(imagePath + "dead.png")))
 val idleImages = Map("Cylna" -> new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                      "bonk" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
                      "wrys" -> new Image(new FileInputStream(imagePath + "knight_idle.png")),
                      "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
                      "Geblah" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
+val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
+                         "slicer" -> boutImgSeq("swordsman"),
+                         "singer" -> boutImgSeq("guy"),
+                         "taker" -> boutImgSeq("ninja"),
+                         "archer" -> boutImgSeq("gunner"),
+                         "warrior" -> boutImgSeq("pirate"),
+                         "channeler" -> boutImgSeq("guy"),
+                         "shooter" -> boutImgSeq("ninja"),
+                         "medic" -> boutImgSeq("guy"),
+                         "rider" -> boutImgSeq("hoplite"),
+                         "flier" -> boutImgSeq("hoplite"))
 val imageSets = Map("Cylna" -> imgAtkWar,
                     "wrys" -> imgDefKni,
                     "bonk" -> imgAtkGuy,
@@ -157,7 +175,9 @@ object GUI extends JFXApp3:
           var tileInt = 0
           val bottomInt = 4
           if t.name == "w" then tileInt = 2
-          if t.name == "s" || t.photoFile=="s" then tileInt = 3
+          else if t.name == "s" || t.photoFile=="s" then tileInt = 3
+          else if t.photoFile == "field_tar" then tileInt = 9
+          else if t.photoFile == "field_bluegrass" then tileInt = 10
           //img selection*/
           toDraw += tileImage(t.pos, tileInt)
           //add bottoms
@@ -197,7 +217,7 @@ object GUI extends JFXApp3:
           val x = tilePosX(pos) + drawScale*8
           val y = tilePosY(pos) - drawScale*12   - pos(2)*8*drawScale
           val z = pos(2)
-          toDraw += unitImage(u.frame, imageSets.getOrElse(u.name, Seq(deadImg)),x, y, z, flip)//status icons
+          toDraw += unitImage(u.frame, classImageSets.getOrElse(u.unitClass.className, Seq(deadImg)),x, y, z, flip)//status icons
           for i <- u.statusList.indices do
             toDraw += statusImage(pos,u.statusList(i),i)
         )
@@ -297,7 +317,8 @@ object GUI extends JFXApp3:
         drawMenus(game.menus, g)
 
         //Keep game going on
-        if actList.isEmpty && !game.isBattleOver then game.handleTurn()
+        if actList.isEmpty && !game.isBattleOver then
+          game.handleTurn()
         text = s"Pos $cursorX, $cursorY. ${game.turnOf}"
         while game.stack.hasNext && actList.isEmpty do
           val explain = game.continue()

@@ -30,7 +30,7 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
   def leader = unitsLeader
   def team = side
 
-  def usableWeapons = unitsInventory.weapons
+  def usableWeapons = unitsInventory.weapons//.filter(w=>character.currentClass.ranks.getOrElse(w.wpntyping))
   def usableMedkits = unitsInventory.medkits
   def usableWeaponsAt(distance: Int) =
     usableWeapons.filter(w => w.range(0)<=distance && w.range(1)>=distance)
@@ -60,7 +60,7 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
 
   def breakArmor(piece: Armor) =
     piece.break()
-    
+
   def breakPiece(part: Part) =
     inventory.armors
       .find(_.bodyPart.similarTo(part))

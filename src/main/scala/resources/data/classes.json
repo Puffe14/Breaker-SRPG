@@ -22,6 +22,10 @@
       "defence": 10,
       "resistance": 0
     },
+    "ranks": {
+      "Blunt":3,
+      "Sharp":1
+    },
     "buffs": {},
     "debuffs": {}
   },
@@ -48,6 +52,9 @@
       "speed": 15,
       "defence": 0,
       "resistance": 0
+    },
+    "ranks": {
+      "Sharp":4
     },
     "buffs": {},
     "debuffs": {}
@@ -76,6 +83,9 @@
       "speed": 5,
       "defence": 0,
       "resistance": 10
+    },
+    "ranks": {
+      "Blunt":2
     },
     "buffs": {},
     "debuffs": {
@@ -110,6 +120,10 @@
       "defence": 5,
       "resistance": 10
     },
+    "ranks": {
+      "Sharp":2,
+      "Range": 1
+    },
     "buffs": {
       "strength": 1,
       "magic": 1,
@@ -121,7 +135,7 @@
   "channeler": {
     "name": "channeler",
     "level": 1,
-    "type": ["infantry"],
+    "type": ["infantry","mystic"],
     "stats": {
       "movement": 3,
       "jump": 2,
@@ -141,6 +155,9 @@
       "speed": 5,
       "defence": 15,
       "resistance": 5
+    },
+    "ranks": {
+      "Spell":4
     },
     "buffs": {},
     "debuffs": {}
@@ -168,6 +185,11 @@
       "speed": 10,
       "defence": 20,
       "resistance": 0
+    },
+    "ranks": {
+      "Long":4,
+      "Range":3,
+      "Blunt":2
     },
     "buffs": {},
     "debuffs": {}
@@ -197,6 +219,68 @@
       "defence": 10,
       "resistance": 0
     },
+    "ranks": {
+      "Long":3,
+      "Sharp":2
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "shooter": {
+    "name": "shooter",
+    "level": 1,
+    "type": ["infantry"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 8,
+      "strength": 4,
+      "magic": 0,
+      "skill": 4,
+      "speed": 2,
+      "defence": 1,
+      "resistance": 0},
+    "growth": {
+      "hitpoints": 25,
+      "strength": 20,
+      "magic": 0,
+      "skill": 15,
+      "speed": 10,
+      "defence": 20,
+      "resistance": 0
+    },
+    "ranks": {
+      "Range":4
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
+  "medic": {
+    "name": "medic",
+    "level": 1,
+    "type": ["infantry","healer"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 8,
+      "strength": 2,
+      "magic": 4,
+      "skill": 4,
+      "speed": 3,
+      "defence": 1,
+      "resistance": 0},
+    "growth": {
+      "hitpoints": 15,
+      "strength": 10,
+      "magic": 30,
+      "skill": 15,
+      "speed": 10,
+      "defence": 10,
+      "resistance": 20
+    },
+    "ranks": {},
     "buffs": {},
     "debuffs": {}
   }
