@@ -31,6 +31,17 @@ import scala.util.Random
       if isEffective then damage *= rules.effectiveMultipllier
     )
     damage
+  def advantage(attacking: Units, defending: Units): Int =
+    var result = 0
+    attacking.weapon.foreach(sw=>
+      defending.weapon.foreach(tw=>
+        val vantages = rules.meleeAdvantages
+        val atkpos = vantages.indexOf(sw.wpntyping)
+        if vantages(atkpos+1) == tw.wpntyping then result = rules.wpnTypeAdvantageBonus
+      )
+    )
+    result
+
 
 val attackDuration = 20
 
@@ -92,7 +103,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
 
   //method for the performing attacks
   def attack(attacker: Units, defender: Units, weapon: Weapon) =
-    val isHit = roll100 < attacker.HI - defender.AV //if the attack hits
+    val isHit = roll100 < attacker.HI - defender.AV + advantage(attacker, defender) //if the attack hits
     explain.addAnimation(attacker,Stance,attackDuration/2)
     explain.addAnimation(attacker,Attack,attackDuration)
     if isHit then
@@ -253,7 +264,7 @@ class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: In
     var hit = 0
     var crit = 0
     attacker.weapon.foreach( weapon =>
-      hit  = highest(lowest(attacker.HI - defender.AV, 0), 100)
+      hit  = highest(lowest(attacker.HI - defender.AV + advantage(attacker, defender), 0), 100)
       crit = highest(lowest(attacker.CR - defender.CA, 0), 100)
     )
     (hit, crit)
@@ -299,7 +310,7 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
 
   // eri skillit objekteiks???, trait hit skill / no hit or sommin
   override def skill(attacker: Units, defender: Units) =
-    var bonusHit = 0
+    var bonusHit = advantage(attacker, defender)
     var damage = 0
     //gives bonus to hitrate if the weapon is effective against enemy
     val isEffective = //if the attackers weapon has an effectiveness against defenders type

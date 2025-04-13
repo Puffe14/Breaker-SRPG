@@ -146,8 +146,8 @@
     },
     "growth": {
       "hitpoints": 25,
-      "strength": 15,
-      "magic": 35,
+      "strength": 30,
+      "magic": 0,
       "skill": 30,
       "speed": 35,
       "defence": 15,

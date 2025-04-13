@@ -14,12 +14,14 @@ class Rules {
   //bonus
   val skillBonusHitRateForEffective = 20
   val skillHitRatePenaltyRatio = 2
-  val typeAdvantageBonus = 15
+  val wpnTypeAdvantageBonus = 15
   //leader
   val leaderBonus = Map[String, Int]("HI"->15,"AV"->15)
   //parts
   val allParts = Set(Part.Head, Part.Torso, Part.Arms, Part.Legs)
   //exp gain
-  val baseKillExp = 40
+  val baseKillExp = 100
   val expLvlDiffMult = 3
+  // advantage relations, scissors -> paper -> rock -> scissors
+  val meleeAdvantages = Vector("Blunt","Long","Sharp","Blunt")
 }
