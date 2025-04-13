@@ -280,7 +280,7 @@
       "defence": 10,
       "resistance": 20
     },
-    "ranks": {},
+    "ranks": {"Sharp":1},
     "buffs": {},
     "debuffs": {}
   },

@@ -277,5 +277,9 @@ class ItemMenu(item: Option[Item]) extends Menu:
 
   override def createSubMenus(game: Game) =
     game.acting.foreach(u=>
-      item.foreach(i=>setSubMenus(Vector(EquipMenu(i),UseMenu(i),DiscardMenu(i))))
+      item.foreach(i=>
+        var menus: Vector[Menu] = Vector()
+        if u.equippables.contains(i) then menus = Vector(EquipMenu(i))
+        if i.isInstanceOf[Consumable] then menus = menus ++ Vector(UseMenu(i))
+        setSubMenus(menus++Vector(DiscardMenu(i))))
     )

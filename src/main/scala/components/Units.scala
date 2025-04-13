@@ -1,6 +1,6 @@
 package components
 import components.Part.Head
-import components.Team.Ally
+import components.Team.*
 import game.Rules
 val rules = Rules()
 val parts = rules.allParts
@@ -12,7 +12,7 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
   var statusSet: Set[Status] = Set()
   var temporaryStats: Map[String, Int] = Map()
   var nearbyBonuses: Map[String, Int] = Map()
-  var side: Team = Ally
+  var side: Team = Player
   
   var moved = false
   var acted = false
@@ -30,8 +30,12 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
   def leader = unitsLeader
   def team = side
 
-  def usableWeapons = unitsInventory.weapons//.filter(w=>character.currentClass.ranks.getOrElse(w.wpntyping))
+  def usableWeapons =
+    unitsInventory.weapons // of the weapons in inventory
+                  .filterNot(w=>character.ranks.get(w.wpntyping) // which rank matches type?
+                                      .forall(_<w.rank))     // if rank is high enough, can use.
   def usableMedkits = unitsInventory.medkits
+  def equippables = usableWeapons ++ usableMedkits ++ armor
   def usableWeaponsAt(distance: Int) =
     usableWeapons.filter(w => w.range(0)<=distance && w.range(1)>=distance)
   def usableMedkitsAt(distance: Int) =
@@ -204,6 +208,8 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
   def dfn = character.dfn + bonus("defence")
   def res = character.res + bonus("resistance")
 
+  def giveExp(gained:Int) =
+    character.expTrack( if gained > 0 then gained else 0 )
 
   //Unit combat stats
 

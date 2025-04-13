@@ -94,6 +94,7 @@ trait Weapon extends Equipment:
   val quick: Boolean
   val wpnType: String
   val dmgType: String
+  val rankLetter: String
 
   //Direct combat stats.
   val givenPower: Int
@@ -125,6 +126,13 @@ trait Weapon extends Equipment:
   def effective: Map[String, Int] = effectiveAgainst
   def dmgtyping: String = dmgType
   def wpntyping: String = wpnType
+  def rank: Int =
+    rankLetter match
+      case "E" => 1
+      case "D" => 2
+      case "C" => 3
+      case "B" => 4
+      case "A" => 5
 
   //Cause the weapon to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
@@ -175,12 +183,21 @@ trait Medkit(amount: Int) extends Equipment:
         equipState+s"$name (${maxDurability-spent}/$maxDurability)"
       case None =>
         s"$name"
+        
+case class MedkitFile(map: LinkedHashMap[String, Value]) extends Medkit(read[Int](map("heal"))):
+  val bonusToStats = read[Map[String, Int]](map("bonus"))
+  val description = read[String](map("description"))
+  val name = read[String](map("name"))
+  val durability = read[Option[Int]](map.get("durability"))
+  var spent = read[Int](map("spent"))
+  override val range: (Int, Int) = read[(Int,Int)](map("range"))
+  override def copyMe: Item = this.copy(map = map)
+end MedkitFile
 
 
 
-
-trait Armor(part: Part) extends Equipment:
-
+trait Armor extends Equipment:
+  val part: Part
   //case Helmet(""), Body, Arms, Legs
   def partName = part.toString
   def bodyPart = part
@@ -201,12 +218,22 @@ trait Armor(part: Part) extends Equipment:
 end Armor
 
 
+case class ArmorFile(map: LinkedHashMap[String, Value]) extends Armor:
+  val givenPart = read[String](map("part"))
+  
+  val name = read[String](map("name"))
+  val part = rules.allParts.find(_.toString==givenPart).getOrElse(Part.AnyPart)
+  val description = read[String](map("description"))
+  val bonusToStats = read[Map[String, Int]](map("bonus"))
+  override def copyMe: Item = this.copy(map = map)
+
+
 case class WeaponFile(filename: String) extends Weapon:
   val wdata = ItemHandler.getWeaponsData(filename)
   val name = read[String](wdata("name"))
   val description = read[String](wdata("description"))
   val durability: Option[Int] = Some(read[Int](wdata("durability")))
-  val rank: String = read[String](wdata("rank"))
+  val rankLetter: String = read[String](wdata("rank"))
   var spent: Int = read[Int](wdata("spent"))
   val quick: Boolean = read[Boolean](wdata("quick"))
   val dmgType: String = wdata("dmgtype").str
@@ -238,6 +265,10 @@ object ItemHandler:
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
   def getWeaponsData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+  def getMedkitsData =
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/medkits.json")))
+  def getArmorsData =
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/armors.json")))
   def getInventoryData =
      ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/inventories.json")))
 
@@ -254,6 +285,18 @@ object ItemHandler:
     val nameToWeapon = for name <- itemFilenames yield
      name -> weaponRead(name)
     (nameToItem++nameToWeapon).toMap
+    // medkits
+    lastData = getMedkitsData
+    itemFilenames = lastData.obj.keys
+    val nameToMedkit = for (name, info) <- lastData.obj.toSeq yield
+     name -> MedkitFile(info.obj)
+    // armors
+    lastData = getArmorsData
+    itemFilenames = lastData.obj.keys
+    val nameToArmor = for (name, info) <- lastData.obj.toSeq yield
+     name -> ArmorFile(info.obj)
+    (nameToItem++nameToWeapon++nameToMedkit++nameToArmor).toMap
+
 
   def weaponRead(filename: String): Equipment =
     WeaponFile(filename)

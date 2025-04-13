@@ -12,12 +12,13 @@ class Class(
   val classGrowth: Map[String, Int],
   val classStats: Map[String, Int],
   val classBuffs: Map[String, Int],
-  val classDebuffs: Map[String, Int]):
+  val classDebuffs: Map[String, Int],
+  val classRanks: Map[String, Int] = Map()):
 
   //Methods that return the stats of the class in a useful form.
   def abilities: Vector[String] = classType
   def growths: Map[String, Int] = classGrowth
-  
+  def ranks: Map[String, Int] = classRanks
   //Buffs and debuffs givent to neaby units
   def buffs: Map[String, Int] = classBuffs
   def debuffs: Map[String, Int] = classDebuffs
@@ -58,5 +59,6 @@ object ClassHandler:
               read[Map[String,Int]](data("growth")),
               read[Map[String,Int]](data("stats")),
               read[Map[String,Int]](data("buffs")),
-              read[Map[String,Int]](data("debuffs"))
+              read[Map[String,Int]](data("debuffs")),
+              read[Map[String,Int]](data("ranks"))
         )

@@ -10,6 +10,7 @@ class TestMace extends Blunt:
   val name = "test mace"
   val description = "it's the test mace"
   val dmgType = "force"
+  val rankLetter = "E"
   //Info on weapon.
   val durability: Option[Int] = Some(12)
   var spent: Int = 0
@@ -32,6 +33,7 @@ class TestSpell extends Spell:
   val name = "test spell"
   val description = "it's the test magic"
   val dmgType = "magic"
+  val rankLetter = "E"
   //Info on weapon.
   val durability: Option[Int] = Some(10)
   var spent: Int = 0
@@ -58,6 +60,7 @@ class TestSword extends Sharp:
   val durability: Option[Int] = Some(10)
   var spent: Int = 0
   val quick: Boolean = true
+  val rankLetter = "E"
 
   //Direct combat stats.
   val givenPower: Int = 5
@@ -81,7 +84,8 @@ class TestMedkit extends Medkit(10):
 
 class TestSoup extends Healing("Soup", "Tasty soup.", Map[String, Int](), 1, 3, 10)
 
-class TestHelmet extends Armor(Head):
+class TestHelmet extends Armor:
+  val part = Head
   val name = "helmet"
   val description = "a basic helmet"
   val bonusToStats = Map("defence" -> 20)

@@ -2,6 +2,7 @@
   "2": {
     "enemies": [["Geblah"]],
     "allies": [],
+    "joining": [],
     "grid": {
       "tiles": ["sand_field","sand_field","sand_field","sand_field"],
       "row": 2,
@@ -25,9 +26,11 @@
   "1": {
     "enemies": [
       ["Ghulam","Medic","Warrior","Swordsman"],
+      ["Archer"],
       ["Slingman"]
      ],
     "allies": [],
+    "joining": ["Faga", "Ulrarik"],
     "grid": {
       "tiles": ["bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
                 "bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
@@ -63,7 +66,10 @@
       ["Medic",0,[0,1]],
       ["Warrior",0,[2,0]],
       ["Swordsman",0,[2,1]],
-      ["Slingman",0,[1,5]]
+      ["Slingman",0,[1,5]],
+      ["Archer",0,[7,1]],
+      ["Faga",0,[0,8]],
+      ["Ulrarik",0,[8,8]]
     ]
   },
 
@@ -72,6 +78,7 @@
       []
      ],
     "allies": [],
+    "joining": [],
     "grid": {
       "tiles": ["gray_field","gray_field","gray_field","sand_field"],
       "row": 2,

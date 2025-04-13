@@ -133,6 +133,15 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   def selectedNext =
     selectedAttacks > targetAttacks
 
+  def expGain() =
+    val leveldif = selectedUnit.lvl - targetUnit.lvl
+    if selectedUnit.isDead then
+      val gain = rules.baseKillExp + lowest(leveldif*rules.expLvlDiffMult,0)
+      targetUnit.giveExp(gain)
+    else if targetUnit.isDead then
+      val gain = rules.baseKillExp - lowest(leveldif*rules.expLvlDiffMult,0)
+      selectedUnit.giveExp(gain)
+
 
   ////// plays out outcomes
 
@@ -159,8 +168,11 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
         selectedStrikes()
       else
         targetStrikes()
-    if selectedUnit.isDead then log += (s"${selectedUnit.name} died")
-    else if targetUnit.isDead then log += (s"${targetUnit.name} died")
+    if selectedUnit.isDead then
+      log += (s"${selectedUnit.name} died")
+    else if targetUnit.isDead then
+      log += (s"${targetUnit.name} died")
+    expGain()
     log += ("battle ends")
     selectedUnit.endTurn()
     log.toVector

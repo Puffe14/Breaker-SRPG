@@ -11,7 +11,8 @@ class FieldMap(enemies: Vector[Group],
                loseConditions: Vector[Condition],
                var rotation: Int,
                var turnNumber: Int,
-               deployment: Vector[(Int,Int)]):
+               deployment: Vector[(Int,Int)],
+               joining: Vector[Units] = Vector()):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
   def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group)
@@ -157,7 +158,7 @@ class FieldMap(enemies: Vector[Group],
     var unitsFound = Set[Units]()
     locationTile.foreach( t =>
       for i <- minR to maxR do
-        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - mover
+        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet // - mover
     )
     unitsFound
 
@@ -177,7 +178,7 @@ class FieldMap(enemies: Vector[Group],
     val (minR, maxR) = range
     var unitsFound = Set[Units]()
     for i <- minR to maxR do
-      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet - mover
+      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet // - mover
     unitsFound.map(unit => (unit, unitDistanceFrom(tile, unit), tile))
 
 end FieldMap

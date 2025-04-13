@@ -1,0 +1,47 @@
+{
+  "leather_greaves": {
+    "name": "Leather Greaves",
+    "description": "Leather greaves that give slight protection to the legs.",
+    "part": "Legs",
+    "bonus": {
+      "PD": 1,
+      "AV": 10
+    }
+  },
+  "sun_lamerral": {
+    "name": "Sun Lamerral",
+    "description": "Lamerral body armor adorned with the holy sun of the Successor Empire",
+    "part": "Torso",
+    "bonus": {
+      "PD": 8,
+      "AV": 15
+    }
+  },
+  "sun_gauntlets": {
+    "name": "Sun Gauntlets",
+    "description": "Gauntlets adorned with the holy sun of the Successor Empire",
+    "part": "Arms",
+    "bonus": {
+      "PD": 2,
+      "AV": 10
+    }
+  },
+  "moon_lamerral": {
+    "name": "Moon Lamerral",
+    "description": "Lamerral body armor polished to shine like the moon increasing mystical resistance.",
+    "part": "Torso",
+    "bonus": {
+      "PD": 5,
+      "MD": 5
+    }
+  },
+  "moon_helm": {
+    "name": "Moon Helm",
+    "description": "A helmet polished to shine like the moon increasing resistance.",
+    "part": "Head",
+    "bonus": {
+      "PD": 2,
+      "MD": 2
+    }
+  }
+}

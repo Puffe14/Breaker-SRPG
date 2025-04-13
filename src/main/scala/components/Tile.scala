@@ -150,8 +150,11 @@ object MapHandler:
       val enemyList = read[Vector[Vector[String]]](fmap("enemies"))
       val enemies = enemyList.map(makeGroup(_, Team.Enemy))
       //Create ally units
-      //val allyList = read[Vector[Vector[String]]](fmap("allies"))
-      val allies = Vector() //allyList.map(makeGroup(_, Team.Ally))
+      val allyList = read[Vector[Vector[String]]](fmap("allies"))
+      val allies = allyList.map(makeGroup(_, Team.Ally))
+      //Create joining player characters
+      val joiningList = read[Vector[String]](fmap("joining"))
+      val joining = joiningList.map(makeUnit(_))
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
       val loseConditions = Vector()
@@ -169,7 +172,8 @@ object MapHandler:
                        loseConditions,
                        rotation,
                        turn,
-                       deployment
+                       deployment,
+                       joining
               )
     nameToMap.toMap
 

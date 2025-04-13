@@ -68,6 +68,7 @@ class Character(
   //Methods for returning important info
   def name = myName
   def chrClass = currentClass
+  def ranks = chrClass.ranks
 
   //Methods for returning important stats (characters own stats + class stats bases)
   def maxHp: Int = stats("hitpoints") + currentClass.maxHp
