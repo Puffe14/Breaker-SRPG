@@ -1,29 +1,30 @@
 {
-  "2": {
-    "enemies": [["Geblah"]],
+  "1": {
+    "enemies": [["Lairaea"]],
     "allies": [],
     "joining": [],
+    "events": {},
     "grid": {
-      "tiles": ["sand_field","sand_field","sand_field","sand_field"],
+      "tiles": ["gray_field","gray_field","sand_field","sand_field"],
       "row": 2,
       "column": 2,
       "elevation": [0,1,0,1]
     },
     "clear": {
-      "title": "survive",
-      "limit": 3
+      "title": "kill",
+      "target": ["Lairaea"]
     },
     "lose": [],
     "deploy": [[0,0],[0,1],[1,0]],
     "rotation": 0,
     "turnNumber": 1,
     "units": [
-      ["Geblah",5,[1,1]]
+      ["Lairaea",2,[1,1]]
     ]
   },
 
 
-  "1": {
+  "3": {
     "enemies": [
       ["Ghulam","Medic","Warrior","Swordsman"],
       ["Archer"],
@@ -31,6 +32,7 @@
      ],
     "allies": [],
     "joining": ["Faga", "Ulrarik"],
+    "events": {},
     "grid": {
       "tiles": ["bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
                 "bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
@@ -73,17 +75,50 @@
     ]
   },
 
-  "3": {
+  "1": {
     "enemies": [
-      []
-     ],
+      ["Lochagos"],
+      ["Swordsman"]
+    ],
     "allies": [],
-    "joining": [],
+    "joining": ["Geblah","Lairaea"],
+    "events": {
+      "aynia_joins": {
+        "title": "reinforcement",
+        "units": [
+          ["Aynia",[4,5]]
+        ],
+        "team": "Player",
+        "turns": [2]
+      },
+      "knight_appears": {
+        "title": "reinforcement",
+        "units": [
+          ["Lochagos",[1,1]]
+        ],
+        "team": "Enemy",
+        "turns": [5,6]
+      }
+    },
     "grid": {
-      "tiles": ["gray_field","gray_field","gray_field","sand_field"],
-      "row": 2,
-      "column": 2,
-      "elevation": [2,2,2,0]
+      "tiles": ["grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","grf","gbu","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","gbu","grf","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf"
+      ],
+      "row": 11,
+      "column": 7,
+      "elevation": [2,1,6,6,6,3,3,2,1,0,0,
+                    2,1,6,6,6,2,2,6,6,0,0,
+                    2,1,1,2,2,2,2,2,0,0,0,
+                    1,1,1,2,2,2,2,2,0,0,0,
+                    1,1,2,2,2,2,2,2,2,0,0,
+                    2,1,1,6,6,6,2,2,2,1,6,
+                    2,1,1,6,6,6,2,2,2,6,6
+      ]
     },
     "clear": {
       "title": "survive",
@@ -91,8 +126,14 @@
     },
     "lose": [],
     "deploy": [[0,0],[0,1],[1,0]],
-    "rotation": 2,
+    "rotation": 0,
     "turnNumber": 1,
-    "units": []
+    "units": [
+      ["Geblah",0,[0,2]],
+      ["Lairaea",0,[0,4]],
+      ["Aynia",2,[4,5]],
+      ["Lochagos",0,[10,0]],
+      ["Swordsman",0,[7,4]]
+    ]
   }
 }

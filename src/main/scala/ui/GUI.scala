@@ -31,7 +31,8 @@ val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field
                                 new Image(new FileInputStream(imagePath + "field_cursor_enemy.png")),
                                 new Image(new FileInputStream(imagePath + "field_cursor_ally.png")),
                                 new Image(new FileInputStream(imagePath + "field_tar.png")),
-                                new Image(new FileInputStream(imagePath + "field_bluegrass.png")))
+                                new Image(new FileInputStream(imagePath + "field_bluegrass.png")),
+                                new Image(new FileInputStream(imagePath + "field_orange.png")))
 val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
@@ -176,6 +177,8 @@ object GUI extends JFXApp3:
           val bottomInt = 4
           if t.name == "w" then tileInt = 2
           else if t.name == "s" || t.photoFile=="s" then tileInt = 3
+          else if t.photoFile == "field_gray" then tileInt = 2
+          else if t.photoFile == "field_orange" then tileInt = 11  
           else if t.photoFile == "field_tar" then tileInt = 9
           else if t.photoFile == "field_bluegrass" then tileInt = 10
           //img selection*/

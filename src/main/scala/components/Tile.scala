@@ -36,7 +36,6 @@ class Occupiable(file: String,
     //if no penalty is found
     1
 
-  def effects: Map[String, Int] = Map("atk" -> 1)
   def occupied: Boolean = occupant.nonEmpty
   def addOccupant(newUnit: Units) = occupant = Some(newUnit)
   def removeOccupant(): Option[Units] =
@@ -158,6 +157,12 @@ object MapHandler:
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
       val loseConditions = Vector()
+      // Events
+      val mapEvents = fmap("events").obj
+      val events = mapEvents.flatMap(n=>
+        val currentMap = n._2.obj
+        readEvent(currentMap)
+      ).toVector
       // dummy player
       val dummyplayer = Organization(Vector(),Vector(),Inventory(0),Team.Player)
       val rotation = read[Int](fmap("rotation"))
@@ -173,13 +178,31 @@ object MapHandler:
                        rotation,
                        turn,
                        deployment,
-                       joining
+                       joining,
+                       events
               )
     nameToMap.toMap
 
 
-  def readCondition(map: LinkedHashMap[String, Value]) =
+  def readCondition(map: LinkedHashMap[String, Value]): Condition =
     read[String](map("title")) match
       case "survive" => Survive(read[Int](map("limit")))
       case "kill" => Kill(read[Vector[String]](map("target")))
       case _ => Route(Team.Enemy)
+
+  def readEvent(map: LinkedHashMap[String, Value]): Option[Event] =
+    read[String](map("title")) match
+      case "reinforcement" =>
+        val team = read[String](map("team")) match
+          case "Player" => Team.Player
+          case "Enemy" => Team.Enemy
+          case "Ally" => Team.Ally
+        val unitsCoords: Vector[(String,(Int,Int))] = read[Vector[(String,(Int,Int))]](map("units"))
+        val bunch = unitsCoords.map((u,c) =>(
+          Units(DataLibrary.characters(u),                // Find the character
+                DataLibrary.inventories("inventory_"+u)), // Find the inventory
+          c)
+        )
+        val turns = read[Vector[Int]](map("turns"))
+        Some(Reinforcement(bunch, team, turns))
+      case _ => None

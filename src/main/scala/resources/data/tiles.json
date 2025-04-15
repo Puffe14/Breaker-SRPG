@@ -12,6 +12,23 @@
       "effect": {},
       "reduction": {}
     },
+    "grf": {
+      "name": "grass",
+      "photo": "field_gray",
+      "effect": {},
+      "reduction": {}
+    },
+    "gbu": {
+      "name": "bush",
+      "photo": "field_orange",
+      "effect": {
+        "avoid": 20,
+        "physical": 1
+      },
+      "reduction": {
+        "infantry": 2,
+        "mounted": 3}
+    },
     "tar": {
       "name": "tar",
       "photo": "field_tar",
@@ -19,7 +36,8 @@
         "avoid": -30,
         "physical": -3,
         "magical": -3,
-        "hpEffect": -5},
+        "hpEffect": -5
+      },
       "reduction": {
         "infantry": 2,
         "mounted": 3

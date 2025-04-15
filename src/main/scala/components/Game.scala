@@ -34,7 +34,7 @@ class Game:
 
   def selectTile(tile: Tile) =
     tile match
-      //If the character is selected again and its not their turn
+      //If the character is selected again and it's not their turn
       case o: Occupiable if acting.nonEmpty && acting.forall(_.team!=turnOf) =>
         acting = None
       //If the character is selected again during the turn
@@ -270,6 +270,7 @@ class Game:
 
   def turnCountUp() =
     currentMap.foreach(_.tickTurn())
+    currentMap.map(_.eventCheck())
 
   //Methods for creating actions
 

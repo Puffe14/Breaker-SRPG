@@ -12,10 +12,11 @@ class FieldMap(enemies: Vector[Group],
                var rotation: Int,
                var turnNumber: Int,
                deployment: Vector[(Int,Int)],
-               joining: Vector[Units] = Vector()):
+               joining: Vector[Units] = Vector(),
+               events: Vector[Event] = Vector()):
   def allCharacters: Vector[Units] =
     grid.unitsOnTiles
-  def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group)
+  def groups: Vector[Group] = enemies ++ allies ++ Vector(player.group) ++ additions
   def setPlayer(org: Organization) =
     player = org
   def setLeaders() =
@@ -66,13 +67,29 @@ class FieldMap(enemies: Vector[Group],
   def deployPlayer() =
     val tiles = deploymentTiles
     val deployed = player.deployed.take(tiles.size)
+    grid.unitsOnTiles.filter(_.team == Team.Player) // Get any "player" team characters on map
+        .foreach(addUnitToPlayerDeployed(_))        // and add them to the player deployds.
     for i <- deployed.indices do
-      tiles(i).addOccupant(deployed(i))
-      deployed(i).setTeam(Player)
+      tiles(i).addOccupant(deployed(i))   // Add the characters chosen to be deployed onto the
+      deployed(i).setTeam(Player)         // deployment map and set their team to player.
+
+  // add new groups onto field map
+  var additions = Vector[Group]()
+  def addGroup(group: Group) =
+    additions = additions.appended(group)
+
+  // add more characters to player organization
+  def addUnitToPlayerDeployed(unit: Units) =
+    player.addDeployed(unit)
+  def addUnitListToDeployed(units: Vector[Units]) =
+    units.foreach(addUnitToPlayerDeployed(_))
 
   // Current turn number goes up
   def tickTurn() =
     turnNumber+=1
+
+  def eventCheck() =
+    events.map(_.trigger(this))
 
   //Gives stat bonuses from tile, aura buffs, and debuffs
   def giveBonuses() =
@@ -158,7 +175,7 @@ class FieldMap(enemies: Vector[Group],
     var unitsFound = Set[Units]()
     locationTile.foreach( t =>
       for i <- minR to maxR do
-        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet // - mover
+        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet
     )
     unitsFound
 
@@ -178,7 +195,7 @@ class FieldMap(enemies: Vector[Group],
     val (minR, maxR) = range
     var unitsFound = Set[Units]()
     for i <- minR to maxR do
-      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet // - mover
+      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet
     unitsFound.map(unit => (unit, unitDistanceFrom(tile, unit), tile))
 
 end FieldMap
