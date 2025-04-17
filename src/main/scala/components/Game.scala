@@ -258,10 +258,12 @@ class Game:
         addToStack(GameOver())
       if fm.isCleared then//If player beats the map
         over = true
-        midBattle = false
+        //midBattle = false
         addToStack(MapWon())
         currentMapNumber+=1//Advance to next map
+        turnOf = Team.Player
         currentMap = DataLibrary.maps.get(currentMapNumber.toString)
+        //currentMap.foreach(fm=>player.foreach(fm.setPlayer(_)))
     )
     over
 

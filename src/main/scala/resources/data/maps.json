@@ -2,7 +2,7 @@
   "1": {
     "enemies": [["Lairaea"]],
     "allies": [],
-    "joining": [],
+    "joining": ["Cylna"],
     "events": {},
     "grid": {
       "tiles": ["gray_field","gray_field","sand_field","sand_field"],
@@ -19,6 +19,7 @@
     "rotation": 0,
     "turnNumber": 1,
     "units": [
+      ["Cylna",0,[0,0]],
       ["Lairaea",2,[1,1]]
     ]
   },
@@ -75,7 +76,7 @@
     ]
   },
 
-  "1": {
+  "2": {
     "enemies": [
       ["Lochagos"],
       ["Swordsman"]
@@ -101,31 +102,31 @@
       }
     },
     "grid": {
-      "tiles": ["grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
-                "grf","grf","grf","grf","grf","grf","gbu","grf","grf","grf","grf",
+      "tiles": ["grf","grf","thc","thc","thc","grf","grf","grf","grf","grf","grf",
+                "grf","grf","thc","thc","thc","grf","gbu","thc","thc","grf","grf",
                 "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
                 "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
                 "grf","grf","grf","grf","grf","gbu","grf","grf","grf","grf","grf",
-                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf",
-                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","grf"
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","grf","thc",
+                "grf","grf","grf","grf","grf","grf","grf","grf","grf","thc","thc"
       ],
       "row": 11,
       "column": 7,
-      "elevation": [2,1,6,6,6,3,3,2,1,0,0,
-                    2,1,6,6,6,2,2,6,6,0,0,
+      "elevation": [2,1,4,4,4,3,3,2,1,0,0,
+                    2,1,4,4,4,2,2,3,3,0,0,
                     2,1,1,2,2,2,2,2,0,0,0,
                     1,1,1,2,2,2,2,2,0,0,0,
                     1,1,2,2,2,2,2,2,2,0,0,
-                    2,1,1,6,6,6,2,2,2,1,6,
-                    2,1,1,6,6,6,2,2,2,6,6
+                    2,1,1,5,5,5,2,2,2,1,2,
+                    2,1,1,5,5,5,2,2,2,2,2
       ]
     },
     "clear": {
       "title": "survive",
-      "limit": 3
+      "limit": 5
     },
     "lose": [],
-    "deploy": [[0,0],[0,1],[1,0]],
+    "deploy": [[0,3]],
     "rotation": 0,
     "turnNumber": 1,
     "units": [

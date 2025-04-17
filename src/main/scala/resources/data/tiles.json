@@ -20,7 +20,7 @@
     },
     "gbu": {
       "name": "bush",
-      "photo": "field_orange",
+      "photo": "field_bush",
       "effect": {
         "avoid": 20,
         "physical": 1
@@ -45,7 +45,7 @@
     },
     "sand_field": {
       "name": "sand",
-      "photo": "s",
+      "photo": "field_sand",
       "effect": {
         "atk": -1,
         "avoid": -10,
@@ -65,6 +65,11 @@
       "name": "wall",
       "photo": "field_red",
       "flyOver": false
+    },
+    "thc": {
+      "name": "thicket",
+      "photo": "field_thicket",
+      "flyOver": true
     }
   }
 }

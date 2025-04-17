@@ -21,18 +21,15 @@ import scala.collection.mutable
 
 // !!! EI TÄMMÖSTÄ
 val imagePath = "src/main/scala/resources/images/"
-val imgTiles: Seq[Image] =  Seq(new Image(new FileInputStream(imagePath + "field_gray.png")),
-                                new Image(new FileInputStream(imagePath + "field_movet.png")),
-                                new Image(new FileInputStream(imagePath + "field_red.png")),
-                                new Image(new FileInputStream(imagePath + "field_sand.png")),
-                                new Image(new FileInputStream(imagePath + "field_base.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor_player.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor_enemy.png")),
-                                new Image(new FileInputStream(imagePath + "field_cursor_ally.png")),
-                                new Image(new FileInputStream(imagePath + "field_tar.png")),
-                                new Image(new FileInputStream(imagePath + "field_bluegrass.png")),
-                                new Image(new FileInputStream(imagePath + "field_orange.png")))
+def imgMake(s: String) = new Image(new FileInputStream(imagePath + s + ".png"))
+def pairImgString(s: String) = s -> imgMake(s)
+var imgTiles: Map[String,Image] = Seq("field_cursor_ally",
+                                      "field_cursor_enemy",
+                                      "field_cursor_player",
+                                      "field_cursor",
+                                      "field_movet").map(pairImgString(_)).toMap
+/*def tileImager(s: String):
+  imgTiles.get(s: String)*/
 val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
                                 new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
@@ -120,13 +117,13 @@ object GUI extends JFXApp3:
 
   // CONNECT TO GAME -------------------
   val game = Game()
-  val test = LogTest()
+  //val test = LogTest()
   game.initialize()
-  test.setGrid()
-  test.resetFighters()
+  //test.setGrid()
+  //test.resetFighters()
   game.battleStart()
   game.currentMap = DataLibrary.maps.get(game.currentMapNumber.toString)
-  game.player = Some(new Organization(Vector(test.unit1), Vector(test.unit1), new Inventory(50), Team.Player))
+  game.player = Some(new Organization(Vector(), Vector(), new Inventory(50), Team.Player))
   //game.currentMap = Some(test.field)
 
   // GRAPHICS AND INTERFACE ------------
@@ -136,11 +133,11 @@ object GUI extends JFXApp3:
 
   //   ImageView methods
 
-  def tileImage(loc: (Int, Int, Int), color: Int) = new ImageView:
+  def tileImage(loc: (Int, Int, Int), img: Image) = new ImageView:
       val (lx, ly, lz) = loc
       x = tilePosX(loc)
       y = tilePosY(loc)
-      image = imgTiles(color)
+      image = img
       scaleX = drawScale*32
       scaleY = drawScale*32
       smooth = false
@@ -182,30 +179,30 @@ object GUI extends JFXApp3:
           else if t.photoFile == "field_tar" then tileInt = 9
           else if t.photoFile == "field_bluegrass" then tileInt = 10
           //img selection*/
-          toDraw += tileImage(t.pos, tileInt)
+          toDraw += tileImage(t.pos, t.photo)
           //add bottoms
           (1 to t.pos(2)).foreach(i =>
             val bottomPos = (t.pos(0), t.pos(1), i-1)
-            toDraw += tileImage(bottomPos, bottomInt))
+            toDraw += tileImage(bottomPos, t.bottom))
         )
       //Add the current units move tiles
       game.currentMoveTiles
-        .foreach(t => toDraw += tileImage(t.pos, 1))
+        .foreach(t => toDraw += tileImage(t.pos, imgTiles("field_movet")))
       toDraw.toVector
 
   def drawCursor =
     game.tileAt(cursorX, cursorY) match
-      case Some(tile) => Vector(tileImage(tile.pos,5))
+      case Some(tile) => Vector(tileImage(tile.pos, imgTiles("field_cursor")))
       case None => Vector()
 
   def drawTargetor =
     game.targetor match
       case Some(tile) if game.openMenus.length>1 =>
-        var color = 5
-        if game.target.forall(_.team==Team.Player) then color = 6
-        if game.target.forall(_.team==Team.Enemy) then color = 7
-        if game.target.forall(_.team==Team.Ally) then color = 8
-        Vector(tileImage(tile.pos,color))
+        var selected = imgTiles("field_cursor")
+        if game.target.forall(_.team==Team.Player) then selected = imgTiles("field_cursor_player")
+        if game.target.forall(_.team==Team.Enemy) then selected = imgTiles("field_cursor_enemy")
+        if game.target.forall(_.team==Team.Ally) then selected = imgTiles("field_cursor_ally")
+        Vector(tileImage(tile.pos,selected))
       case Some(_) => Vector()
       case _ => Vector()
 

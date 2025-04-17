@@ -5,7 +5,7 @@ import game.Rules
 val rules = Rules()
 val parts = rules.allParts
 
-class Units(var character: Character, val unitsInventory: Inventory = Inventory(rules.unitInventoryLimit)):
+case class Units(var character: Character, val unitsInventory: Inventory = Inventory(rules.unitInventoryLimit)):
   var unitsLeader: Option[Units] = None
   var damageTaken: Int = 0
   var woundsTaken: Set[Part] = Set()
@@ -333,4 +333,6 @@ class Units(var character: Character, val unitsInventory: Inventory = Inventory(
     " Combat:\n" + s"  AT: $AT, HI: $HI, CR: $CR \n  AS: $AS, SK: $SK \n  PD: $PD, MD: $MD, AV: $AV, CA: $CA \n" +
     " Items: " + unitsInventory.toString()
 
+  def copyMe: Units =
+    this.copy(character=character)
 end Units

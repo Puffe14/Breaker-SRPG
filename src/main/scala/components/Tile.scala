@@ -3,8 +3,11 @@ import game.DataLibrary
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
+import scalafx.scene.image.Image
 import ujson.Value.Value
 import upickle.core.LinkedHashMap
+
+import java.io.FileInputStream
 
 trait Tile(val photoFile: String, val name: String):
   var position: (Int, Int, Int) = (0, 0, 0)
@@ -14,6 +17,10 @@ trait Tile(val photoFile: String, val name: String):
   def setPos(x: Int, y: Int, z: Int) =
     position = (x, y, z)
   def copy: Tile
+  val photo: Image =
+    new Image(new FileInputStream("src/main/scala/resources/images/" + photoFile + ".png"))
+  val bottom: Image =
+    new Image(new FileInputStream("src/main/scala/resources/images/" + "field_base" + ".png"))
 end Tile
 
 class Occupiable(file: String,
@@ -135,8 +142,9 @@ object MapHandler:
       def makeGroup(memberNames: Vector[String], team: Team): Group =
         Group(memberNames.map(makeUnit(_)), Behaviour.Agressive, team, false)
       def makeUnit(unitName: String): Units =
-        val unit = Units(DataLibrary.characters(unitName),                // Find the character
+        val unit = Units(DataLibrary.characters(unitName),         // Find the character
                          DataLibrary.inventories("inventory_"+unitName))  // Find the inventory
+                                    .copyMe
         unitsInfo.find((a,b,c)=> a == unitName) // find out if they have a set place on the map
                  .foreach((a,b,c) =>
                     grid.addUnitAt(unit, c) // Place the character on the map
@@ -200,7 +208,8 @@ object MapHandler:
         val unitsCoords: Vector[(String,(Int,Int))] = read[Vector[(String,(Int,Int))]](map("units"))
         val bunch = unitsCoords.map((u,c) =>(
           Units(DataLibrary.characters(u),                // Find the character
-                DataLibrary.inventories("inventory_"+u)), // Find the inventory
+                DataLibrary.inventories("inventory_"+u))  // Find the inventory
+                .copyMe,
           c)
         )
         val turns = read[Vector[Int]](map("turns"))

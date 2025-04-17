@@ -3,6 +3,10 @@ import components.*
 import components.Behaviour.*
 import scala.util.Random
 
+// yksikkö testit
+// raportti
+
+
 object AI:
   var game = Game()
   var currentGroup: Option[Group] = None

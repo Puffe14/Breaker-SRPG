@@ -23,7 +23,8 @@ class Organization(var members: Vector[Units], var deployed: Vector[Units], stor
 
   //Adds a new unit to the deployed team.
   def addDeployed(unit: Units) =
-    deployed.appended(unit)
+    addMember(unit)
+    deployed = deployed.appended(unit)
 
   //Removes a new unit from the deployed team.
   def removeDeployed(unit: Units) =
