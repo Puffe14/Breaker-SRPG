@@ -16,7 +16,10 @@ class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector
   def effect(fieldMap: FieldMap): Unit =
     val units = bunch.map(_._1)
     // Place units on map
-    bunch.foreach((u, p) => fieldMap.theGrid.addUnitAt(u, p))
+    bunch.foreach((u, p) =>
+      fieldMap.theGrid.addUnitAt(u, p)
+      u.equipFirst()
+    )
     // then based on the team
     team match
       case Team.Player =>

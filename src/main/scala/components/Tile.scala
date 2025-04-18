@@ -207,7 +207,7 @@ object MapHandler:
           case "Ally" => Team.Ally
         val unitsCoords: Vector[(String,(Int,Int))] = read[Vector[(String,(Int,Int))]](map("units"))
         val bunch = unitsCoords.map((u,c) =>(
-          Units(DataLibrary.characters(u),                // Find the character
+          Units(DataLibrary.characters(u).copyMe,         // Find the character
                 DataLibrary.inventories("inventory_"+u))  // Find the inventory
                 .copyMe,
           c)

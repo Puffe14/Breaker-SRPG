@@ -61,7 +61,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   def takeDamage(amount: Int) =
     damageTaken += amount
-    if damageTaken > HP then damageTaken = MaxHP
+    if damageTaken > MaxHP then damageTaken = MaxHP
 
   def healDamage(amount: Int) =
     damageTaken -= amount

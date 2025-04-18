@@ -65,7 +65,7 @@
     "rotation": 2,
     "turnNumber": 1,
     "units": [
-      ["Ghulam",0,[0,0]],
+      ["Ghulam",4,[0,0]],
       ["Medic",0,[0,1]],
       ["Warrior",0,[2,0]],
       ["Swordsman",0,[2,1]],
@@ -81,7 +81,9 @@
       ["Lochagos"],
       ["Swordsman"]
     ],
-    "allies": [],
+    "allies": [
+      ["Slingman"]
+    ],
     "joining": ["Geblah","Lairaea"],
     "events": {
       "aynia_joins": {
@@ -98,7 +100,7 @@
           ["Lochagos",[1,1]]
         ],
         "team": "Enemy",
-        "turns": [5,6]
+        "turns": [5]
       }
     },
     "grid": {
@@ -134,7 +136,8 @@
       ["Lairaea",0,[0,4]],
       ["Aynia",2,[4,5]],
       ["Lochagos",0,[10,0]],
-      ["Swordsman",0,[7,4]]
+      ["Swordsman",0,[7,4]],
+      ["Slingman",0,[6,1]]
     ]
   }
 }

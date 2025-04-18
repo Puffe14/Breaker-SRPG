@@ -63,7 +63,7 @@
   "taker": {
     "name": "taker",
     "level": 1,
-    "type": ["infantry"],
+    "type": ["infantry","healer"],
     "stats": {
       "movement": 3,
       "jump": 2,

@@ -65,7 +65,7 @@ val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
                          "channeler" -> boutImgSeq("guy"),
                          "shooter" -> boutImgSeq("ninja"),
                          "medic" -> boutImgSeq("guy"),
-                         "rider" -> boutImgSeq("hoplite"),
+                         "rider" -> boutImgSeq("knight"),
                          "flier" -> boutImgSeq("hoplite"))
 val imageSets = Map("Cylna" -> imgAtkWar,
                     "wrys" -> imgDefKni,

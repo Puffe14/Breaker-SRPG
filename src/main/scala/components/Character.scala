@@ -48,7 +48,7 @@ case class Character(
   //Rolls growths for level-ups and collects them for display
   def levelUp(): Map[String, Int] =
     val levelUpsMap = mutable.Map[String, Int]()
-    val roll = Random().nextInt(100)
+    def roll = Random().nextInt(100)
     val leveled = growths.toMap
     leveled.keys.foreach(stat =>
       val currentG = leveled(stat)
@@ -115,42 +115,4 @@ object CharacterHandler:
                   read[Int](dt("exp")),
                   read[Map[String,Int]](dt("growth")),
                   read[Map[String,Int]](dt("stats"))
-        )
-
-
-
-
-
-class UnitStats:
-  var hitpoints = 0
-  var strength = 0
-  var magic = 0
-  var defence = 0
-  var resistance = 0
-  var speed = 0
-  var skill = 0
-  var movement = 0
-  var jump = 0
-
-  def setFromMap(map: Map[String, Int]) =
-    hitpoints = map.getOrElse("hitpoints", 0)
-    strength = map.getOrElse("strength", 0)
-    magic = map.getOrElse("magic", 0)
-    defence = map.getOrElse("defence", 0)
-    resistance = map.getOrElse("resistance", 0)
-    speed = map.getOrElse("speed", 0)
-    skill = map.getOrElse("skill", 0)
-    movement = map.getOrElse("movement", 0)
-    jump = map.getOrElse("jump", 0)
-
-  def toMap: Map[String, Int] =
-    Map("hitpoints"->hitpoints,
-        "strength"->strength,
-        "magic"->magic,
-        "defence"->defence,
-        "resistance"->resistance,
-        "skill"->skill,
-        "speed"->speed,
-        "movement"->movement,
-        "jump"->jump,
         )

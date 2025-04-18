@@ -9,6 +9,7 @@ trait Menu:
   var subMenus: Vector[Menu] = Vector()
   def setSubMenus(menus: Vector[Menu]) =
     subMenus = menus
+    if selector > subMenus.length then selector = subMenus.length-1
   def createSubMenus(game: Game) =
     subMenus = Vector()
   def itemTitles: Vector[String] =

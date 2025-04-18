@@ -393,6 +393,7 @@ class Game:
           case m: TargetMenu => bout = m.combat(this)
           case _ =>
     )
+    if stack.nonEmpty then openMenus = Vector()
     openMenus.foreach(_.createSubMenus(this)) //update
 
   def addMenu(menu: Menu) =
@@ -407,7 +408,6 @@ class Game:
       latest match
         case m: ConfirmMenu =>
           if latest.subMenus.nonEmpty then addMenu(latest.pick)
-          else latest.pick
         case _ =>
           if latest.subMenus.nonEmpty then addMenu(latest.pick)
           else println("EMPTY MENU SUBS")

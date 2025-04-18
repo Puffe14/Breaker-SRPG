@@ -66,6 +66,7 @@ object AI:
     //attacks on enemies
     val attacks = combats.filterNot(_.isInstanceOf[Heal])
                       .filter(_.target.team != u.team)
+                      .filter(u.team!=Team.Ally || _.target.team != Team.Player)
     //healing teammates
     val heals =    combats.collect { case a: Heal => a }
                       .filter(_.target.team == u.team)
@@ -78,7 +79,7 @@ object AI:
     /*!!!if u.hasStatus(Confused) then
       randomFrom(sensibleActions)*/
 
-    //the attacks the one that will take the most damage
+    //the attacks the one that will deal the most damage
     if attacks.nonEmpty then
       attacks.maxBy(n => n.forecast.aEV*3 - n.forecast.bEV)
     //the heals the one who is most hurt
