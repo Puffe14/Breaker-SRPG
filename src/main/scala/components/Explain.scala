@@ -10,15 +10,15 @@ class Explain(val name: String = ""):
     val start = totalTime
     totalTime += time
     acts = acts ++ Vector(Act(unit, animation, start, totalTime))
-
-  /*def addAnimation(unit: Units, animation: Animation) =
-    //If this character doesn't have an animation yet
-    if series.exists(_.unit!=unit) then
-      series = series.updated(series.length, AniSeries(unit))*/
+  //Create an act with a message
+  def addAnimation(unit: Units, animation: Animation, time: Int, message: String) =
+    val start = totalTime
+    totalTime += time
+    acts = acts ++ Vector(Act(unit, animation, start, totalTime, message))
 end Explain
 
 
-class Act(unit: Units, animation: Animation, start: Int, end: Int):
+class Act(unit: Units, animation: Animation, start: Int, end: Int, val msg: String = ""):
   def actor = unit
   def frame = animation
   def done(time: Int) = time > end

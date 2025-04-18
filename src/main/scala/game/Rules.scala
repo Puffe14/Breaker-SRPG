@@ -24,4 +24,7 @@ class Rules {
   val expLvlDiffMult = 3
   // advantage relations, scissors -> paper -> rock -> scissors
   val meleeAdvantages = Vector("Blunt","Long","Sharp","Blunt")
+  //animation times
+  val lvlAnimTime = 50
+  val atkAnimTime = 40
 }

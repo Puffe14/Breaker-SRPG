@@ -142,7 +142,7 @@ object MapHandler:
       def makeGroup(memberNames: Vector[String], team: Team): Group =
         Group(memberNames.map(makeUnit(_)), Behaviour.Agressive, team, false)
       def makeUnit(unitName: String): Units =
-        val unit = Units(DataLibrary.characters(unitName),         // Find the character
+        val unit = Units(DataLibrary.characters(unitName).copyMe,         // Find the character
                          DataLibrary.inventories("inventory_"+unitName))  // Find the inventory
                                     .copyMe
         unitsInfo.find((a,b,c)=> a == unitName) // find out if they have a set place on the map

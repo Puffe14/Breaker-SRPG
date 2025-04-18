@@ -43,7 +43,7 @@ import scala.util.Random
     result
 
 
-val attackDuration = 20
+val attackDuration = rules.atkAnimTime
 
 class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
   val rules = Rules()
@@ -111,12 +111,10 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
       var damage = predictDmg(attacker, defender)
       if isCritical then damage *= rules.critMultiplier
       defender.takeDamage(damage)
-      log += (s"${attacker.name} hit ${defender.name} with $damage damage")
-      explain.addAnimation(defender,Hurt,attackDuration)
+      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hit ${defender.name} with $damage damage")
       weapon.spend(1)
     else
-      log += (s"${attacker.name} misses ${defender.name}")
-      explain.addAnimation(defender,Evade,attackDuration)
+      explain.addAnimation(defender,Evade,attackDuration, s"${attacker.name} misses ${defender.name}")
   end attack
 
 
@@ -148,10 +146,11 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
     val leveldif = selectedUnit.lvl - targetUnit.lvl
     if selectedUnit.isDead then
       val gain = rules.baseKillExp + lowest(leveldif*rules.expLvlDiffMult,0)
-      targetUnit.giveExp(gain)
+      explain.addAnimation(targetUnit, Idle, rules.lvlAnimTime, targetUnit.giveExp(gain))
     else if targetUnit.isDead then
       val gain = rules.baseKillExp - lowest(leveldif*rules.expLvlDiffMult,0)
-      selectedUnit.giveExp(gain)
+      explain.addAnimation(selectedUnit, Idle, rules.lvlAnimTime, selectedUnit.giveExp(gain))
+
 
 
   ////// plays out outcomes
@@ -324,10 +323,9 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
     if isHit then
       skillEffect(attacker, defender)
       spend(attacker)
-      explain.addAnimation(defender,Hurt,attackDuration)
+      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hit ${defender.name} with $damage")
     else
-      log += s"${attacker.name} misses ${defender.name}"
-      explain.addAnimation(defender,Evade,attackDuration)
+      explain.addAnimation(defender,Evade,attackDuration, s"${attacker.name} misses ${defender.name}")
 end RollSkill
 
 
@@ -343,10 +341,9 @@ end Heal
 
 class Treat(selectedUnit: Units, targetUnit: Units, range: Int, medkit: Medkit, part: Part) extends Skill(selectedUnit, targetUnit, range):
   override def skillEffect(attacker: Units, defender: Units) =
-    log += (s"${attacker.name} treats ${defender.name}'s $part")
     target.healWound(part)
     explain.addAnimation(attacker,Attack,attackDuration)
-    explain.addAnimation(defender,Hurt,attackDuration)
+    explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} treats ${defender.name}'s $part")
 end Treat
 
 

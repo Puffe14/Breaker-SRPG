@@ -114,6 +114,8 @@ object GUI extends JFXApp3:
   var cursorX = 0
   var cursorY = 0
   var text = "Hello canvas"
+  var currentMessage = Vector[String]()
+  val msgWindow = MessageWindow()
 
   // CONNECT TO GAME -------------------
   val game = Game()
@@ -253,6 +255,9 @@ object GUI extends JFXApp3:
       i.draw(g, offset+100, 380)
       offset += i.width+i.pad
 
+    //Draw the message window
+    if currentMessage.nonEmpty then
+      msgWindow.draw(g,0,currentMessage)
 
   // CONTROL
 
@@ -326,8 +331,10 @@ object GUI extends JFXApp3:
           //Capture acts from explain
           actList = explain.acts
         game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
-        actList.filter(_.show(delta)).foreach(a => setAniInt(a.actor, a.frame))
         actList = actList.filterNot(_.done(delta))
+        val activeActs = actList.filter(_.show(delta))
+        activeActs.foreach(a => setAniInt(a.actor, a.frame))
+        currentMessage = activeActs.map(_.msg).filter(_!="")
         delta+=1
     })
     timer.start()

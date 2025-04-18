@@ -172,25 +172,38 @@ class Game:
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile,unit.Range))) //Who can be attacked? --(who, from)
           .toSet //all available unit, distance, tile combinations
           .map((targetable, distance, currentTile) =>
-            val newAction = Combat(unit, targetable, distance)
-            newAction.location = Some(currentTile)
-            newAction)
+            val newActions: Vector[Combat] =
+              // possible breaks
+              val breaks = if unit.canBreak then for b <- targetable.breakableParts yield
+                Break(unit, targetable, distance, b) else Vector()
+              // possible wounds
+              val wounds = if unit.canWound then for b <- targetable.woundableParts yield
+                Wound(unit, targetable, distance, b) else Vector()
+              // combine all of them
+              Vector(Combat(unit, targetable, distance)) ++ breaks.toVector ++ wounds.toVector
+
+            newActions.foreach(_.location = Some(currentTile))
+            newActions)
           .toVector
         val heals = (for medkit <- unit.usableMedkits yield //Medkits that the character could use
           fm.movementRangeTiles(unit) //On movement range tiles --Tiles
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile,medkit.range)))
           .toSet//Who can be attacked? --(who, from)
           .map((targetable, distance, currentTile) =>  //all available unit, distance, tile combinations
-            val newAction = Heal(unit, targetable, distance, medkit)
-            newAction.location = Some(currentTile)
-            newAction
+            val newActions: Vector[Combat] =
+              // possible treats
+              val treats = for b <- targetable.wounds yield
+                Treat(unit, targetable, distance, medkit, b)
+              treats.toVector.appended(Heal(unit, targetable, distance, medkit))
+            newActions.foreach(_.location = Some(currentTile))
+            newActions
           ).toVector
           ).flatten
         //all possible item uses for character
         val uses = (for c <- unit.consumables yield use(unit,c)) //use action for each item
           .flatten //remove option
           .toVector //to vector
-        combats ++ heals ++ uses
+        combats.flatten ++ heals.flatten ++ uses
 
   def attackRangeUnitsFor(unit: Units): Vector[Units] =
     var guys = Vector[Units]()
@@ -204,6 +217,13 @@ class Game:
               .foreach(tl=> unit.medkit.foreach(medkit => guys = fm.attackRangeUnitsAt(unit,tl,medkit.range)
                                    .map(_(0)).toVector)))
     guys
+  def breakRangeUnitsFor(unit: Units): Vector[Units] =
+    attackRangeUnitsFor(unit).filter(_.breakableParts.nonEmpty)
+  def woundRangeUnitsFor(unit: Units): Vector[Units] =
+    attackRangeUnitsFor(unit).filter(_.woundableParts.nonEmpty)
+  def treatRangeUnitsFor(unit: Units): Vector[Units] =
+    medRangeUnitsFor(unit).filter(_.wounds.nonEmpty)
+
 
   def initialize() =
     IOHandler.buildClasses()
@@ -333,6 +353,7 @@ class Game:
     bout = combat
   def performBout() =
     addOptionToStack(bout)
+    setBout(None)
   def setForecast() =
     forecast = bout match
       case Some(combat) => Some(combat.forecast)
@@ -384,7 +405,9 @@ class Game:
     if openMenus.nonEmpty then
       val latest = openMenus.last
       latest match
-        case m: ConfirmMenu => addMenu(latest.pick)
+        case m: ConfirmMenu =>
+          if latest.subMenus.nonEmpty then addMenu(latest.pick)
+          else latest.pick
         case _ =>
           if latest.subMenus.nonEmpty then addMenu(latest.pick)
           else println("EMPTY MENU SUBS")

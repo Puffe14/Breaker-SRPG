@@ -30,11 +30,17 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def leader = unitsLeader
   def team = side
 
+  // whether or not a unit has particular abilities
+  def canHeal: Boolean = types.contains("healer")
+  def canBreak: Boolean = types.contains("breaks")
+  def canWound: Boolean = types.contains("wounder")
+  def canFlies: Boolean = types.contains("flier")
+
   def usableWeapons =
     unitsInventory.weapons // of the weapons in inventory
                   .filterNot(w=>character.ranks.get(w.wpntyping) // which rank matches type?
                                       .forall(_<w.rank))     // if rank is high enough, can use.
-  def usableMedkits = unitsInventory.medkits
+  def usableMedkits = if canHeal then unitsInventory.medkits else Vector()
   def equippables = usableWeapons ++ usableMedkits ++ armor
   def usableWeaponsAt(distance: Int) =
     usableWeapons.filter(w => w.range(0)<=distance && w.range(1)>=distance)
@@ -208,8 +214,9 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def dfn = character.dfn + bonus("defence")
   def res = character.res + bonus("resistance")
 
-  def giveExp(gained:Int) =
-    character.expTrack( if gained > 0 then gained else 0 )
+  def giveExp(gained:Int): String =
+    character.expTrack( if gained > 0 then gained else 0 ).mkString(", ")
+
 
   //Unit combat stats
 

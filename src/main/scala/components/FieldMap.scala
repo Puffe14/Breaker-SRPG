@@ -123,7 +123,7 @@ class FieldMap(enemies: Vector[Group],
       val accessibles = mutable.Buffer[Tile]()
       if thisOneOk then accessibles += tile
       val availableNeighbors = grid.neighbors(tile)
-                                   .collect { case a: Occupiable => a }
+                                   //.collect { case a: Occupiable => a }
                                    .filter(t => grid.elevationDifference(elevation, t) <= jump)
       availableNeighbors
         .foreach(accessibles ++= moveCheck(moveLeft-tile.moveReduction(types), _, types, team, tile.pos(2), jump))
@@ -142,7 +142,7 @@ class FieldMap(enemies: Vector[Group],
       case o: Occupiable if o.occupant.forall(_.team == team) =>
         findSurrounding(false)
       //If it can be flown over
-      case u: Unoccupiable if u.canFlyOver && types.contains("flyer") =>
+      case u: Unoccupiable if u.canFlyOver && types.contains("flier") =>
         findSurrounding(false)
       //If other checks fail
       case _ =>
@@ -175,7 +175,7 @@ class FieldMap(enemies: Vector[Group],
     var unitsFound = Set[Units]()
     locationTile.foreach( t =>
       for i <- minR to maxR do
-        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet
+        unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(t,i)).toSet - mover
     )
     unitsFound
 
@@ -195,7 +195,7 @@ class FieldMap(enemies: Vector[Group],
     val (minR, maxR) = range
     var unitsFound = Set[Units]()
     for i <- minR to maxR do
-      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet
+      unitsFound = unitsFound ++ grid.unitsFromTiles(grid.tileInRangeFrom(tile,i)).toSet - mover
     unitsFound.map(unit => (unit, unitDistanceFrom(tile, unit), tile))
 
 end FieldMap

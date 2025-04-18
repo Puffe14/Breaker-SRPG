@@ -48,7 +48,8 @@
   "inventory_Lochagos": [
     ["bread",0],
     ["d_mace",0],
-    ["i_lance",0]
+    ["i_lance",0],
+    ["sun_lamerral",0]
   ],
   "inventory_Ghulam": [
     ["bamboo_bow",0],

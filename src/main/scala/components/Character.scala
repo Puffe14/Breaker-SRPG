@@ -16,7 +16,7 @@ import scala.util.Random
 
 
 
-class Character(
+case class Character(
    //character parameters
    val myName: String,
    var currentClass: Class,
@@ -33,10 +33,11 @@ class Character(
   //!!! to an event that give message as a legible string
   //Increase experience and handle if reaches lvlup
   def expTrack(increase: Int): Vector[String] =
-    val message: mutable.Buffer[String] = mutable.Buffer()
+    val message: mutable.Buffer[String] = mutable.Buffer(s"$name gained $increase exp")
     exp += increase
     val lvlsUp = exp/100
     if lvlsUp > 0 then
+      level += 1
       message += "LEVEL UP\n"
       for i <- 0 until lvlsUp do
         message += levelUp().map((k, v) => s"$k: $v").mkString(", ")
@@ -80,6 +81,8 @@ class Character(
   def res: Int = stats("resistance") + currentClass.res
   def move:Int = currentClass.move
   def jump:Int = currentClass.jump
+
+  def copyMe: Character = this.copy(myName=myName)
 end Character
 
 

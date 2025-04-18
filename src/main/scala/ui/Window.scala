@@ -55,6 +55,25 @@ class MenuWindow(menu: Menu) extends Window:
 end MenuWindow
 
 
+class MessageWindow() extends Window:
+  override val width = 650-(font+margin)*2
+  def draw(g: GraphicsContext, offset: Int, message: Vector[String]) =
+    val xo = x + offset
+    val yp = font*2+margin
+    val fm = font+margin
+    val height = message.size*fm+fm
+
+    //Create background!
+    g.fill = Gray // Set the fill color.
+    g.fillRect(xo, yp-font, width, height+font)
+
+    //Display the message
+    g.fill = Purple
+    g.font = Font(font)
+    g.fillText(message.mkString("\n"),fm,yp+margin)
+
+end MessageWindow
+
 
 class ForecastWindow(fc: Forecast) extends Window:
   override val width = 500

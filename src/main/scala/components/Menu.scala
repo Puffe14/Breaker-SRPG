@@ -46,10 +46,6 @@ class ConfirmMenu extends Menu:
   override def createSubMenus(game: Game) =
     effect(game)
 
-class UnitMenu(actor: Units, targets: Vector[Units]) extends Menu:
-  val title = "Unit"
-  override def createSubMenus(game: Game) =  ()
-    // !!! unused? setSubMenus(targets.map(CombatMenu(actor,_,this)))
 
 class CombatMenu(actor: Units, target: Units, previous: TargetMenu) extends ConfirmMenu:
   def targetUnit = target
@@ -61,11 +57,6 @@ class CombatMenu(actor: Units, target: Units, previous: TargetMenu) extends Conf
 class BoutMenu extends ConfirmMenu:
   override def effect(game: Game) =
     game.performBout()
-
-
-/*class ForecastMenu extends ConfirmMenu:
-  override def effect(game: Game) =
-end ForecastMenu*/
 
 
 // Not part of menu tree
@@ -236,13 +227,19 @@ class ActionsMenu extends Menu:
   override def createSubMenus(game: Game) =
     var collector = Vector[Menu]()
     def atc(menu: Menu) = collector = collector.appended(menu)
+
     game.acting.foreach(actor =>
       if game.attackRangeUnitsFor(actor).nonEmpty then
         atc(AttackMenu())
-        if actor.types.contains("wounder") then atc(WoundMenu())
-        if actor.types.contains("breaker") then atc(BreakMenu())
+        if actor.canWound &&
+           game.woundRangeUnitsFor(actor).nonEmpty then
+          atc(WoundMenu())
+        if actor.canBreak &&
+           game.breakRangeUnitsFor(actor).nonEmpty then
+          atc(BreakMenu())
       if game.medRangeUnitsFor(actor).nonEmpty then
         atc(HealMenu())
+      if game.treatRangeUnitsFor(actor).nonEmpty then
         atc(TreatMenu())
     )
     setSubMenus(collector ++ Vector(InventoryMenu(),WaitMenu()))
