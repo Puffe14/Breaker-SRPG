@@ -32,7 +32,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   // whether or not a unit has particular abilities
   def canHeal: Boolean = types.contains("healer")
-  def canBreak: Boolean = types.contains("breaks")
+  def canBreak: Boolean = types.contains("breaker")
   def canWound: Boolean = types.contains("wounder")
   def canFlies: Boolean = types.contains("flier")
 
@@ -61,15 +61,21 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   def takeDamage(amount: Int) =
     damageTaken += amount
-    if damageTaken > MaxHP then damageTaken = MaxHP
+    limitHP()
 
   def healDamage(amount: Int) =
     damageTaken -= amount
+    limitHP()
+
+  def limitHP() =
     if damageTaken < 0 then
       damageTaken = 0
+    if damageTaken > MaxHP then
+      damageTaken = MaxHP
 
   def breakArmor(piece: Armor) =
     piece.break()
+    inventory.clean()
 
   def breakPiece(part: Part) =
     inventory.armors

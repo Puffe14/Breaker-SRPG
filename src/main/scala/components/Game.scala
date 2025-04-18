@@ -38,7 +38,7 @@ class Game:
       case o: Occupiable if acting.nonEmpty && acting.forall(_.team!=turnOf) =>
         acting = None
       //If the character is selected again during the turn
-      case o: Occupiable if acting == o.occupantOnTile =>
+      case o: Occupiable if acting.nonEmpty && acting == o.occupantOnTile =>
         menuPick()
       //Beat-em-up
       case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) && targetInRangeOfActor =>
@@ -245,7 +245,6 @@ class Game:
       fm.clearDead()
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
-      groupsWithTurn.foreach(_.reduceTemporary())
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them
@@ -264,6 +263,7 @@ class Game:
         case Team.Ally =>  turnCountUp(); Team.Player
       refreshAll()
       deSelect()
+      groupsWithTurn.foreach(_.reduceTemporary())
     clearPostAction()
     clearMenuWhenActed()
       //handleTurn() //If the turn is over, let the next ones act

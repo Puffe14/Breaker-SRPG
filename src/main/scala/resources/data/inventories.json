@@ -9,6 +9,11 @@
     ["bread",0],
     ["i_sword",0]
   ],
+  "inventory_BossLairaea": [
+    ["bread",0],
+    ["dagger",0],
+    ["practice_mail",0]
+  ],
   "inventory_Geblah": [
     ["dagger",0],
     ["s_sling",0],

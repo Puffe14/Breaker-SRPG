@@ -24,6 +24,7 @@ class Inventory(slotCount: Int):
     item match
       case Some(foundItem) if slots.contains(item) =>
         slots = slots.updated(slots.indexOf(Some(foundItem)), None)
+        definedToTop()
         Some(foundItem)
       case _ => None
 
@@ -127,6 +128,7 @@ class Inventory(slotCount: Int):
     }
     medInSlots
 
+  //!!! never used
   def fromSlots[T](itemClass: Vector[T]): Vector[T] =
     val slotted = items.flatten
     var itemInSlots: Vector[T] = Vector()

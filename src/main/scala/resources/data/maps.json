@@ -1,6 +1,6 @@
 {
   "1": {
-    "enemies": [["Lairaea"]],
+    "enemies": [["BossLairaea"]],
     "allies": [],
     "joining": ["Cylna"],
     "events": {},
@@ -20,7 +20,7 @@
     "turnNumber": 1,
     "units": [
       ["Cylna",0,[0,0]],
-      ["Lairaea",2,[1,1]]
+      ["BossLairaea",2,[1,1]]
     ]
   },
 

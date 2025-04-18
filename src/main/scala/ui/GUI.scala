@@ -108,7 +108,7 @@ object GUI extends JFXApp3:
   //"Camera" control variables
   var drawScale = 3                                     //The scale of the pictures drawn
   var middle = (screenW/drawScale, screenH/drawScale)   //The drawing location of the game map
-  var cameraMoveIncrement = 5
+  var cameraMoveIncrement = 10
   var mouseX = 0
   var mouseY = 0
   var cursorX = 0
@@ -157,8 +157,8 @@ object GUI extends JFXApp3:
       viewOrder_(-zpos.toDouble-1)
 
   def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
-      x = tilePosX(loc)  -drawScale*8
-      y = tilePosY(loc)  -drawScale*8 + number*6*drawScale
+      x = tilePosX(loc)
+      y = tilePosY(loc)  -drawScale*4 + number*6*drawScale
       image = iconImages(name)
       scaleX = drawScale*8
       scaleY = drawScale*6
@@ -238,7 +238,7 @@ object GUI extends JFXApp3:
       offset += i.width+i.pad   // Set seperation to the next menu
     offset = 0
     // show tile being hovered
-    val dontHideHoverMenus = game.forecast.isEmpty
+    val dontHideHoverMenus = game.turnOf == Team.Player && game.forecast.isEmpty && actList.isEmpty
     if dontHideHoverMenus then
       hoverTile.foreach(TileWindow(_).draw(g, 0))
     // show who is being inspected
@@ -311,13 +311,12 @@ object GUI extends JFXApp3:
         g.fill = White // Set the fill color.
         g.fillRect(0, 0, screenW, screenH) // Fill rectangle at (0, 0) with width 600 and height 450.
 
+        //Draw methods for groups of Images
+        drawAllMap(drawField++drawUnits++drawCursor++drawTargetor, g)
         //Write nonsense
         g.fill = Blue
         g.font = Font(30) // Set text size
-        g.fillText(text, 250, 50) // Fill text at (10, 100)
-
-        //Draw methods for groups of Images
-        drawAllMap(drawField++drawUnits++drawCursor++drawTargetor, g)
+        g.fillText(text, 370, 50) // Fill text
         //Draw "UI" on top
         drawMenus(game.menus, g)
 

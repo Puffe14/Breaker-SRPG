@@ -1,4 +1,12 @@
 {
+  "practice_mail": {
+    "name": "Practice Mail",
+    "description": "Its effects are only imaginary.",
+    "part": "Torso",
+    "bonus": {
+      "PD": 10
+    }
+  },
   "leather_greaves": {
     "name": "Leather Greaves",
     "description": "Leather greaves that give slight protection to the legs.",

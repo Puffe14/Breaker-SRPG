@@ -10,6 +10,7 @@ import scalafx.scene.layout.*
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
 import scalafx.Includes.*
+import scalafx.scene.paint.Color
 
 
 class Window:
@@ -20,6 +21,12 @@ class Window:
   val width = 200
   val height = 400
   val font = 20
+
+  def teamToColor(team: Team) =
+    team match
+      case Team.Player => Blue
+      case Team.Enemy => DarkRed
+      case Team.Ally => DarkGreen
 end Window
 
 
@@ -115,7 +122,7 @@ class MiniUnitWindow(unit: Units) extends Window:
     val writables = Vector(s"${unit.name}",s"${unit.lvlExp}",s"HP: $HP", s"ATK: $ATK", s"HIT: $HIT", s"CRT: $CRT")
     //Draw the panel
     for i <- writables.indices do
-      g.fill = Blue
+      g.fill = if unit.acted then Color.LightGray else teamToColor(unit.team)
       g.font = Font(font) // Set text size
       g.fillText(writables(i), xo+pad, yo+pad-margin + font + fm*(i))
 end MiniUnitWindow
@@ -174,10 +181,7 @@ class CharacterWindow(unit: Units) extends Window:
     val unitVek = unit.statsUnitVector.map((a,b)=>s"$a: $b").sliding(2,2).toVector
     val invVek = unit.inventory.listItems.sliding(2,2).toVector
 
-    val teamColor = unit.team match
-      case Team.Player => Blue
-      case Team.Enemy => Red
-      case Team.Ally => Green
+    val teamColor = teamToColor(unit.team)
 
     // Write nonsense
     def pairbunch(vek: Vector[Vector[String]], fontsDown: Int, fontDivider: Int) =

@@ -113,6 +113,7 @@ class FieldMap(enemies: Vector[Group],
     units.filter(_.team==unit.team).foreach(_.givenNearbyBuffs.foreach((a,b)=>addToStat(a,b)))
     units.filter(_.team!=unit.team).foreach(_.givenNearbyDebuffs.foreach((a,b)=>addToStat(a,b)))
     unit.setNearbyBonus(bonus.toMap)
+    unit.takeDamage(-tile.hpEffect)
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE

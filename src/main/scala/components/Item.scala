@@ -205,7 +205,7 @@ trait Armor extends Equipment:
   private var broken = false
 
   override def intact =
-    broken
+    !broken
 
   def break() =
     broken = true
