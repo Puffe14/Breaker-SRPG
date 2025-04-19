@@ -1,4 +1,22 @@
 {
+  "super_club": {
+    "name": "Super Club",
+    "description": "A test weapon.",
+    "rank": "E",
+    "spent": 0,
+    "durability": 15,
+    "quick": true,
+    "wpntype": "Blunt",
+    "dmgtype": "force",
+    "power": 5,
+    "hit": 260,
+    "crit": 0,
+    "range": [1, 1],
+    "weight": 1,
+    "effective": {},
+    "bonus": {"MD": 2,
+              "PD": 2}
+  },
   "dagger": {
     "name": "Dagger",
     "description": "A simple dagger.",
@@ -93,8 +111,8 @@
     "quick": false,
     "wpntype": "Blunt",
     "dmgtype": "force",
-    "power": 3,
-    "hit": 260,
+    "power": 2,
+    "hit": 80,
     "crit": 0,
     "range": [1, 1],
     "weight": 4,

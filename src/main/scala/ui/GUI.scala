@@ -113,25 +113,35 @@ object GUI extends JFXApp3:
   var mouseY = 0
   var cursorX = 0
   var cursorY = 0
-  var text = "Hello canvas"
+  var text = "Hello player"
   var currentMessage = Vector[String]()
   val msgWindow = MessageWindow()
+  var game = Game()
+  var actList = Vector[Act]()
+  startUp()
 
-  // CONNECT TO GAME -------------------
-  val game = Game()
-  //val test = LogTest()
-  game.initialize()
-  //test.setGrid()
-  //test.resetFighters()
-  game.battleStart()
-  game.currentMap = DataLibrary.maps.get(game.currentMapNumber.toString)
-  game.player = Some(new Organization(Vector(), Vector(), new Inventory(50), Team.Player))
-  //game.currentMap = Some(test.field)
+
+  def startUp() =
+    // RESET GUI STUFF
+    drawScale = 3
+    middle = (screenW/drawScale, screenH/drawScale)
+    cameraMoveIncrement = 10
+    mouseX = 0
+    mouseY = 0
+    cursorX = 0
+    cursorY = 0
+    text = "Hello player"
+    currentMessage = Vector[String]()
+    // CONNECT TO GAME
+    game = Game()
+    game.initialize()
+    game.battleStart()
+    game.currentMap = DataLibrary.maps.get(game.currentMapNumber.toString)
+    game.player = Some(new Organization(Vector(), Vector(), new Inventory(50), Team.Player))
+    // Animation
+    actList = Vector[Act]()
 
   // GRAPHICS AND INTERFACE ------------
-
-    // Animation
-  var actList = Vector[Act]()
 
   //   ImageView methods
 
@@ -147,7 +157,6 @@ object GUI extends JFXApp3:
 
   def unitImage(imgNum: Int, images: Seq[Image], xpos: Int, ypos: Int, zpos: Int, flip: Boolean) = new ImageView:
       if flip then x = xpos + 16*drawScale else x = xpos
-      //x = xpos
       val mirror = if flip then -1 else 1
       y = ypos + 8*drawScale*zpos
       image = images(imgNum)
@@ -171,16 +180,7 @@ object GUI extends JFXApp3:
       val toDraw = mutable.Buffer[ImageView]()
       game.allTiles         //Gather tiles to be drawn
         .foreach(t =>
-          //img selection/* !!!
-          var tileInt = 0
-          val bottomInt = 4
-          if t.name == "w" then tileInt = 2
-          else if t.name == "s" || t.photoFile=="s" then tileInt = 3
-          else if t.photoFile == "field_gray" then tileInt = 2
-          else if t.photoFile == "field_orange" then tileInt = 11  
-          else if t.photoFile == "field_tar" then tileInt = 9
-          else if t.photoFile == "field_bluegrass" then tileInt = 10
-          //img selection*/
+          //img selection from tile photo value
           toDraw += tileImage(t.pos, t.photo)
           //add bottoms
           (1 to t.pos(2)).foreach(i =>
@@ -246,10 +246,11 @@ object GUI extends JFXApp3:
       val window = CharacterWindow(u)
       window.draw(g, 310)
     )
-    
+    //draw the battle forecast to ease player choice
     game.forecast.foreach(u=>
       ForecastWindow(u).draw(g, 50)
     )
+    //draw the small selector windows for changing weapon or target part
     val selectorWindows = game.selectorMenus.map(LeftRightMenuWindow(_))
     for i <- selectorWindows do
       i.draw(g, offset+100, 380)
@@ -442,6 +443,7 @@ object GUI extends JFXApp3:
         case KeyCode.E => game.turnWise()
         case KeyCode.Z => zoomIn()
         case KeyCode.X => zoomOut()
+        case KeyCode.M => startUp()
         case KeyCode.Down => cameraUp(cameraMoveIncrement)
         case KeyCode.Right => cameraLeft(cameraMoveIncrement)
         case KeyCode.Up => cameraDown(cameraMoveIncrement)

@@ -180,6 +180,31 @@
       "resistance": 10
     }
   },
+  "Fusiller": {
+    "name": "Fusiller",
+    "class": "shooter",
+    "classes": ["shooter"],
+    "level": 1,
+    "exp": 0,
+    "stats": {
+      "hitpoints": 9,
+      "strength": 2,
+      "magic": 0,
+      "skill": 2,
+      "speed": 2,
+      "defence": 0,
+      "resistance": 0
+    },
+    "growth": {
+      "hitpoints": 25,
+      "strength": 25,
+      "magic": 0,
+      "skill": 25,
+      "speed": 25,
+      "defence": 20,
+      "resistance": 20
+    }
+  },
   "Archer": {
     "name": "Archer",
     "class": "shooter",
@@ -237,7 +262,7 @@
     "level": 2,
     "exp": 0,
     "stats": {
-      "hitpoints": 25,
+      "hitpoints": 13,
       "strength": 5,
       "magic": 0,
       "skill": 5,
@@ -262,7 +287,7 @@
     "level": 2,
     "exp": 0,
     "stats": {
-      "hitpoints": 25,
+      "hitpoints": 14,
       "strength": 2,
       "magic": 0,
       "skill": 3,
@@ -335,11 +360,11 @@
     "name": "Lairaea",
     "class": "slicer",
     "classes": ["slicer"],
-    "level": 1,
+    "level": 2,
     "exp": 0,
     "stats": {
       "hitpoints": 13,
-      "strength": 6,
+      "strength": 3,
       "magic": 0,
       "skill": 4,
       "speed": 8,

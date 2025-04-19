@@ -1,8 +1,8 @@
 {
   "1": {
-    "enemies": [["BossLairaea"]],
-    "allies": [],
-    "joining": ["Cylna"],
+    "enemies": [ [["BossLairaea",2,[1,1]]] ],
+    "allies": [[]],
+    "joining": [ ["Cylna",0,[0,0]] ],
     "events": {},
     "grid": {
       "tiles": ["gray_field","gray_field","sand_field","sand_field"],
@@ -16,23 +16,31 @@
     },
     "lose": [],
     "deploy": [[0,0],[0,1],[1,0]],
-    "rotation": 0,
-    "turnNumber": 1,
-    "units": [
-      ["Cylna",0,[0,0]],
-      ["BossLairaea",2,[1,1]]
-    ]
+    "rotation": 2,
+    "turnNumber": 1
   },
 
 
   "3": {
     "enemies": [
-      ["Ghulam","Medic","Warrior","Swordsman"],
-      ["Archer"],
-      ["Slingman"]
+      [
+        ["Ghulam",4,[0,0]],
+        ["Medic",0,[0,1]],
+        ["Warrior",0,[2,0]],
+        ["Swordsman",0,[2,1]]
+      ],
+      [
+        ["Archer",0,[7,1]]
+      ],
+      [
+        ["Slingman",0,[1,5]]
+      ]
      ],
-    "allies": [],
-    "joining": ["Faga", "Ulrarik"],
+    "allies": [[]],
+    "joining": [
+      ["Faga",0,[0,8]],
+      ["Ulrarik",0,[8,8]]
+    ],
     "events": {},
     "grid": {
       "tiles": ["bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf","bgf",
@@ -63,28 +71,31 @@
     "lose": [],
     "deploy": [[4,8],[5,8],[6,8],[7,8],[8,8]],
     "rotation": 2,
-    "turnNumber": 1,
-    "units": [
-      ["Ghulam",4,[0,0]],
-      ["Medic",0,[0,1]],
-      ["Warrior",0,[2,0]],
-      ["Swordsman",0,[2,1]],
-      ["Slingman",0,[1,5]],
-      ["Archer",0,[7,1]],
-      ["Faga",0,[0,8]],
-      ["Ulrarik",0,[8,8]]
-    ]
+    "turnNumber": 1
   },
 
   "2": {
     "enemies": [
-      ["Lochagos","Medic"],
-      ["Swordsman","Warrior"]
+      [
+        ["Lochagos",0,[10,0]],
+        ["Medic",0,[9,3]]
+      ],
+      [
+        ["Fusiller",0,[3,2]],
+        ["Warrior",0,[3,3]]
+      ],
+      [
+        ["Swordsman",0,[7,4]],
+        ["Warrior",0,[9,4]]
+      ]
     ],
     "allies": [
-      ["Slingman"]
+     [ ["Slingman",0,[6,1]] ]
     ],
-    "joining": ["Geblah","Lairaea"],
+    "joining": [
+      ["Geblah",0,[0,2]],
+      ["Lairaea",0,[0,4]]
+    ],
     "events": {
       "aynia_joins": {
         "title": "reinforcement",
@@ -130,16 +141,6 @@
     "lose": [],
     "deploy": [[0,3]],
     "rotation": 0,
-    "turnNumber": 1,
-    "units": [
-      ["Geblah",0,[0,2]],
-      ["Lairaea",0,[0,4]],
-      ["Aynia",2,[4,5]],
-      ["Lochagos",0,[10,0]],
-      ["Swordsman",0,[7,4]],
-      ["Warrior",0,[9,4]],
-      ["Medic",0,[9,3]],
-      ["Slingman",0,[6,1]]
-    ]
+    "turnNumber": 1
   }
 }

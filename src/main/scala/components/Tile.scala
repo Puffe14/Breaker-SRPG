@@ -137,34 +137,32 @@ object MapHandler:
                  )
       grid.givePositionToTiles()
 
-      val unitsInfo = read[Vector[(String,Int,(Int,Int))]](fmap("units"))
-
-      def makeGroup(memberNames: Vector[String], team: Team): Group =
-        Group(memberNames.map(makeUnit(_)), Behaviour.Agressive, team, false)
-      def makeUnit(unitName: String): Units =
+      def makeGroup(memberInfo: Vector[(String,Int,(Int,Int))], team: Team): Group =
+        Group(memberInfo.map(makeUnit(_)), Behaviour.Agressive, team, false)
+      def makeUnit(unitInfo: (String,Int,(Int,Int))): Units =
+        val unitName = unitInfo(0)  //get the name
         val unit = Units(DataLibrary.characters(unitName).copyMe,         // Find the character
                          DataLibrary.inventories("inventory_"+unitName))  // Find the inventory
                                     .copyMe
-        unitsInfo.find((a,b,c)=> a == unitName) // find out if they have a set place on the map
-                 .foreach((a,b,c) =>
-                    grid.addUnitAt(unit, c) // Place the character on the map
-                    unit.takeDamage(b)      // Harm them enough
-                    unit.equipFirst()       // Equip the weapon on their first slot
-        )
+        val (a,b,c) = unitInfo
+        grid.addUnitAt(unit, c) // Place the character on the map
+        unit.takeDamage(b)      // Harm them enough
+        unit.equipFirst()       // Equip the weapon on their first slot
+        //finally return the unit made so it can be used to make the group
         unit
 
       //Create enemy units
-      val enemyList = read[Vector[Vector[String]]](fmap("enemies"))
+      val enemyList = read[Vector[Vector[(String,Int,(Int,Int))]]](fmap("enemies"))
       val enemies = enemyList.map(makeGroup(_, Team.Enemy))
       //Create ally units
-      val allyList = read[Vector[Vector[String]]](fmap("allies"))
+      val allyList = read[Vector[Vector[(String,Int,(Int,Int))]]](fmap("allies"))
       val allies = allyList.map(makeGroup(_, Team.Ally))
       //Create joining player characters
-      val joiningList = read[Vector[String]](fmap("joining"))
+      val joiningList = read[Vector[(String,Int,(Int,Int))]](fmap("joining"))
       val joining = joiningList.map(makeUnit(_))
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
-      val loseConditions = Vector()
+      val loseConditions = Vector() //!!! reading lose conditions unimplemented
       // Events
       val mapEvents = fmap("events").obj
       val events = mapEvents.flatMap(n=>
@@ -208,7 +206,7 @@ object MapHandler:
         val unitsCoords: Vector[(String,(Int,Int))] = read[Vector[(String,(Int,Int))]](map("units"))
         val bunch = unitsCoords.map((u,c) =>(
           Units(DataLibrary.characters(u).copyMe,         // Find the character
-                DataLibrary.inventories("inventory_"+u))  // Find the inventory
+                DataLibrary.inventories("inventory_"+u).copyMe)  // Find the inventory
                 .copyMe,
           c)
         )

@@ -172,4 +172,12 @@ class Inventory(slotCount: Int):
       case None => "empty"
     }.mkString(", ")
 
+  def copyMe: Inventory =
+    val newInv = Inventory(this.slotCount)
+    slots.foreach {
+      case Some(i)=> newInv.add(Some(i.copyMe))
+      case _ =>
+    }
+    newInv
+
 end Inventory

@@ -323,7 +323,7 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
     if isHit then
       skillEffect(attacker, defender)
       spend(attacker)
-      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hit ${defender.name} with $damage")
+      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hits ${defender.name}")
     else
       explain.addAnimation(defender,Evade,attackDuration, s"${attacker.name} misses ${defender.name}")
 end RollSkill
@@ -335,7 +335,7 @@ class Heal(selectedUnit: Units, targetUnit: Units, range: Int, medkit: Medkit) e
     log += (s"${attacker.name} heals ${defender.name} with $damage")
     defender.healDamage(damage)
     explain.addAnimation(attacker,Attack,attackDuration)
-    explain.addAnimation(defender,Hurt,attackDuration)
+    explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} heals ${defender.name} with $damage")
 end Heal
 
 

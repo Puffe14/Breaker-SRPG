@@ -45,6 +45,9 @@
   "inventory_Slingman": [
     ["far_sling",0]
   ],
+  "inventory_Fusiller": [
+    ["s_sling",2]
+  ],
   "inventory_Medic": [
     ["dagger",0],
     ["simple_medkit",0]

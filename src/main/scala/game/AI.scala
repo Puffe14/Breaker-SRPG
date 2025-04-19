@@ -77,7 +77,7 @@ object AI:
     val combats = availableActions
                       .collect { case a: Combat => a }
     //attacks on enemies
-    val attacks = combats.filterNot(_.isInstanceOf[Heal])
+    val attacks = combats.filterNot(_.isInstanceOf[Heal]).filterNot(_.isInstanceOf[Treat])
                       .filter(_.target.team != u.team)
                       .filter(u.team!=Team.Ally || _.target.team != Team.Player)
     //healing teammates
@@ -86,18 +86,20 @@ object AI:
                       .filter(_.target.damageTaken!=0)
     //treating teammates
     val treats = availableActions.collect { case a: Treat => a }
+                      .filter(_.target.team == u.team)
     //use items on self
     val uses = availableActions.collect { case a: Use => a }
     //wound an enemy
-    val wounds = availableActions.collect { case a: Wound => a }
+    val wounds = attacks.collect { case a: Wound => a }
       .filter(_.target.wounds.isEmpty) //if the target doesn't have any wounds
       .filter(_.target.lvl>u.lvl)       //only attack dangerous enemies
     //break enemy armor
-    val breaks = availableActions.collect { case a: Break => a }
+    val breaks = attacks.collect { case a: Break => a }
     //combine actions to a total vector of actions
     val sensibleActions = attacks ++ heals ++ uses
 
-    /*if u.hasStatus(Confused) then
+    /*!!! confusion status from leader death not implemented
+    if u.hasStatus(Confused) then
       randomFrom(sensibleActions)*/
 
     //Treat the highest level member of the group
