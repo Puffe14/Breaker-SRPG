@@ -78,8 +78,8 @@
 
   "2": {
     "enemies": [
-      ["Lochagos"],
-      ["Swordsman"]
+      ["Lochagos","Medic"],
+      ["Swordsman","Warrior"]
     ],
     "allies": [
       ["Slingman"]
@@ -137,6 +137,8 @@
       ["Aynia",2,[4,5]],
       ["Lochagos",0,[10,0]],
       ["Swordsman",0,[7,4]],
+      ["Warrior",0,[9,4]],
+      ["Medic",0,[9,3]],
       ["Slingman",0,[6,1]]
     ]
   }

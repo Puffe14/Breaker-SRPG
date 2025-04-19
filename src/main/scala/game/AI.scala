@@ -27,7 +27,20 @@ object AI:
     var find: Option[Action] = None
     val actions = bestMemberActions(g)
     val combats = actions.collect { case a: Combat => a }
-    if combats.nonEmpty then find = Some(combats.maxBy(c=>c.forecast.aEV))
+    val breaks = actions.collect { case a: Break => a }
+    val wounds = actions.collect { case a: Wound => a }
+    val treats = actions.collect { case a: Treat => a }
+    //PRIORITIZE SKILLS
+    //wound if available
+    find = wounds.maxByOption(c=>c.forecast.aHit)
+    //break if available
+    find = breaks.maxByOption(c=>c.forecast.aHit)
+    //treat the one with most wounds
+    find = treats.maxByOption(c=>c.target.wounds.size)
+    //otherwise pick a high value attack
+    if find.nonEmpty && combats.nonEmpty then
+      find = Some(combats.maxBy(c=>c.forecast.aEV))
+    //or just whatever that is left
     else find = actions.headOption
     find
 
@@ -71,16 +84,33 @@ object AI:
     val heals =    combats.collect { case a: Heal => a }
                       .filter(_.target.team == u.team)
                       .filter(_.target.damageTaken!=0)
+    //treating teammates
+    val treats = availableActions.collect { case a: Treat => a }
     //use items on self
     val uses = availableActions.collect { case a: Use => a }
+    //wound an enemy
+    val wounds = availableActions.collect { case a: Wound => a }
+      .filter(_.target.wounds.isEmpty) //if the target doesn't have any wounds
+      .filter(_.target.lvl>u.lvl)       //only attack dangerous enemies
+    //break enemy armor
+    val breaks = availableActions.collect { case a: Break => a }
     //combine actions to a total vector of actions
     val sensibleActions = attacks ++ heals ++ uses
 
-    /*!!!if u.hasStatus(Confused) then
+    /*if u.hasStatus(Confused) then
       randomFrom(sensibleActions)*/
 
+    //Treat the highest level member of the group
+    if treats.nonEmpty then
+      treats.maxBy(_.target.lvl)
+    //Select the best break attack by hitrate
+    else if breaks.nonEmpty then
+      breaks.maxBy(_.forecast.aHit)
+    //or the best wound attack by hitrate
+    else if wounds.nonEmpty then
+      wounds.maxBy(_.forecast.aHit)
     //the attacks the one that will deal the most damage
-    if attacks.nonEmpty then
+    else if attacks.nonEmpty then
       attacks.maxBy(n => n.forecast.aEV*3 - n.forecast.bEV)
     //the heals the one who is most hurt
     else if heals.nonEmpty then

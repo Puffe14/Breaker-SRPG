@@ -335,7 +335,7 @@
     "name": "Lairaea",
     "class": "slicer",
     "classes": ["slicer"],
-    "level": 2,
+    "level": 1,
     "exp": 0,
     "stats": {
       "hitpoints": 13,
