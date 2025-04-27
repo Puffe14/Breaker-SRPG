@@ -2,6 +2,8 @@ package components
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
+import ujson.Value.Value
+import upickle.core.LinkedHashMap
 
 
 class Class(
@@ -15,6 +17,8 @@ class Class(
   val classDebuffs: Map[String, Int],
   val classRanks: Map[String, Int] = Map()):
 
+  def name = className
+  def stats = classStats
   //Methods that return the stats of the class in a useful form.
   def abilities: Vector[String] = classType
   def growths: Map[String, Int] = classGrowth
@@ -36,8 +40,6 @@ class Class(
 end Class
 
 
-//case class ClassRead(filename: String) derives ReadWriter: end ClassRead
-
 
 object ClassHandler:
   var lastData = getData
@@ -45,14 +47,13 @@ object ClassHandler:
 
   // return all the classes to be created
   def create: Map[String, Class] =
-    val classFilenames = lastData.obj.keys
-    val nameToClass = for name <- classFilenames yield
-     name -> classRead(name)
+    val data = getData.obj
+    val nameToClass = for (name, info) <- data yield
+      name -> classRead(info.obj)
     nameToClass.toMap
 
-  // From the last getData, read the particular map and create a Class based on it.
-  def classRead(filename: String): Class =
-    val data = lastData(filename)
+  // From the given map, read it and create a Class based on it.
+  def classRead(data: LinkedHashMap[String, Value]): Class =
     new Class(read[String](data("name")),
               read[Int](data("level")),
               read[Vector[String]](data("type")),

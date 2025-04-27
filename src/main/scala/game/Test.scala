@@ -255,7 +255,7 @@ class LogTest:
       case "treat" => Treat(unit3,unit2,1,testmed,Head).playS()
       case "ai" => AIup()
       case "pass" =>
-        if game.stack.isEmpty && !game.enemyTurnOver then
+        if game.stack.isEmpty then
           AIup()
         else
           game.continueS()
@@ -323,7 +323,7 @@ class LogTest:
     Vector()
 
   def AIcontrol: Boolean =
-    if game.enemyTurnOver then ai = false
+    //if game.enemyTurnOver then ai = false
     ai
 
 @main

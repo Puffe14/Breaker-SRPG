@@ -27,7 +27,7 @@ end Group
 
 enum Behaviour:
   //def a = ()
-  case Agressive, Stand, OnSight, Reach, Control
+  case Agressive, Stand, OnSight, Reach, Control, Erratic
 
 
 //change unit and move methods to follow Team

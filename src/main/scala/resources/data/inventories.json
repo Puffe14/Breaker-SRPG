@@ -68,5 +68,8 @@
     ["moon_lamerral",0],
     ["moon_helm",0],
     ["bread",2]
+  ],
+  "inventory_tester": [
+    ["super_club",2]
   ]
 }

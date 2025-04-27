@@ -228,13 +228,13 @@ case class ArmorFile(map: LinkedHashMap[String, Value]) extends Armor:
   override def copyMe: Item = this.copy(map = map)
 
 
-case class WeaponFile(filename: String) extends Weapon:
+case class WeaponFile(filename: String, used: Int = 0) extends Weapon:
   val wdata = ItemHandler.getWeaponsData(filename)
   val name = read[String](wdata("name"))
   val description = read[String](wdata("description"))
   val durability: Option[Int] = Some(read[Int](wdata("durability")))
   val rankLetter: String = read[String](wdata("rank"))
-  var spent: Int = read[Int](wdata("spent"))
+  var spent: Int = if used == 0 then read[Int](wdata("spent")) else used
   val quick: Boolean = read[Boolean](wdata("quick"))
   val dmgType: String = wdata("dmgtype").str
   val wpnType: String = wdata("wpntype").str
@@ -245,14 +245,14 @@ case class WeaponFile(filename: String) extends Weapon:
   val givenWeight: Int = read[Int](wdata("weight"))
   val effectiveAgainst: Map[String, Int] = read[Map[String, Int]](wdata("effective"))
   val bonusToStats: Map[String, Int] = read[Map[String, Int]](wdata("bonus"))
-  override def copyMe: Item = this.copy(filename = filename)
+  override def copyMe: Item = this.copy(used = spent)
 end WeaponFile
 
 /**/
 
 object ItemHandler:
   def getData(weaponType: String) =
-    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/weapons.json")))
   def getItem(filename: String) =
     val data = getData("")
     data(filename)
@@ -264,7 +264,7 @@ object ItemHandler:
   def getConsumablesData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
   def getWeaponsData =
-    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/blunts.json")))
+    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/weapons.json")))
   def getMedkitsData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/medkits.json")))
   def getArmorsData =

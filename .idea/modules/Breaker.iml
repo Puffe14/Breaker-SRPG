@@ -19,12 +19,6 @@
     <orderEntry type="library" name="sbt: com.lihaoyi:upickle-core_3:3.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:upickle-implicits_3:3.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:upickle_3:3.2.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-core_3:0.14.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-generic_3:0.14.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-jawn_3:0.14.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-numbers_3:0.14.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-parser_3:0.14.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-yaml_3:0.14.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.openjfx:javafx-base:22:jar" level="project" />
     <orderEntry type="library" name="sbt: org.openjfx:javafx-base:22:win:jar" level="project" />
     <orderEntry type="library" name="sbt: org.openjfx:javafx-controls:22:jar" level="project" />
@@ -39,13 +33,25 @@
     <orderEntry type="library" name="sbt: org.openjfx:javafx-swing:22:win:jar" level="project" />
     <orderEntry type="library" name="sbt: org.openjfx:javafx-web:22:jar" level="project" />
     <orderEntry type="library" name="sbt: org.openjfx:javafx-web:22:win:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scala-lang.modules:scala-xml_3:2.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.15:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.3.5:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalactic:scalactic_3:3.2.16:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalafx:scalafx_3:22.0.0-R33:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-core_3:2.6.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-kernel_3:2.6.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:jawn-parser_3:1.1.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:simulacrum-scalafix-annotations_3:0.5.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.yaml:snakeyaml:1.28:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-compatible:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-core_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-diagrams_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-featurespec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-flatspec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-freespec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funspec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funsuite_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-matchers-core_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-mustmatchers_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-propspec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-refspec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-shouldmatchers_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-wordspec_3:3.2.16:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_3:3.2.16:jar" level="project" />
   </component>
 </module>

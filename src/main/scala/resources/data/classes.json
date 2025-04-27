@@ -1,4 +1,34 @@
 {
+  "tester": {
+    "name": "tester",
+    "level": 1,
+    "type": ["infantry"],
+    "stats": {
+      "movement": 1,
+      "jump": 1,
+      "hitpoints": 1,
+      "strength": 1,
+      "magic": 1,
+      "skill": 1,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 1},
+    "growth": {
+      "hitpoints": 1,
+      "strength": 1,
+      "magic": 1,
+      "skill": 1,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 1
+    },
+    "ranks": {
+      "Blunt":1,
+      "Sharp":1
+    },
+    "buffs": {"AV": 1},
+    "debuffs": {"AV": 1}
+  },
   "wilder": {
     "name": "wilder",
     "level": 1,

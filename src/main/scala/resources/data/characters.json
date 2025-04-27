@@ -380,5 +380,31 @@
       "defence": 10,
       "resistance": 10
     }
+  },
+
+  "tester": {
+    "name": "test",
+    "class": "tester",
+    "classes": ["tester"],
+    "level": 1,
+    "exp": 1,
+    "stats": {
+      "hitpoints": 1,
+      "strength": 1,
+      "magic": 1,
+      "skill": 1,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 1
+    },
+    "growth": {
+      "hitpoints": 1,
+      "strength": 1,
+      "magic": 1,
+      "skill": 1,
+      "speed": 1,
+      "defence": 1,
+      "resistance": 1
+    }
   }
 }

@@ -136,14 +136,14 @@ object MapHandler:
                       read[Vector[Int]](gridMap("elevation"))
                  )
       grid.givePositionToTiles()
-
+      
+      //!!! Behaviour handling missing, all groups automatically Agressive.
       def makeGroup(memberInfo: Vector[(String,Int,(Int,Int))], team: Team): Group =
         Group(memberInfo.map(makeUnit(_)), Behaviour.Agressive, team, false)
       def makeUnit(unitInfo: (String,Int,(Int,Int))): Units =
         val unitName = unitInfo(0)  //get the name
         val unit = Units(DataLibrary.characters(unitName).copyMe,         // Find the character
-                         DataLibrary.inventories("inventory_"+unitName))  // Find the inventory
-                                    .copyMe
+                         DataLibrary.inventories("inventory_"+unitName).copyMe)  // Find the inventory
         val (a,b,c) = unitInfo
         grid.addUnitAt(unit, c) // Place the character on the map
         unit.takeDamage(b)      // Harm them enough
@@ -162,7 +162,7 @@ object MapHandler:
       val joining = joiningList.map(makeUnit(_))
       // Conditions
       val winCondition = readCondition(fmap("clear").obj)
-      val loseConditions = Vector() //!!! reading lose conditions unimplemented
+      val loseConditions = Vector(Route(Team.Player)) //!!! reading lose conditions unimplemented
       // Events
       val mapEvents = fmap("events").obj
       val events = mapEvents.flatMap(n=>

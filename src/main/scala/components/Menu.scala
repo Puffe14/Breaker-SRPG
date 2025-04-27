@@ -28,6 +28,7 @@ trait Menu:
   def selectorUp() = selection(-1)
   def selectorDown() = selection(1)
 
+  /** Returns the submenu picked. */
   def pick: Menu =
     val next = subMenus(select)
     next

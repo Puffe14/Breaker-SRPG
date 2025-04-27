@@ -1,9 +1,14 @@
 package components
 
+import scalafx.scene.image.Image
+import java.io.FileInputStream
+
 trait Status(name: String, file: String):
   def fileName = file
   def description = "a status effect"
   override def toString = name
+  val image: Image =
+    new Image(new FileInputStream("src/main/scala/resources/images/" + file + ".png"))
 end Status
 
 

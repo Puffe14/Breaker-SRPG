@@ -17,6 +17,7 @@ class Game:
   var stack: Iterator[Action] = Iterator()
   var zoom: Int = 2
   var direction: Int = 0
+  var currentTurn: Int = 0
   var openMenus: Vector[Menu] = Vector()
   var selectorMenus: Vector[InstantMenu] = Vector()
 
@@ -245,13 +246,15 @@ class Game:
       fm.clearDead()
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
+      currentTurn = fm.turnNumber
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them
     if turnOf!=Team.Player then
-      if AI.currentGroup.isEmpty && !groupsWithTurn.forall(_.doneActing) then
+      val groupsLeft = groupsWithTurn.filter(!_.doneActing)
+      if AI.currentGroup.isEmpty && groupsLeft.nonEmpty then
         AI.game = this
-        AI.groupsLeft = groupsWithTurn.iterator
+        AI.groupsLeft = groupsLeft.iterator
       AI.play()
 
 
@@ -266,7 +269,6 @@ class Game:
       groupsWithTurn.foreach(_.reduceTemporary())
     clearPostAction()
     clearMenuWhenActed()
-      //handleTurn() //If the turn is over, let the next ones act
   end handleTurn
 
   /** Checks whether if the battle is over or not */
@@ -283,7 +285,6 @@ class Game:
         currentMapNumber+=1//Advance to next map
         turnOf = Team.Player
         currentMap = DataLibrary.maps.get(currentMapNumber.toString)
-        //currentMap.foreach(fm=>player.foreach(fm.setPlayer(_)))
     )
     over
 
@@ -450,13 +451,7 @@ class Game:
   def inMenu = openMenus.nonEmpty
   def menus = openMenus
 
-
-  def setTargetedPart(tPart: Part) = part = tPart
-
-
-  //TESTING
-
-  def enemyTurnOver =
-    currentMap.forall(_.unitsOnTeam(Team.Enemy).forall(_.turnOver))
+  def setTargetedPart(tPart: Part) =
+    part = tPart
 
 end Game

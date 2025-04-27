@@ -50,6 +50,8 @@ class Survive(turnLimit: Int) extends Condition:
   def met(fieldMap: FieldMap): Boolean =
     fieldMap.currentTurn == turnLimit
 
+  override def toString: String = s"Survive $turnLimit turns"
+
 //Reach a particular set of tiles with a specific team. //class Reach(locations: Vector[Occupiable], side: Team) extends Condition:
 class Reach(locations: Vector[Occupiable], side: Team) extends Condition:
   def met(fieldMap: FieldMap): Boolean =

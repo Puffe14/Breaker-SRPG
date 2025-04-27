@@ -13,6 +13,15 @@ object AI:
   var groupsLeft = Iterator[Group]()
   var currentUnit: Option[Units] = None
 
+  /**Called to make the AI act and continue going through groups*/
+    def play() =
+      if (currentGroup.isEmpty || currentGroup.forall(_.doneActing)) && groupsLeft.nonEmpty then
+        currentGroup = Some(nextGroup())
+      if currentGroup.forall(_.doneActing) then
+        currentGroup = None
+      currentGroup.foreach(continue(_))
+
+  /**Gives a random item [T] from a collection.*/
   def randomFrom[T, C[T] <: collection.Seq[T]](thingCollection: C[T]): T =
     val number = Random().nextInt(thingCollection.length)
     thingCollection(number)
@@ -47,7 +56,7 @@ object AI:
 
   /**Adds Groups next action to the action queue of the game.*/
   def continue(g: Group) =
-    val mongo: Vector[Action] = selectNextAction(g) match
+    val actAndGo: Vector[Action] = selectNextAction(g) match
       case Some(c: Combat) =>
         game.move(c.select) match
           case Some(move) =>
@@ -56,15 +65,9 @@ object AI:
           case _ => Vector(c)
       case Some(a: Action) => Vector(a)
       case _ => Vector()
-    addToStack(mongo)
+    addToStack(actAndGo)
 
-
-  def play() =
-    if (currentGroup.isEmpty || currentGroup.forall(_.doneActing)) && groupsLeft.nonEmpty then
-      currentGroup = Some(nextGroup())
-    if currentGroup.forall(_.doneActing) then
-      currentGroup = None
-    currentGroup.foreach(continue(_))
+  
 
   //!!! could I add a way to track action priority based on if hp is critical or so on?
   /**Checks the best action for a unit*/
@@ -98,12 +101,11 @@ object AI:
     //combine actions to a total vector of actions
     val sensibleActions = attacks ++ heals ++ uses
 
-    /*!!! confusion status from leader death not implemented
-    if u.hasStatus(Confused) then
-      randomFrom(sensibleActions)*/
-
+    //Select a random sensible action
+    if currentGroup.forall(_.behaviour == Behaviour.Erratic) then
+      randomFrom(sensibleActions)
     //Treat the highest level member of the group
-    if treats.nonEmpty then
+    else if treats.nonEmpty then
       treats.maxBy(_.target.lvl)
     //Select the best break attack by hitrate
     else if breaks.nonEmpty then

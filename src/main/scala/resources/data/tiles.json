@@ -48,7 +48,7 @@
       "photo": "field_sand",
       "effect": {
         "atk": -1,
-        "avoid": -10,
+        "avoid": -25,
         "physical": -1,
         "magical": -1,
         "hpEffect": 0

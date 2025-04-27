@@ -28,23 +28,6 @@ var imgTiles: Map[String,Image] = Seq("field_cursor_ally",
                                       "field_cursor_player",
                                       "field_cursor",
                                       "field_movet").map(pairImgString(_)).toMap
-/*def tileImager(s: String):
-  imgTiles.get(s: String)*/
-val imgAtkWar: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "warrior_idle.png")),
-                                new Image(new FileInputStream(imagePath + "warrior_atk_1.png")),
-                                new Image(new FileInputStream(imagePath + "warrior_atk_2.png")),
-                                new Image(new FileInputStream(imagePath + "warrior_hurt.png")),
-                                new Image(new FileInputStream(imagePath + "dead.png")))
-val imgDefKni: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "knight_idle.png")),
-                                new Image(new FileInputStream(imagePath + "knight_atk_1.png")),
-                                new Image(new FileInputStream(imagePath + "knight_atk_2.png")),
-                                new Image(new FileInputStream(imagePath + "knight_hurt.png")),
-                                new Image(new FileInputStream(imagePath + "dead.png")))
-val imgAtkGuy: Seq[Image] = Seq(new Image(new FileInputStream(imagePath + "guy_idle.png")),
-                                new Image(new FileInputStream(imagePath + "guy_atk_1.png")),
-                                new Image(new FileInputStream(imagePath + "guy_atk_2.png")),
-                                new Image(new FileInputStream(imagePath + "guy_hurt.png")),
-                                new Image(new FileInputStream(imagePath + "dead.png")))
 def boutImgSeq(name: String): Seq[Image] = Seq(new Image(new FileInputStream(imagePath + name + "_idle.png")),
                                               new Image(new FileInputStream(imagePath + name + "_atk_1.png")),
                                               new Image(new FileInputStream(imagePath + name + "_atk_2.png")),
@@ -67,12 +50,7 @@ val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
                          "medic" -> boutImgSeq("guy"),
                          "rider" -> boutImgSeq("knight"),
                          "flier" -> boutImgSeq("hoplite"))
-val imageSets = Map("Cylna" -> imgAtkWar,
-                    "wrys" -> imgDefKni,
-                    "bonk" -> imgAtkGuy,
-                    "ghost" -> imgAtkGuy,
-                    "gonzales" -> imgAtkGuy,
-                    "Geblah" -> imgAtkGuy)
+
 val iconImages =
   Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
       "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
@@ -141,6 +119,7 @@ object GUI extends JFXApp3:
     // Animation
     actList = Vector[Act]()
 
+
   // GRAPHICS AND INTERFACE ------------
 
   //   ImageView methods
@@ -168,7 +147,7 @@ object GUI extends JFXApp3:
   def statusImage(loc: (Int, Int, Int), name: String, number: Int) = new ImageView:
       x = tilePosX(loc)
       y = tilePosY(loc)  -drawScale*4 + number*6*drawScale
-      image = iconImages(name)
+      image = iconImages.getOrElse(name, deadImg)
       scaleX = drawScale*8
       scaleY = drawScale*6
       viewOrder_(-loc(2).toDouble-1)
@@ -212,10 +191,8 @@ object GUI extends JFXApp3:
       val toDraw = mutable.Buffer[ImageView]()
       game.allTilesWithUnits.foreach(t =>
         t.occupantOnTile.foreach(u =>
-          //var tileInt = 0
           val pos = t.pos
           val flip = u.team != Team.Player
-          //println(u.name +" at "+pos)
           val x = tilePosX(pos) + drawScale*8
           val y = tilePosY(pos) - drawScale*12   - pos(2)*8*drawScale
           val z = pos(2)
@@ -270,9 +247,6 @@ object GUI extends JFXApp3:
   def selectTile() =
     hoverTile.foreach(game.selectTile(_))
   def hoverTile: Option[Tile] =
-    /*val (x, y) = mouseAsPos
-    text = s"Pos $x, $y Mouse $mouseX, $mouseY"
-    game.tileAt(x,y)*/
     val (x, y) = (cursorX, cursorY)
     game.tileAt(x,y)
   def inspectTile() =
@@ -322,14 +296,17 @@ object GUI extends JFXApp3:
         drawMenus(game.menus, g)
 
         //Keep game going on
-        if actList.isEmpty && !game.isBattleOver then
+        if game.isBattleOver then
+          text = s"Battle OVER"
+        else if actList.isEmpty then
           game.handleTurn()
-        text = s"Pos $cursorX, $cursorY. ${game.turnOf}"
+          text = s"Turn Pos $cursorX, $cursorY. ${game.turnOf}"
         while game.stack.hasNext && actList.isEmpty do
           val explain = game.continue()
           delta = 0
           //Capture acts from explain
           actList = explain.acts
+        //handle animating units
         game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
         actList = actList.filterNot(_.done(delta))
         val activeActs = actList.filter(_.show(delta))

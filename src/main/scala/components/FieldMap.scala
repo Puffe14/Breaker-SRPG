@@ -26,6 +26,7 @@ class FieldMap(enemies: Vector[Group],
     clearCondition.met(this)
   def isLost: Boolean =
     loseConditions.exists(_.met(this))
+  def clear = clearCondition.toString
   def theGrid = grid
   def SAVEABLE: String = ""
 
@@ -56,6 +57,7 @@ class FieldMap(enemies: Vector[Group],
     grid.tilesWithUnits.filter(_.occupantOnTile
                        .forall(_.isDead))
                        .foreach(_.removeOccupant())
+    giveBonuses() //set bonuses again to account for deaths
 
   def unitsOnTeam(team: Team) =
     allCharacters.filter(_.team == team)
@@ -64,6 +66,7 @@ class FieldMap(enemies: Vector[Group],
     deployment.flatMap((x, y) => grid.tileAt(x, y))
               .collect { case a: Occupiable => a }
 
+  /**Place player characters onto the deployment tiles on the map.*/
   def deployPlayer() =
     val tiles = deploymentTiles
     val deployed = player.deployed.take(tiles.size)
@@ -73,25 +76,28 @@ class FieldMap(enemies: Vector[Group],
       tiles(i).addOccupant(deployed(i))   // Add the characters chosen to be deployed onto the
       deployed(i).setTeam(Player)         // deployment map and set their team to player.
 
-  // add new groups onto field map
+  /** add new groups onto field map*/
   var additions = Vector[Group]()
   def addGroup(group: Group) =
     additions = additions.appended(group)
 
-  // add more characters to player organization
+  /**add more characters to this maps current player organization*/
   def addUnitToPlayerDeployed(unit: Units) =
     player.addDeployed(unit)
   def addUnitListToDeployed(units: Vector[Units]) =
     units.foreach(addUnitToPlayerDeployed(_))
 
-  // Current turn number goes up
+  /**Current turn number goes up*/
   def tickTurn() =
     turnNumber+=1
 
+  /**Check if an event should be triggered on the map. */
+  //!!! ability to give a message to announce event missing
   def eventCheck() =
     events.map(_.trigger(this))
 
-  //Gives stat bonuses from tile, aura buffs, and debuffs
+  /**Gives stat bonuses from tile, aura buffs, and debuffs
+   * for all units on the map.*/
   def giveBonuses() =
     theGrid.tilesWithUnits.foreach(t =>
       t.occupantOnTile.foreach(u =>
@@ -99,8 +105,8 @@ class FieldMap(enemies: Vector[Group],
       )
     )
 
-
-  //Has to be able to this for current unit when moving without recalculating EVERYONE
+  /**Give buffs and debuffs from the environment
+   * like class auras or tile hp effect to a given unit on their given tile*/
   def calculateBonus(unit: Units, tile: Occupiable) =
     unit.resetNearbyBonus()
     val bonus = mutable.Map[String, Int]()
@@ -118,13 +124,14 @@ class FieldMap(enemies: Vector[Group],
 
   //Methdos for determining which tiles a unit could occupy with current MOVE
 
+  /**Method for determining the tiles accessible based on movement, current tile and class types.
+   * Used by movementRangeTiles to determine where a unit can move.*/
   def moveCheck(moveLeft: Double, tile: Tile, types: Vector[String], team: Team, elevation: Int, jump: Int): Vector[Tile] =
 
     def findSurrounding(thisOneOk: Boolean) =
       val accessibles = mutable.Buffer[Tile]()
       if thisOneOk then accessibles += tile
       val availableNeighbors = grid.neighbors(tile)
-                                   //.collect { case a: Occupiable => a }
                                    .filter(t => grid.elevationDifference(elevation, t) <= jump)
       availableNeighbors
         .foreach(accessibles ++= moveCheck(moveLeft-tile.moveReduction(types), _, types, team, tile.pos(2), jump))
@@ -157,6 +164,7 @@ class FieldMap(enemies: Vector[Group],
   def tilesVisible: Vector[Tile] =
     grid.visibleTiles(rotation)
 
+  /**Returns a set of tiles which the given unit can move to during this turn. */
   def movementRangeTiles(mover: Units): Set[Tile] =
     //find the location of the moving unit and find their info
     val locationTile = tileOf(mover)
@@ -169,6 +177,7 @@ class FieldMap(enemies: Vector[Group],
     )
     tilesFound
 
+  /**Gives a set of who can a unit attack. */
   def attackRangeUnits(mover: Units): Set[Units] =
     //find the location of the moving unit and find their info
     val locationTile = tileOf(mover)
@@ -180,9 +189,10 @@ class FieldMap(enemies: Vector[Group],
     )
     unitsFound
 
+  /**Which units are close enough to impose buff or debuff to the given one.*/
   def statusRangeUnitsFor(selected: Units): Set[Units] =
     val locationTile = tileOf(selected)
-    val (minR, maxR) = (1, 2)
+    val (minR, maxR) = rules.statusAuraRange
     var unitsFound = Set[Units]()
     locationTile.foreach( t =>
       for i <- minR to maxR do
@@ -191,7 +201,7 @@ class FieldMap(enemies: Vector[Group],
     unitsFound
 
   /** Checks who can be attacked on a particular location.
-   *  Returns the unit and distance from checked tile.    */
+   *  Returns the unit, distance from checked tile, and tile.    */
   def attackRangeUnitsAt(mover: Units, tile: Tile, range: (Int, Int)): Set[(Units,Int,Tile)] =
     val (minR, maxR) = range
     var unitsFound = Set[Units]()

@@ -141,6 +141,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def givenNearbyDebuffs: Map[String, Int] =
     character.currentClass.classDebuffs
 
+  /** Lists all status names that need to be displayed by icons. */
   def statusList: Vector[String] =
     wounds.map("wound "+_.name).toVector
     ++ armor.map("armor "+_.bodyPart.name)
@@ -149,6 +150,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   //bonuses
 
+  /**Totals together all bonuses given to a particular stat. */
   def bonus(status: String): Int =
     var total = 0
     val armors = unitsInventory.equippedArmors
@@ -201,8 +203,8 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
       case _ =>
 
   def equipFirst() =
-    usableWeapons.headOption.foreach(equip(_))
-    usableMedkits.headOption.foreach(equip(_))
+    if weapon.isEmpty then usableWeapons.headOption.foreach(equip(_))
+    if medkit.isEmpty then usableMedkits.headOption.foreach(equip(_))
     unitsInventory.armors.foreach(equip(_))
 
   def discard(item: Item) =
@@ -220,8 +222,9 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def dfn = character.dfn + bonus("defence")
   def res = character.res + bonus("resistance")
 
+  /** Give exp to this unit and return a string message if they levelup.*/
   def giveExp(gained:Int): String =
-    character.expTrack( if gained > 0 then gained else 0 ).mkString(", ")
+    character.expTrack( if gained > 0 then gained else 0 ).mkString(" ")
 
 
   //Unit combat stats
