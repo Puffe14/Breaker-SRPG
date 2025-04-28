@@ -3,7 +3,7 @@ package components
 import scala.collection.mutable
 
 class Inventory(slotCount: Int):
-  //Creates the slots for the inventory, filled with None.
+  /** Creates the slots for the inventory, filled with None. */
   private var slots: Vector[Option[Item]] = Vector.fill(slotCount)(None)
 
   /** Moves all non-empty slots to the top of the inventory slots. */
@@ -42,11 +42,12 @@ class Inventory(slotCount: Int):
     else
       false
 
-  //Swaps two items in their slots between inventories.
+  /** Swaps two items in their slots between inventories. */
   def swap(other: Inventory, index: Int, otherIndex: Int) =
     if !(other == this && index == otherIndex) then
       val otherThing = other.remove(other.items(otherIndex))
       val thisThing = this.remove(this.items(index))
+
       if otherIndex > index then
         this.add(otherThing)
         other.add(thisThing)
@@ -55,6 +56,7 @@ class Inventory(slotCount: Int):
         this.add(otherThing)
 
   //Return items in inventory wrapped in Some
+
   def items: Vector[Option[Item]] =
     slots
 
@@ -76,12 +78,11 @@ class Inventory(slotCount: Int):
     }
     None
 
-
   def equippedArmors: Vector[Armor] =
     armors.filter(_.isEquipped)
 
 
-  //! voiko armors ja weapons tehdä paremmin? ???
+  // List all items of a type in inventory
 
   def armors: Vector[Armor] =
     val slotted = items.flatten
@@ -106,7 +107,6 @@ class Inventory(slotCount: Int):
     weaponInSlots
 
   def medkits: Vector[Medkit] =
-    //fromSlots(Vector[Medkit]())
     val slotted = items.flatten
     var medInSlots: Vector[Medkit] = Vector()
 
@@ -128,19 +128,7 @@ class Inventory(slotCount: Int):
     }
     medInSlots
 
-  //!!! never used
-  def fromSlots[T](itemClass: Vector[T]): Vector[T] =
-    val slotted = items.flatten
-    var itemInSlots: Vector[T] = Vector()
-
-    slotted.foreach {
-      case item: T =>
-        itemInSlots = itemInSlots.appended(item)
-      case _ =>
-    }
-    itemInSlots
-
-  //---------------------
+  // Equip methods
 
   def equipWeapon(weapon: Weapon, toggle: Boolean) =
     equippedWeapon.foreach(w=> if w!=weapon then w.unequip())
@@ -158,7 +146,7 @@ class Inventory(slotCount: Int):
     if toggle then armor.toggleEquip()
     else armor.equip()
 
-  //----------------------
+  //Returns information that are useful in other classes
 
   def listItems: Vector[String] =
     items.map {

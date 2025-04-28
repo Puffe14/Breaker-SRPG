@@ -141,8 +141,6 @@ object AI:
   def nextGroup() =
     groupsLeft.next()
 
-
-  def setGroup() = ()
   def checkGroupCondition() = ()
 
   def bStand = currentGroup.forall(_.behaviour==Stand)

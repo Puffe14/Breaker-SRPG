@@ -27,7 +27,8 @@
     "joining": [ ["Cylna",0,[0,0]] ],
     "events": {},
     "grid": {
-      "tiles": ["gray_field","gray_field","sand_field","sand_field"],
+      "tiles": ["gray_field","gray_field",
+                "sand_field","sand_field"],
       "row": 2,
       "column": 2,
       "elevation": [0,1,0,1]
@@ -133,7 +134,7 @@
           ["Lochagos",[1,1]]
         ],
         "team": "Enemy",
-        "turns": [5]
+        "turns": [4]
       }
     },
     "grid": {

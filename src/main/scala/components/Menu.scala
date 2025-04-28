@@ -2,7 +2,7 @@ package components
 
 trait Menu:
   val title: String
-  private var selector = 0
+  private var selector = 0 //Which menu item is selected?
   def hidden = false
 
   // Items shown in the menus
@@ -20,7 +20,7 @@ trait Menu:
   def effect(game: Game) = ()
 
   // For handling which menu item will be chosen
-  def select = selector
+  def select: Int = selector
   def selection(i: Int) =
     val sml = subMenus.length
     if sml>0 then

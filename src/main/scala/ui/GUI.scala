@@ -50,6 +50,7 @@ val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
                          "medic" -> boutImgSeq("guy"),
                          "rider" -> boutImgSeq("knight"),
                          "flier" -> boutImgSeq("hoplite"))
+val defaultClassImageSet = boutImgSeq("guy")
 
 val iconImages =
   Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
@@ -262,7 +263,7 @@ object GUI extends JFXApp3:
           val x = tilePosX(pos) + drawScale*8
           val y = tilePosY(pos) - drawScale*12   - pos(2)*8*drawScale
           val z = pos(2)
-          toDraw += unitImage(u.frame, classImageSets.getOrElse(u.unitClass.className, Seq(deadImg)),x, y, z, flip)//status icons
+          toDraw += unitImage(u.frame, classImageSets.getOrElse(u.unitClass.className, defaultClassImageSet),x, y, z, flip)//status icons
           for i <- u.statusList.indices do
             toDraw += statusImage(pos,u.statusList(i),i)
         )
@@ -303,7 +304,8 @@ object GUI extends JFXApp3:
     if currentMessage.nonEmpty then
       msgWindow.draw(g,0,currentMessage)
 
-  // CONTROL
+
+  // CONTROL ------------
 
   def cameraUp(increment: Int) = middle = (middle(0), middle(1)-increment)
   def cameraDown(increment: Int) = middle = (middle(0), middle(1)+increment)
