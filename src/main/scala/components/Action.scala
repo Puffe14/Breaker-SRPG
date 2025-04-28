@@ -56,7 +56,7 @@ end Trade
 class Use(unit: Units, item: Consumable) extends Action:
   def play(): Explain =
     explain = Explain(unit.name + " used " + item.name)
-    explain.addAnimation(unit,Hurt,actLength)
+    explain.addAnimation(unit,Hurt,actLength,explain.name)
     unit.useItem(item)
     unit.endTurn()
     explain

@@ -32,25 +32,26 @@ class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector
 
 //Often used conditions
 trait Condition:
-  var field: Option[FieldMap] = None
   def met(fieldMap: FieldMap): Boolean
+  def description: String
 
 //Met when the characters with target names are dead
 class Kill(targets: Vector[String]) extends Condition:
   def met(fieldMap: FieldMap): Boolean =
     targets.forall(name => fieldMap.allCharacters.forall(c=>c.name!=name))
+  def description = s"Kill ${targets.mkString(", ")}"
 
 //Remove ALL characters on a particular team on map.
 class Route(targetTeam: Team) extends Condition:
   def met(fieldMap: FieldMap): Boolean =
     fieldMap.unitsOnTeam(targetTeam).isEmpty
+  def description = s"Route $targetTeam}"
 
 //Survive until a particular turn
 class Survive(turnLimit: Int) extends Condition:
   def met(fieldMap: FieldMap): Boolean =
     fieldMap.currentTurn == turnLimit
-
-  override def toString: String = s"Survive $turnLimit turns"
+  def description = s"Survive $turnLimit turns"
 
 //Reach a particular set of tiles with a specific team. //class Reach(locations: Vector[Occupiable], side: Team) extends Condition:
 class Reach(locations: Vector[Occupiable], side: Team) extends Condition:
@@ -58,3 +59,4 @@ class Reach(locations: Vector[Occupiable], side: Team) extends Condition:
     locations.exists(_ //If for any of the locations
       .occupantOnTile  //There is an occupant
       .forall(_.team == side)) //On given team
+  def description = s"$side reach ${locations.mkString(", ")}."

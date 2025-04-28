@@ -4,6 +4,7 @@ import os.{RelPath, pwd}
 import os.read as or
 import ujson.Value.Value
 import upickle.core.LinkedHashMap
+import game.ReadingHandler
 
 
 class Class(
@@ -28,23 +29,22 @@ class Class(
   def debuffs: Map[String, Int] = classDebuffs
   
   //Stats
-  def move: Int = classStats("movement")
-  def maxHp: Int = classStats("hitpoints")
-  def str: Int =   classStats("strength")
-  def mag: Int = classStats("magic")
-  def skl: Int =   classStats("skill")
-  def spd: Int = classStats("speed")
-  def dfn: Int =   classStats("defence")
-  def res: Int = classStats("resistance")
-  def jump:Int = classStats("jump")
+  def move: Int = classStats.getOrElse("movement",0)
+  def maxHp: Int = classStats.getOrElse("hitpoints",0)
+  def str: Int =   classStats.getOrElse("strength",0)
+  def mag: Int = classStats.getOrElse("magic",0)
+  def skl: Int =   classStats.getOrElse("skill",0)
+  def spd: Int = classStats.getOrElse("speed",0)
+  def dfn: Int =   classStats.getOrElse("defence",0)
+  def res: Int = classStats.getOrElse("resistance",0)
+  def jump:Int = classStats.getOrElse("jump",0)
 end Class
 
 
 
-object ClassHandler:
-  var lastData = getData
-  def getData = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/classes.json")))
-
+object ClassHandler extends ReadingHandler:
+  val fileName: String = "classes.json"
+  
   // return all the classes to be created
   def create: Map[String, Class] =
     val data = getData.obj

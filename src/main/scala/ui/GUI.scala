@@ -99,6 +99,7 @@ object GUI extends JFXApp3:
   startUp()
 
 
+  /** Called to reset the game. */
   def startUp() =
     // RESET GUI STUFF
     drawScale = 3
@@ -119,6 +120,71 @@ object GUI extends JFXApp3:
     // Animation
     actList = Vector[Act]()
 
+
+  // START -----------------------------
+
+  def start() =
+    //Create stage
+    stage = new JFXApp3.PrimaryStage:
+      title = "Breaker"
+      width = screenW
+      height = screenH
+
+    //Canvas init
+    val canvas = Canvas(screenW, screenH)
+    val bottomBox = HBox()
+    val g = canvas.graphicsContext2D
+    canvas.onMouseMoved = (event: MouseEvent) => setMouseLocation(event)
+
+    //Connect rest to root
+    val root = GridPane()
+    root.add(canvas, 1, 0)
+    val scene = Scene(parent = root)
+    scene.onKeyPressed =  (event: KeyEvent) => handlePress(event)
+    stage.scene = scene
+
+    //Animation timer keeps track of the passage of time
+    val timer = AnimationTimer(t => {
+      if time % refreshFrame == 0 then
+        //Draw background
+        g.fill = White // Set the fill color.
+        g.fillRect(0, 0, screenW, screenH) //fill the entire screen
+
+        //Draw methods for groups of Images
+        drawAllMap(drawField++drawUnits++drawCursor++drawTargetor, g)
+        //Write helpful info for player
+        g.fill = Blue
+        g.font = Font(15)
+        g.fillText(game.situation, 20, 50) // Fill for clear condition / situation text
+        g.font = Font(30)
+        g.fillText(infoText, 250, 50) // Fill for right side turn, cursor team info
+        //Draw "UI" on top
+        drawMenus(game.menus, g)
+
+        //Keep game going on
+        if game.isBattleOver then
+          infoText = s"BATTLE OVER"
+        else if actList.isEmpty then
+          if game.currentMap.nonEmpty then
+            game.handleTurn()
+            infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
+          else infoText = ""
+
+        while game.stack.hasNext && actList.isEmpty do
+          val explain = game.continue()
+          //set the timer to zero
+          delta = 0
+          //Capture acts from explain
+          actList = explain.acts
+        //handle animating units
+        game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
+        actList = actList.filterNot(_.done(delta))
+        val activeActs = actList.filter(_.show(delta))
+        activeActs.foreach(a => setAniInt(a.actor, a.frame))
+        currentMessage = activeActs.map(_.msg).filter(_!="")
+        delta+=1
+    })
+    timer.start()
 
   // GRAPHICS AND INTERFACE ------------
 
@@ -257,64 +323,7 @@ object GUI extends JFXApp3:
     mouseY = event.y.toInt - middle(1)
 
 
-  // START -----------------------------
 
-  def start() =
-    //Create stage
-    stage = new JFXApp3.PrimaryStage:
-      title = "Breaker"
-      width = screenW
-      height = screenH
-
-    //Canvas init
-    val canvas = Canvas(screenW, screenH)
-    val bottomBox = HBox()
-    val g = canvas.graphicsContext2D
-    canvas.onMouseMoved = (event: MouseEvent) => setMouseLocation(event)
-
-    //Connect rest to root
-    val root = GridPane()
-    root.add(canvas, 1, 0)
-    val scene = Scene(parent = root)
-    scene.onKeyPressed =  (event: KeyEvent) => handlePress(event)
-    stage.scene = scene
-
-    //Animation timer keeps track of the passage of time
-    val timer = AnimationTimer(t => {
-      if time % refreshFrame == 0 then
-        //Clean background!
-        g.fill = White // Set the fill color.
-        g.fillRect(0, 0, screenW, screenH) // Fill rectangle at (0, 0) with width 600 and height 450.
-
-        //Draw methods for groups of Images
-        drawAllMap(drawField++drawUnits++drawCursor++drawTargetor, g)
-        //Write nonsense
-        g.fill = Blue
-        g.font = Font(30) // Set text size
-        g.fillText(infoText, 250, 50) // Fill text
-        //Draw "UI" on top
-        drawMenus(game.menus, g)
-
-        //Keep game going on
-        if game.isBattleOver then
-          infoText = s"BATTLE OVER"
-        else if actList.isEmpty then
-          game.handleTurn()
-          infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
-        while game.stack.hasNext && actList.isEmpty do
-          val explain = game.continue()
-          delta = 0
-          //Capture acts from explain
-          actList = explain.acts
-        //handle animating units
-        game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
-        actList = actList.filterNot(_.done(delta))
-        val activeActs = actList.filter(_.show(delta))
-        activeActs.foreach(a => setAniInt(a.actor, a.frame))
-        currentMessage = activeActs.map(_.msg).filter(_!="")
-        delta+=1
-    })
-    timer.start()
 
 
   // USEFUL METHODS ---------------------
@@ -337,16 +346,9 @@ object GUI extends JFXApp3:
     else if dir == 3 then  x* 8*drawScale   - y*8*drawScale    + middle(1) - z*8*drawScale
     else 0
 
-  def mouseAsPos: (Int, Int) =
-      val (x,y) = (mouseX/(drawScale*32), mouseY/(drawScale*16))
-      val dir = game.dir
-      if dir == 0 then      (Math.floor( (x + 2*y) / 2.0).toInt,
-                             Math.floor((-x + 2*y) / 2.0).toInt)
-      else if dir == 1 then (0, 0)//x*16*drawScale   + y*16*drawScale
-      else if dir == 2 then (0, 0)//-x*16*drawScale   + y*16*drawScale
-      else if dir == 3 then (0, 0)//-x*16*drawScale   - y*16*drawScale
-      else (0, 0)
+  //BUTTON INPUT HANDLING
 
+  //Cursor movement based on viewing direction
   def cursorUp() =
     game.dir match
       case 0 => cursorOnGridDown()
@@ -376,6 +378,7 @@ object GUI extends JFXApp3:
       case 3 => cursorOnGridUp()
       case _ => ()
 
+  //cancel outside of menus
   def unSelect() =
     game.cancel()
 
@@ -385,12 +388,14 @@ object GUI extends JFXApp3:
   def zoomOut() =
     drawScale-=1
 
+  //Absolute movement for position regardless of viewing direction
   def cursorOnGridUp() =    cursorY += 1
   def cursorOnGridDown() =  cursorY -= 1
   def cursorOnGridRight() = cursorX += 1
   def cursorOnGridLeft() =  cursorX -= 1
 
   def handlePress(event: KeyEvent) =
+    //Controls when in selector menus where the bout weapon and target part are set
     if game.selectorMenus.nonEmpty then
       event.code match
         case KeyCode.W => game.menuSUp()
@@ -400,6 +405,7 @@ object GUI extends JFXApp3:
         case KeyCode.Enter => game.menuPick()
         case KeyCode.Space => game.menuBack()
         case _ =>
+    //Controls when in menus
     else if game.inMenu then
       event.code match
         case KeyCode.W => game.menuUp()
@@ -407,6 +413,7 @@ object GUI extends JFXApp3:
         case KeyCode.Enter => game.menuPick()
         case KeyCode.Space => game.menuBack()
         case _ =>
+    //Controls during player turn for intereacting with the map
     else if game.turnOf == Team.Player && actList.isEmpty then
       event.code match
         case KeyCode.W => cursorUp()
@@ -425,4 +432,8 @@ object GUI extends JFXApp3:
         case KeyCode.Right => cameraLeft(cameraMoveIncrement)
         case KeyCode.Up => cameraDown(cameraMoveIncrement)
         case KeyCode.Left => cameraRight(cameraMoveIncrement)
+        case _ =>
+    //Controls outside all the other possibilities
+    else event.code match
+        case KeyCode.M => startUp()
         case _ =>

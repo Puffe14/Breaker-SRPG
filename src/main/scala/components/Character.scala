@@ -1,5 +1,5 @@
 package components
-import game.DataLibrary
+import game.{DataLibrary, ReadingHandler}
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
@@ -26,11 +26,12 @@ case class Character(
    val growths: Map[String, Int],
    var stats:  Map[String, Int]):
 
-  //Methods for effecting characters!
+  //Methods for effecting characters
+
   def swapClass(newClass: Class) =
     currentClass = newClass
 
-  //!!! to an event that give message as a legible string
+  //!!! could be changed to an event that give message as a legible string
   //Increase experience and handle if reaches lvlup
   def expTrack(increase: Int): Vector[String] =
     val message: mutable.Buffer[String] = mutable.Buffer(s"$name gained $increase exp")
@@ -72,13 +73,13 @@ case class Character(
   def ranks = chrClass.ranks
 
   //Methods for returning important stats (characters own stats + class stats bases)
-  def maxHp: Int = stats("hitpoints") + currentClass.maxHp
-  def str: Int =   stats("strength") + currentClass.str
-  def mag: Int = stats("magic") + currentClass.mag
-  def skl: Int =   stats("skill") + currentClass.skl
-  def spd: Int = stats("speed") + currentClass.spd
-  def dfn: Int =   stats("defence") + currentClass.dfn
-  def res: Int = stats("resistance") + currentClass.res
+  def maxHp: Int = stats.getOrElse("hitpoints",0) + currentClass.maxHp
+  def str: Int =   stats.getOrElse("strength",0) + currentClass.str
+  def mag: Int =   stats.getOrElse("magic",0) + currentClass.mag
+  def skl: Int =   stats.getOrElse("skill",0) + currentClass.skl
+  def spd: Int =   stats.getOrElse("speed",0) + currentClass.spd
+  def dfn: Int =   stats.getOrElse("defence",0) + currentClass.dfn
+  def res: Int =   stats.getOrElse("resistance",0) + currentClass.res
   def move:Int = currentClass.move
   def jump:Int = currentClass.jump
 
@@ -89,9 +90,8 @@ end Character
 
 
 
-object CharacterHandler:
-  var lastData = getData
-  def getData = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/characters.json")))
+object CharacterHandler extends ReadingHandler:
+  val fileName = "characters.json"
 
   // return all the classes to be created
   def create: Map[String, Character] =

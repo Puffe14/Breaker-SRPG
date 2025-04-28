@@ -1,5 +1,10 @@
 package components
 import components.Team.*
+import game.DataLibrary
+import os.{RelPath, read as or}
+import ujson.Value.Value
+import upickle.core.LinkedHashMap
+import upickle.default.read
 
 import scala.collection.mutable
 
@@ -26,7 +31,7 @@ class FieldMap(enemies: Vector[Group],
     clearCondition.met(this)
   def isLost: Boolean =
     loseConditions.exists(_.met(this))
-  def clear = clearCondition.toString
+  def clear = clearCondition.description
   def theGrid = grid
   def SAVEABLE: String = ""
 
@@ -211,3 +216,103 @@ class FieldMap(enemies: Vector[Group],
     unitsFound.map(unit => (unit, unitDistanceFrom(tile, unit), tile))
 
 end FieldMap
+
+
+
+object MapHandler:
+  var lastData = getData
+  def getData = ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/maps.json")))
+  def create: Map[String, FieldMap] =
+    lastData = getData
+    val maps = lastData.obj
+    val mapnames = maps.keys
+    val nameToMap = for name <- mapnames yield
+      val fmap = maps(name)
+
+      //Create grid
+      val gridMap = fmap("grid").obj
+       // Get the tiles
+      val tiles = read[Vector[String]](gridMap("tiles")).map(DataLibrary.tiles(_).copy)
+      val grid = Grid(tiles,
+                      read[Int](gridMap("row")),
+                      read[Int](gridMap("column")),
+                      read[Vector[Int]](gridMap("elevation"))
+                 )
+      grid.givePositionToTiles()
+      
+      //!!! Behaviour handling missing, all groups automatically Agressive.
+      def makeGroup(memberInfo: Vector[(String,Int,(Int,Int))], team: Team): Group =
+        Group(memberInfo.map(makeUnit(_)), Behaviour.Agressive, team, false)
+      def makeUnit(unitInfo: (String,Int,(Int,Int))): Units =
+        val unitName = unitInfo(0)  //get the name
+        val unit = Units(DataLibrary.characters(unitName).copyMe,         // Find the character
+                         DataLibrary.inventories("inventory_"+unitName).copyMe)  // Find the inventory
+        val (a,b,c) = unitInfo
+        grid.addUnitAt(unit, c) // Place the character on the map
+        unit.takeDamage(b)      // Harm them enough
+        unit.equipFirst()       // Equip the weapon on their first slot
+        //finally return the unit made so it can be used to make the group
+        unit
+
+      //Create enemy units
+      val enemyList = read[Vector[Vector[(String,Int,(Int,Int))]]](fmap("enemies"))
+      val enemies = enemyList.map(makeGroup(_, Team.Enemy))
+      //Create ally units
+      val allyList = read[Vector[Vector[(String,Int,(Int,Int))]]](fmap("allies"))
+      val allies = allyList.map(makeGroup(_, Team.Ally))
+      //Create joining player characters
+      val joiningList = read[Vector[(String,Int,(Int,Int))]](fmap("joining"))
+      val joining = joiningList.map(makeUnit(_))
+      // Conditions
+      val winCondition = readCondition(fmap("clear").obj)
+      val loseConditions = Vector(Route(Team.Player)) //!!! reading lose conditions unimplemented
+      // Events
+      val mapEvents = fmap("events").obj
+      val events = mapEvents.flatMap(n=>
+        val currentMap = n._2.obj
+        readEvent(currentMap)
+      ).toVector
+      // dummy player
+      val dummyplayer = Organization(Vector(),Vector(),Inventory(0),Team.Player)
+      val rotation = read[Int](fmap("rotation"))
+      val turn = read[Int](fmap("turnNumber"))
+      val deployment = read[Vector[(Int,Int)]](fmap("deploy"))
+      // Finally create the FieldMap itself
+      name -> FieldMap(enemies,
+                       allies,
+                       grid,
+                       dummyplayer,
+                       winCondition,
+                       loseConditions,
+                       rotation,
+                       turn,
+                       deployment,
+                       joining,
+                       events
+              )
+    nameToMap.toMap
+
+
+  def readCondition(map: LinkedHashMap[String, Value]): Condition =
+    read[String](map("title")) match
+      case "survive" => Survive(read[Int](map("limit")))
+      case "kill" => Kill(read[Vector[String]](map("target")))
+      case _ => Route(Team.Enemy)
+
+  def readEvent(map: LinkedHashMap[String, Value]): Option[Event] =
+    read[String](map("title")) match
+      case "reinforcement" =>
+        val team = read[String](map("team")) match
+          case "Player" => Team.Player
+          case "Enemy" => Team.Enemy
+          case "Ally" => Team.Ally
+        val unitsCoords: Vector[(String,(Int,Int))] = read[Vector[(String,(Int,Int))]](map("units"))
+        val bunch = unitsCoords.map((u,c) =>(
+          Units(DataLibrary.characters(u).copyMe,         // Find the character
+                DataLibrary.inventories("inventory_"+u).copyMe)  // Find the inventory
+                .copyMe,
+          c)
+        )
+        val turns = read[Vector[Int]](map("turns"))
+        Some(Reinforcement(bunch, team, turns))
+      case _ => None

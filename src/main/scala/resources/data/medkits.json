@@ -4,7 +4,7 @@
     "description": "A simple medical packet that healers can use to treat simple wounds.",
     "durability": 15,
     "heal": 6,
-    "range": [0,1],
+    "range": [1,1],
     "spent": 0,
     "bonus": {}
   },
@@ -13,7 +13,7 @@
     "description": "A medical packet that is enhanced by sturdust; capable of healing without touch.",
     "durability": 5,
     "heal": 10,
-    "range": [0,4],
+    "range": [1,4],
     "spent": 0,
     "bonus": {}
   }

@@ -1,5 +1,5 @@
 package components
-import game.DataLibrary
+import game.{DataLibrary, ReadingHandler}
 import upickle.default.*
 import os.{RelPath, pwd}
 import os.read as or
@@ -220,12 +220,16 @@ end Armor
 
 case class ArmorFile(map: LinkedHashMap[String, Value]) extends Armor:
   val givenPart = read[String](map("part"))
-  
   val name = read[String](map("name"))
-  val part = rules.allParts.find(_.toString==givenPart).getOrElse(Part.AnyPart)
   val description = read[String](map("description"))
+
+  val part = rules.allParts.find(_.toString.toLowerCase==givenPart.toLowerCase)
+                           .getOrElse(Part.AnyPart)
+
   val bonusToStats = read[Map[String, Int]](map("bonus"))
+
   override def copyMe: Item = this.copy(map = map)
+end ArmorFile
 
 
 case class WeaponFile(filename: String, used: Int = 0) extends Weapon:
@@ -250,16 +254,8 @@ end WeaponFile
 
 /**/
 
-object ItemHandler:
-  def getData(weaponType: String) =
-    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/weapons.json")))
-  def getItem(filename: String) =
-    val data = getData("")
-    data(filename)
-
-  def getConsumables =
-    ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
-  var lastData = getConsumables
+object ItemHandler extends ReadingHandler:
+  val fileName = "weapons.json"
   var dataType = "healings"
   def getConsumablesData =
     ujson.read(or(os.pwd / RelPath(s"src/main/scala/resources/data/consumables.json")))
@@ -275,7 +271,7 @@ object ItemHandler:
   // return all the classes to be created
   def create: Map[String, Item] =
     // cnsm
-    lastData = getConsumables
+    lastData = getConsumablesData
     var itemFilenames = lastData.obj.keys
     val nameToItem = for name <- itemFilenames yield
      name -> consumableRead(name)

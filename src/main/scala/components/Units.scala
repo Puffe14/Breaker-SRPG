@@ -1,5 +1,5 @@
 package components
-import components.Part.Head
+import components.Part.{AnyPart, Head}
 import components.Team.*
 import game.Rules
 val rules = Rules()
@@ -144,7 +144,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   /** Lists all status names that need to be displayed by icons. */
   def statusList: Vector[String] =
     wounds.map("wound "+_.name).toVector
-    ++ armor.map("armor "+_.bodyPart.name)
+    ++ armor.filter(_.bodyPart!=AnyPart).map("armor "+_.bodyPart.name)
     ++ status.map(_.fileName).toVector
 
 

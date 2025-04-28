@@ -25,6 +25,13 @@ class Game:
   var openMenus: Vector[Menu] = Vector()
   var selectorMenus: Vector[InstantMenu] = Vector()
 
+  def situation: String =
+    currentMap match
+      case Some(fm) if fm.isCleared => "Map cleared"
+      case Some(fm) if fm.isLost => "Map lost, 'm' to reset."
+      case Some(fm) => fm.clear
+      case _ => "No map to play"
+
   // CONTROLS
 
   def turnClockwise() =
@@ -55,7 +62,6 @@ class Game:
       //Move acting unit to given tile
       case o: Occupiable if acting.nonEmpty =>
         unitToTile(o)
-        deSelect()
       //Select a new acting unit
       case o: Occupiable =>
         acting = o.occupantOnTile
@@ -101,7 +107,7 @@ class Game:
       setSelectMenus(Vector())
       forecast = None
 
-
+  /** Moves a unit to a tile by adding a Move to stack. */
   def unitToTile(o: Occupiable) =
     if currentMoveTiles.contains(o) then
       acting.foreach(move(_) match
@@ -111,6 +117,7 @@ class Game:
           case None =>
         )
 
+  /** Used for a quicker way to attack simply by selecting acting and target. */
   def attack() =
     acting.foreach(a=>
       target.foreach(t=>
@@ -200,7 +207,7 @@ class Game:
               // possible wounds
               val wounds = if unit.canWound then for b <- targetable.woundableParts yield
                 Wound(unit, targetable, distance, b) else Vector()
-              // combine all of them
+              // combine all of them with basic Combat
               Vector(Combat(unit, targetable, distance)) ++ breaks.toVector ++ wounds.toVector
             //Sets where these actions are happening so that a correct Move is made.
             newActions.foreach(_.location = Some(currentTile))
