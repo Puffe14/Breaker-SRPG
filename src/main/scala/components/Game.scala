@@ -3,9 +3,11 @@ import game.{AI, DataLibrary, IOHandler}
 
 
 class Game:
+  //Map in question
   var currentMapNumber: Int = 1
   var currentMap: Option[FieldMap] = None
   var midBattle: Boolean = false
+  //Who is doing what to whom?
   var turnOf: Team = Team.Player
   var player: Option[Organization] = None
   var acting: Option[Units] = None
@@ -15,24 +17,27 @@ class Game:
   var forecast: Option[Forecast] = None
   var part: Part = Part.Head
   var stack: Iterator[Action] = Iterator()
+  //Map control
   var zoom: Int = 2
   var direction: Int = 0
   var currentTurn: Int = 0
+  //Menu handling
   var openMenus: Vector[Menu] = Vector()
   var selectorMenus: Vector[InstantMenu] = Vector()
 
   // CONTROLS
 
-  def turnWise() =
+  def turnClockwise() =
     val newDir = (direction + 1)%4
     currentMap.foreach(_.setRotation(newDir))
     direction = newDir
-  def turnAnti() =
+  def turnAnticlockwise() =
     val newDir = ((direction - 1)%4+4)%4
     currentMap.foreach(_.setRotation(newDir))
     direction = newDir
   def dir: Int = direction
 
+  /** Decides what happens when a tile is selected. */
   def selectTile(tile: Tile) =
     tile match
       //If the character is selected again and it's not their turn
@@ -41,43 +46,50 @@ class Game:
       //If the character is selected again during the turn
       case o: Occupiable if acting.nonEmpty && acting == o.occupantOnTile =>
         menuPick()
-      //Beat-em-up
+      //Beat-em-up with current weapon
       case o: Occupiable if target.nonEmpty && !acting.forall(_.turnOver) && targetInRangeOfActor =>
         attack()
       //Select target
       case o: Occupiable if o.occupied && acting.nonEmpty =>
         target = o.occupantOnTile
-        //forecast = Some(fight())
       //Move acting unit to given tile
       case o: Occupiable if acting.nonEmpty =>
         unitToTile(o)
+        deSelect()
       //Select a new acting unit
       case o: Occupiable =>
         acting = o.occupantOnTile
         inspected = None
       case _ =>
 
+  /** Defines what happens when a */
   def inspectTile(tile: Tile) =
     tile match
       case o: Occupiable if o.occupied => inspected = o.occupantOnTile
       case _ =>
 
-  def targetPart = part
-  def setTarget(newTarget: Option[Units]) = target = newTarget
+  //Defines targeting for player's battle interactions
+  def targetPart =
+    part
+  def setTarget(newTarget: Option[Units]) =
+    target = newTarget
   def targetor: Option[Tile] =
     target match
       case Some(u) => tileOf(u)
       case None => None
 
+  /** Handles what takes place when pressing the back button. */
   def cancel() =
     if inspected.nonEmpty then inspected = None
     else if   openMenus.nonEmpty then menuBack()
     else if target.nonEmpty then target = None
     else if acting.nonEmpty then acting = None
-  
+
   def deSelect() =
     acting = None
     target = None
+    bout = None
+    selectorMenus = Vector()
 
   def clearPostAction() =
     if acting.forall(_.turnOver) then
@@ -139,26 +151,31 @@ class Game:
 
   // ACTION STACK
 
+  /** Takes the next action on the stack, plays its effects
+   *  and return the Explain for it that the UI can use to showcase what took place. */
   def continue(): Explain =
     val ret = nextOnStack().play()
-    isBattleOver
     ret
 
+  /** Was used for older testing before explain was implemented. */
   def continueS(): Vector[String] =
     val ret = nextOnStack().playS()
-    isBattleOver
     ret
 
+  /** Add an action to the stack to be performed and explained. */
   def addToStack(act: Action) =
     stack = stack ++ Iterable(act)
 
+  /** Maybe add an action to the stack. Makes it faster to add Option[Action]. */
   def addOptionToStack(act: Option[Action]) =
     act.foreach(addToStack(_))
 
+  /** Returns the Action in the stack. */
   def nextOnStack(): Action =
     if stack.nonEmpty then stack.next()
     else new EmptyAction()
 
+  /** Remove everything from the stack. */
   def clearStack(): Unit =
     stack = Iterator()
 
@@ -169,7 +186,10 @@ class Game:
     currentMap match
       case None => Vector()
       case Some(fm) =>
-        val combats = fm.movementRangeTiles(unit) //On movement range tiles --Tiles
+        val possibleWeaponsOrNone = unit.usableWeapons.map(Some(_))++None
+        val combats = (for weapon <- possibleWeaponsOrNone yield //Weapons that the character could use
+          weapon.foreach(unit.equip(_))
+          fm.movementRangeTiles(unit) //On movement range tiles --Tiles
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile,unit.Range))) //Who can be attacked? --(who, from)
           .toSet //all available unit, distance, tile combinations
           .map((targetable, distance, currentTile) =>
@@ -182,10 +202,13 @@ class Game:
                 Wound(unit, targetable, distance, b) else Vector()
               // combine all of them
               Vector(Combat(unit, targetable, distance)) ++ breaks.toVector ++ wounds.toVector
-
+            //Sets where these actions are happening so that a correct Move is made.
             newActions.foreach(_.location = Some(currentTile))
-            newActions)
-          .toVector
+            //Sets the weapon used when the actions happen
+            newActions.foreach(_.weapon = weapon)
+            newActions
+          ).toVector
+          ).flatten
         val heals = (for medkit <- unit.usableMedkits yield //Medkits that the character could use
           fm.movementRangeTiles(unit) //On movement range tiles --Tiles
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile,medkit.range)))
@@ -266,7 +289,8 @@ class Game:
         case Team.Ally =>  turnCountUp(); Team.Player
       refreshAll()
       deSelect()
-      groupsWithTurn.foreach(_.reduceTemporary())
+      groupsWithTurn.foreach(_.reduceTemporary()) //reduce temporary status effects
+      currentMap.foreach(_.giveBonuses(true)) //hurt or heal tile effects and bonuses
     clearPostAction()
     clearMenuWhenActed()
   end handleTurn
@@ -356,6 +380,7 @@ class Game:
     addOptionToStack(bout)
     setBout(None)
   def setForecast() =
+    bout.foreach(_.updateForecast())
     forecast = bout match
       case Some(combat) => Some(combat.forecast)
       case None => None
@@ -419,10 +444,12 @@ class Game:
 
   def menuBack() =
     openMenus = openMenus.take(openMenus.length-1)
-    selectorMenus = Vector()
-    forecast = None
-    target = None
-    bout = None
+    selectorMenus = Vector() //close selector menus
+    if bout.nonEmpty then //go back to selecting target
+      forecast = None
+      bout = None
+    else //reset target to None
+      target = None
   def menuUp() =
     openMenus.last match
       case m: InstantMenu => m.selectUpEffect(this)

@@ -59,11 +59,14 @@ object AI:
     val actAndGo: Vector[Action] = selectNextAction(g) match
       case Some(c: Combat) =>
         game.move(c.select) match
+          // In case the character needs to move
           case Some(move) =>
             move.location = c.location
             Vector(move, c)
+          // If no movement takes place
           case _ => Vector(c)
-      case Some(a: Action) => Vector(a)
+      case Some(a: Action) =>
+        Vector(a)
       case _ => Vector()
     addToStack(actAndGo)
 
@@ -102,29 +105,33 @@ object AI:
     val sensibleActions = attacks ++ heals ++ uses
 
     //Select a random sensible action
-    if currentGroup.forall(_.behaviour == Behaviour.Erratic) then
-      randomFrom(sensibleActions)
-    //Treat the highest level member of the group
-    else if treats.nonEmpty then
-      treats.maxBy(_.target.lvl)
-    //Select the best break attack by hitrate
-    else if breaks.nonEmpty then
-      breaks.maxBy(_.forecast.aHit)
-    //or the best wound attack by hitrate
-    else if wounds.nonEmpty then
-      wounds.maxBy(_.forecast.aHit)
-    //the attacks the one that will deal the most damage
-    else if attacks.nonEmpty then
-      attacks.maxBy(n => n.forecast.aEV*3 - n.forecast.bEV)
-    //the heals the one who is most hurt
-    else if heals.nonEmpty then
-      heals.maxBy(_.select.damageTaken)
-    //consume an item if hurt !!!(doesn't consider if it heals or not)
-    else if uses.nonEmpty && u.damageTaken != 0 then
-      uses.head
-    //Nothing to do? End turn and wait.
-    else
-      Wait(u)
+    val action =
+      if currentGroup.forall(_.behaviour == Behaviour.Erratic) then
+        randomFrom(sensibleActions)
+      //Treat the highest level member of the group
+      else if treats.nonEmpty then
+        treats.maxBy(_.target.lvl)
+      //Select the best break attack by hitrate
+      else if breaks.nonEmpty then
+        breaks.maxBy(_.forecast.aHit)
+      //or the best wound attack by hitrate
+      else if wounds.nonEmpty then
+        wounds.maxBy(_.forecast.aHit)
+      //the attacks the one that will deal the most damage
+      else if attacks.nonEmpty then
+        attacks.maxBy(n => n.forecast.aEV*3 - n.forecast.bEV)
+      //the heals the one who is most hurt
+      else if heals.nonEmpty then
+        heals.maxBy(_.select.damageTaken)
+      //consume an item if hurt !!!(doesn't consider if it heals or not)
+      else if uses.nonEmpty && u.damageTaken != 0 then
+        uses.head
+      //Nothing to do? End turn and wait.
+      else
+        Wait(u)
+    //Equip the necessary item for the action
+    action.weapon.foreach(u.equip(_))
+    action
 
   /** Add action to the stack of the game. */
   def addToStack(actions: Vector[Action]) =

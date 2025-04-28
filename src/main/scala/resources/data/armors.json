@@ -4,7 +4,8 @@
     "description": "Its effects are only imaginary.",
     "part": "Torso",
     "bonus": {
-      "PD": 10
+      "PD": 10,
+      "AV": -40
     }
   },
   "leather_greaves": {

@@ -36,7 +36,7 @@
         "avoid": -30,
         "physical": -3,
         "magical": -3,
-        "hpEffect": -5
+        "hpEffect": -2
       },
       "reduction": {
         "infantry": 2,

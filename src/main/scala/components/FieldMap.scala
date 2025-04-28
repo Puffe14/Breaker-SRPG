@@ -57,7 +57,7 @@ class FieldMap(enemies: Vector[Group],
     grid.tilesWithUnits.filter(_.occupantOnTile
                        .forall(_.isDead))
                        .foreach(_.removeOccupant())
-    giveBonuses() //set bonuses again to account for deaths
+    giveBonuses(false) //set bonuses again to account for deaths
 
   def unitsOnTeam(team: Team) =
     allCharacters.filter(_.team == team)
@@ -98,16 +98,16 @@ class FieldMap(enemies: Vector[Group],
 
   /**Gives stat bonuses from tile, aura buffs, and debuffs
    * for all units on the map.*/
-  def giveBonuses() =
+  def giveBonuses(includeHealth: Boolean) =
     theGrid.tilesWithUnits.foreach(t =>
       t.occupantOnTile.foreach(u =>
-        calculateBonus(u, t)
+        calculateBonus(u, t, includeHealth)
       )
     )
 
   /**Give buffs and debuffs from the environment
    * like class auras or tile hp effect to a given unit on their given tile*/
-  def calculateBonus(unit: Units, tile: Occupiable) =
+  def calculateBonus(unit: Units, tile: Occupiable, includeHealth: Boolean) =
     unit.resetNearbyBonus()
     val bonus = mutable.Map[String, Int]()
     def addToStat(which: String, amount: Int) =
@@ -119,7 +119,8 @@ class FieldMap(enemies: Vector[Group],
     units.filter(_.team==unit.team).foreach(_.givenNearbyBuffs.foreach((a,b)=>addToStat(a,b)))
     units.filter(_.team!=unit.team).foreach(_.givenNearbyDebuffs.foreach((a,b)=>addToStat(a,b)))
     unit.setNearbyBonus(bonus.toMap)
-    unit.takeDamage(-tile.hpEffect)
+    if includeHealth then
+      unit.takeDamage(-tile.hpEffect)
 
 
   //Methdos for determining which tiles a unit could occupy with current MOVE

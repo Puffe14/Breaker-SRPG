@@ -5,6 +5,7 @@ import components.Animation.*
 
 trait Action:
   var location: Option[Tile] = None
+  var weapon: Option[Weapon] = None
   var explain: Explain = Explain("")
   var actLength: Int = 30
   def playS(): Vector[String] = Vector(explain.name)
@@ -30,7 +31,7 @@ class Move(unit: Units, fieldMap: FieldMap) extends Action:
       msg = Vector(unit.name+" to "+tile.pos)
     )
     unit.moves()
-    fieldMap.giveBonuses()
+    fieldMap.giveBonuses(false)
     Explain(msg.mkString)
 end Move
 

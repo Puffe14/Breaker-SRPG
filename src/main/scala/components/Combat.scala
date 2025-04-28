@@ -84,8 +84,12 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
     else if attackSpeedDifference < -rules.doubleDiff then 2
     else 1
 
-  def forecast =
+  var forecast = //var so that it only changes when needed instead of always making a new when like previously with def
+    giveForecast
+  def giveForecast =
     Forecast(selectedUnit,targetUnit,selectedAttacks,targetAttacks,skillDifference,attackSpeedDifference)
+  def updateForecast() = //changes forecast to match new weapon or so on
+    forecast = giveForecast
 
   def forecastString: String =
     val f = forecast
@@ -111,7 +115,7 @@ class Combat(selectedUnit: Units, targetUnit: Units, range: Int) extends Action:
       var damage = predictDmg(attacker, defender)
       if isCritical then damage *= rules.critMultiplier
       defender.takeDamage(damage)
-      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hit ${defender.name} with $damage damage")
+      explain.addAnimation(defender,Hurt,attackDuration, s"${attacker.name} hit ${defender.name} with $damage damage. Now ${defender.hpMhp} left.")
       weapon.spend(1)
     else
       explain.addAnimation(defender,Evade,attackDuration, s"${attacker.name} misses ${defender.name}")
@@ -196,7 +200,7 @@ end Combat
 
 
 
-class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: Int, speed: Int):
+class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skillDif: Int, speedDif: Int, hitPenalty: Int = 1):
   //Provides all calculated results for outside use.
   
   //predicted dmg
@@ -216,9 +220,9 @@ class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: In
   val bEV = EV(bDmg, bHit, bCrit, bAtks)
   //the direction of attacks
   val arrow =
-    if skill < -rules.vantageDiff && bAtkNum > 0 then
+    if skillDif < -rules.vantageDiff && bAtkNum > 0 then
       0 //"<-"
-    else if speed > rules.alacrityDiff then
+    else if speedDif > rules.alacrityDiff then
       1 //"->->"
     else
       2 //"->"
@@ -262,8 +266,12 @@ class Forecast(val a: Units, val b: Units, aAtkNum: Int, bAtkNum: Int, skill: In
   private def predictHitCrit(attacker: Units, defender: Units): (Int, Int) =
     var hit = 0
     var crit = 0
+    //only penalize hit for being a skill if its the attackerbeing predicted
+    val penalizedHit =
+      if hitPenalty!=1 && attacker == a then attacker.HI / hitPenalty
+      else attacker.HI
     attacker.weapon.foreach( weapon =>
-      hit  = highest(lowest(attacker.HI - defender.AV + advantage(attacker, defender), 0), 100)
+      hit  = highest(lowest(penalizedHit - defender.AV + advantage(attacker, defender), 0), 100)
       crit = highest(lowest(attacker.CR - defender.CA, 0), 100)
     )
     (hit, crit)
@@ -280,6 +288,10 @@ class Skill(selectedUnit: Units, targetUnit: Units, range: Int) extends Combat(s
       selectedAttacks -= 1
       if !selectedCanAttack then selectedAttacks = 0
 
+  override def giveForecast =
+    //penalize hit for being a skill and vantage rules don't apply
+    Forecast(selectedUnit,targetUnit,selectedAttacks,targetAttacks,0,attackSpeedDifference,rules.skillHitRatePenaltyRatio)
+
   override def play(): Explain =
     resetLog()
     log += (s"${selectedUnit.name} ${this.toString}s ${targetUnit.name}")
@@ -291,7 +303,7 @@ class Skill(selectedUnit: Units, targetUnit: Units, range: Int) extends Combat(s
     log.toVector
     explain
 
-  // eri skillit objekteiks???, trait hit skill / no hit or sommin
+  // The default for a skill is to always activate its effect.
   def skill(attacker: Units, defender: Units) =
     skillEffect(attacker, defender)
 end Skill
@@ -307,19 +319,28 @@ class RollSkill(selectedUnit: Units, targetUnit: Units, range: Int) extends Skil
 
   def spend(attacker: Units) = attacker.weapon.foreach(w => w.spend(skillCost))
 
-  // eri skillit objekteiks???, trait hit skill / no hit or sommin
+  //What happens when the skill user attempts to use it.
   override def skill(attacker: Units, defender: Units) =
     var bonusHit = advantage(attacker, defender)
     var damage = 0
+
     //gives bonus to hitrate if the weapon is effective against enemy
     val isEffective = //if the attackers weapon has an effectiveness against defenders type
         attacker.weapon.forall(w => attacker.types.exists(w.effective.contains(_)))
     if isEffective then bonusHit += rules.skillBonusHitRateForEffective
+
     //checks if the attack hits, hitrate / ratio  - avoid + bonus
+    val penalizedHit =
+      if attacker == selectedUnit then attacker.HI / rules.skillHitRatePenaltyRatio
+      else attacker.HI
+
+    //Does the skill land?
     val isHit = roll100 < attacker.HI / rules.skillHitRatePenaltyRatio - defender.AV + bonusHit
+
+    //Animate what is happening
     explain.addAnimation(attacker,Stance,attackDuration/2)
     explain.addAnimation(attacker,Attack,attackDuration)
-    //If the skill requires a hit check
+    //The result of the hit check
     if isHit then
       skillEffect(attacker, defender)
       spend(attacker)

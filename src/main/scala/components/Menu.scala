@@ -67,9 +67,11 @@ trait InstantMenu extends ConfirmMenu:
   def selectUpEffect(game: Game) =
     selectorUp()
     effect(game)
+    game.setForecast()
   def selectDownEffect(game: Game) =
     selectorDown()
     effect(game)
+    game.setForecast()
 end InstantMenu
 
 class EquipsMenu(equips: Vector[Equipment]) extends InstantMenu:

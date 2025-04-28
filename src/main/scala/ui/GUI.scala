@@ -231,7 +231,7 @@ object GUI extends JFXApp3:
     val selectorWindows = game.selectorMenus.map(LeftRightMenuWindow(_))
     for i <- selectorWindows do
       i.draw(g, offset+100, 380)
-      offset += i.width+i.pad
+      offset += i.width
 
     //Draw the message window
     if currentMessage.nonEmpty then
@@ -297,7 +297,7 @@ object GUI extends JFXApp3:
 
         //Keep game going on
         if game.isBattleOver then
-          infoText = s"Battle OVER"
+          infoText = s"BATTLE OVER"
         else if actList.isEmpty then
           game.handleTurn()
           infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
@@ -416,8 +416,8 @@ object GUI extends JFXApp3:
         case KeyCode.Enter => selectTile()
         case KeyCode.Tab => inspectTile()
         case KeyCode.Space => unSelect()
-        case KeyCode.Q => game.turnAnti()
-        case KeyCode.E => game.turnWise()
+        case KeyCode.Q => game.turnAnticlockwise()
+        case KeyCode.E => game.turnClockwise()
         case KeyCode.Z => zoomIn()
         case KeyCode.X => zoomOut()
         case KeyCode.M => startUp()
