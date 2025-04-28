@@ -343,7 +343,8 @@ object ItemHandler:
     val inventoryMap = dt.obj
     val allItems = DataLibrary.items
     val itemsAndUses = read[Seq[(String, Int)]](inventoryMap(s"$inventoryName")) //"inventory_$unitName"
-    val inventory = Inventory(itemsAndUses.size)
+    val slotsNumber = if itemsAndUses.size < 6 then 6 else itemsAndUses.size
+    val inventory = Inventory(slotsNumber)
     // Set the items from the inventory to the spent state and add them to it
     itemsAndUses.map((item,uses)=>
       val newItem = allItems(item).copyMe

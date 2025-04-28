@@ -91,7 +91,7 @@ object GUI extends JFXApp3:
   var mouseY = 0
   var cursorX = 0
   var cursorY = 0
-  var text = "Hello player"
+  var infoText = "Hello player"
   var currentMessage = Vector[String]()
   val msgWindow = MessageWindow()
   var game = Game()
@@ -108,7 +108,7 @@ object GUI extends JFXApp3:
     mouseY = 0
     cursorX = 0
     cursorY = 0
-    text = "Hello player"
+    infoText = "Hello player"
     currentMessage = Vector[String]()
     // CONNECT TO GAME
     game = Game()
@@ -291,16 +291,16 @@ object GUI extends JFXApp3:
         //Write nonsense
         g.fill = Blue
         g.font = Font(30) // Set text size
-        g.fillText(text, 370, 50) // Fill text
+        g.fillText(infoText, 250, 50) // Fill text
         //Draw "UI" on top
         drawMenus(game.menus, g)
 
         //Keep game going on
         if game.isBattleOver then
-          text = s"Battle OVER"
+          infoText = s"Battle OVER"
         else if actList.isEmpty then
           game.handleTurn()
-          text = s"Turn Pos $cursorX, $cursorY. ${game.turnOf}"
+          infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
         while game.stack.hasNext && actList.isEmpty do
           val explain = game.continue()
           delta = 0
