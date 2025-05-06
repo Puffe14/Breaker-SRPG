@@ -1,0 +1,93 @@
+[debug] > Exec(early(addDefaultCommands), None, None)
+[debug] > Exec(addDefaultCommands, None, None)
+[debug] > Exec(early(initialize), None, None)
+[debug] > Exec(initialize, None, None)
+[debug] > Exec(early(addPluginSbtFile="""C:\Users\Omistaja\AppData\Local\Temp\idea.sbt"""), None, None)
+[debug] > Exec(addPluginSbtFile="""C:\Users\Omistaja\AppData\Local\Temp\idea.sbt""", None, None)
+[debug] > Exec(boot, None, None)
+[debug] > Exec(writeSbtVersion, None, None)
+[debug] > Exec(reload, None, None)
+[debug] > Exec(sbtStashOnFailure, None, None)
+[debug] > Exec(onFailure loadFailed, None, None)
+[debug] > Exec(loadp, None, None)
+[info] welcome to sbt 1.10.7 (Amazon.com Inc. Java 17.0.14)
+[debug] Load.defaultLoad until apply took 801.589399ms
+[debug]           Load.loadUnit: plugins took 955.553199ms
+[debug]           Load.loadUnit: defsScala took 1.564801ms
+[debug] [Loading] Scanning directory C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker\project
+[debug]             Load.loadUnit: mkEval took 31.591599ms
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker\project, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 89.3579 ms
+[info] loading settings for project breaker-build from idea.sbt...
+[debug]               Load.resolveProject(breaker-build) took 231.2934ms
+[debug]             Load.loadTransitive: finalizeProject(Project(id breaker-build, base: C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker\project, plugins: List(<none>))) took 460.5477ms
+[debug] [Loading] Done in C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker\project, returning: (breaker-build)
+[debug]           Load.loadUnit: loadedProjectsRaw took 2054.0983ms
+[debug]           Load.loadUnit: cleanEvalClasses took 115.615599ms
+[debug]         Load.loadUnit(file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/project/, ...) took 3167.516301ms
+[debug]       Load.apply: load took 4220.201401ms
+[debug]       Load.apply: resolveProjects took 44.839901ms
+[debug]       Load.apply: finalTransforms took 584.2589ms
+[debug]       Load.apply: config.delegates took 54.0645ms
+[debug]       Load.apply: Def.make(settings)... took 4457.429399ms
+[debug]       Load.apply: structureIndex took 1300.145799ms
+[debug]       Load.apply: mkStreams took 10.0294ms
+[info] loading project definition from C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker\project
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug]     Load.loadUnit: plugins took 23554.224901ms
+[debug]     Load.loadUnit: defsScala took 0.013799ms
+[debug] [Loading] Scanning directory C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker
+[debug]       Load.loadUnit: mkEval took 2.4146ms
+[debug] [Loading] Found root project root w/ remaining 
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(org.jetbrains.sbt.StructurePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(org.jetbrains.sbt.IdeaShellPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(org.jetbrains.sbt.StructurePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(org.jetbrains.sbt.IdeaShellPlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.SemanticdbPlugin,sbt.plugins.JUnitXmlReportPlugin,org.jetbrains.sbt.IdeaShellPlugin,org.jetbrains.sbt.StructurePlugin,sbt.plugins.MiniDependencyTreePlugin)
+[debug] Plugins.deducer#function took 15.2476 ms
+[info] loading settings for project root from build.sbt...
+[debug]         Load.resolveProject(root) took 180.738ms
+[debug]       Load.loadTransitive: finalizeProject(Project(id root, base: C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker, plugins: List(<none>))) took 202.2011ms
+[debug] [Loading] Done in C:\Users\Omistaja\Documents\_OPINNOT\Ohjelmointi\OStudio 1\Breaker, returning: (root)
+[debug]     Load.loadUnit: loadedProjectsRaw took 2100.550599ms
+[debug]     Load.loadUnit: cleanEvalClasses took 440.816201ms
+[debug]   Load.loadUnit(file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/, ...) took 26112.922ms
+[debug] Load.apply: load took 26249.0276ms
+[debug] Load.apply: resolveProjects took 4.8017ms
+[debug] Load.apply: finalTransforms took 589.107699ms
+[debug] Load.apply: config.delegates took 1.823ms
+[debug] Load.apply: Def.make(settings)... took 1288.801499ms
+[debug] Load.apply: structureIndex took 314.9587ms
+[debug] Load.apply: mkStreams took 0.007401ms
+[info] set current project to Breaker (in build file:/C:/Users/Omistaja/Documents/_OPINNOT/Ohjelmointi/OStudio%201/Breaker/)
+[debug] > Exec(sbtPopOnFailure, None, None)
+[debug] > Exec(resumeFromFailure, None, None)
+[debug] > Exec(notifyUsersAboutShell, None, None)
+[debug] > Exec(iflast shell, None, None)
+[debug] > Exec(idea-shell, None, None)

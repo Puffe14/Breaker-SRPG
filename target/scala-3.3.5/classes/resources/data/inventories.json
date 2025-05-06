@@ -1,0 +1,75 @@
+{
+  "inventory_Cylna": [
+    ["w_club",2],
+    ["i_mace",0  ],
+    ["bread",1],
+    ["leather_greaves",0]
+  ],
+  "inventory_Lairaea": [
+    ["bread",0],
+    ["i_sword",0]
+  ],
+  "inventory_BossLairaea": [
+    ["bread",0],
+    ["dagger",0],
+    ["practice_mail",0]
+  ],
+  "inventory_Geblah": [
+    ["dagger",0],
+    ["s_sling",0],
+    ["star_fragment",0]
+  ],
+  "inventory_Aynia": [
+    ["ray_spell",0],
+    ["fission_spell",0],
+    ["sun_gauntlets",0],
+    ["stellar_incence",0]
+  ],
+  "inventory_Faga": [
+    ["i_lance",0],
+    ["bread",0]
+  ],
+  "inventory_Ulrarik": [
+    ["w_club",0],
+    ["simple_medkit",0],
+    ["astral_medkit",2]
+  ],
+
+  "inventory_Warrior": [
+    ["w_club",0]
+  ],
+  "inventory_Swordsman": [
+    ["dagger",0],
+    ["i_sword",0]
+  ],
+  "inventory_Slingman": [
+    ["far_sling",0]
+  ],
+  "inventory_Fusiller": [
+    ["s_sling",2]
+  ],
+  "inventory_Medic": [
+    ["dagger",0],
+    ["simple_medkit",0]
+  ],
+  "inventory_Archer": [
+    ["bamboo_bow",0],
+    ["moon_helm",0]
+  ],
+  "inventory_Lochagos": [
+    ["bread",0],
+    ["d_mace",0],
+    ["i_lance",0],
+    ["sun_lamerral",0]
+  ],
+  "inventory_Ghulam": [
+    ["bamboo_bow",0],
+    ["i_lance",0],
+    ["moon_lamerral",0],
+    ["moon_helm",0],
+    ["bread",2]
+  ],
+  "inventory_tester": [
+    ["super_club",2]
+  ]
+}
