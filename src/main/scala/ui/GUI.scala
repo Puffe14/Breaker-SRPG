@@ -97,6 +97,7 @@ object GUI extends JFXApp3:
   val msgWindow = MessageWindow()
   var game = Game()
   var actList = Vector[Act]()
+  var explanation = Explain("")
   startUp()
 
 
@@ -177,19 +178,25 @@ object GUI extends JFXApp3:
           delta = 0
           //Capture acts from explain
           actList = explain.acts
+          //set explanation
+          explanation = explain
+        //check for dialogue
+        if explanation.dialogueNotOver then
+          currentMessage = Vector(explanation.dialogue.line)
         //handle animating units
-        game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
-        actList = actList.filterNot(_.done(delta))
-        val activeActs = actList.filter(_.show(delta))
-        activeActs.foreach(a => setAniInt(a.actor, a.frame))
-        currentMessage = activeActs.map(_.msg).filter(_!="")
-        delta+=1
+        else if actList.nonEmpty then
+          game.allTilesWithUnits.foreach(_.occupantOnTile.foreach(setAniInt(_, Idle)))
+          actList = actList.filterNot(_.done(delta))
+          val activeActs = actList.filter(_.show(delta))
+          activeActs.foreach(a => setAniInt(a.actor, a.frame))
+          currentMessage = activeActs.map(_.msg).filter(_!="")
+          delta+=1
     })
     timer.start()
 
   // GRAPHICS AND INTERFACE ------------
 
-  //   ImageView methods
+  // ImageView methods
 
   def tileImage(loc: (Int, Int, Int), img: Image) = new ImageView:
       val (lx, ly, lz) = loc
@@ -415,6 +422,9 @@ object GUI extends JFXApp3:
         case KeyCode.Enter => game.menuPick()
         case KeyCode.Space => game.menuBack()
         case _ =>
+    else if explanation.dialogueNotOver then
+      event.code match
+        case _ => explanation.advanceDialogue()
     //Controls during player turn for intereacting with the map
     else if game.turnOf == Team.Player && actList.isEmpty then
       event.code match
