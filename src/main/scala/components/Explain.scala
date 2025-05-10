@@ -19,7 +19,7 @@ class Explain(val name: String = ""):
     acts = acts ++ Vector(Act(unit, animation, start, totalTime, message))
 
   //Create a new dialogue and add it to the list
-  def addDialogoue(line: String) = //, face: Image) =
+  def addDialogue(line: String) = //, face: Image) =
     lines = lines.appended(Dialogue(line))
 
   //returns the current dialogue
@@ -35,8 +35,9 @@ class Explain(val name: String = ""):
       false
 
   def dialogueNotOver: Boolean =
-    lines.isEmpty && lineNumber < lines.size - 1
+    lines.nonEmpty && lineNumber < lines.size
 
+  def skipDialogue() = lineNumber = lines.size
 end Explain
 
 

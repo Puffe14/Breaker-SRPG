@@ -181,6 +181,7 @@ object GUI extends JFXApp3:
           //set explanation
           explanation = explain
         //check for dialogue
+        currentMessage = Vector()
         if explanation.dialogueNotOver then
           currentMessage = Vector(explanation.dialogue.line)
         //handle animating units
@@ -415,7 +416,7 @@ object GUI extends JFXApp3:
         case KeyCode.Space => game.menuBack()
         case _ =>
     //Controls when in menus
-    else if game.inMenu then
+    if game.inMenu then
       event.code match
         case KeyCode.W => game.menuUp()
         case KeyCode.S => game.menuDown()
@@ -424,6 +425,7 @@ object GUI extends JFXApp3:
         case _ =>
     else if explanation.dialogueNotOver then
       event.code match
+        case KeyCode.Tab => explanation.skipDialogue()
         case _ => explanation.advanceDialogue()
     //Controls during player turn for intereacting with the map
     else if game.turnOf == Team.Player && actList.isEmpty then
