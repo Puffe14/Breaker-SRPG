@@ -87,14 +87,14 @@ class Game:
   /** Handles what takes place when pressing the back button. */
   def cancel() =
     if inspected.nonEmpty then inspected = None
-    else if   openMenus.nonEmpty then menuBack()
+    else if openMenus.nonEmpty then menuBack()
     else if target.nonEmpty then target = None
     else if acting.nonEmpty then acting = None
 
   def deSelect() =
     acting = None
     target = None
-    bout = None
+    setBout(None)
     selectorMenus = Vector()
 
   def clearPostAction() =
@@ -320,11 +320,13 @@ class Game:
         over = true
         //midBattle = false
         addToStack(MapWon())
-        currentMapNumber+=1//Advance to next map
-        turnOf = Team.Player
-        currentMap = DataLibrary.maps.get(currentMapNumber.toString)
     )
     over
+
+  def nextMap() =
+    currentMapNumber+=1//Advance to next map
+    turnOf = Team.Player
+    currentMap = DataLibrary.maps.get(currentMapNumber.toString)
 
   def battleStart() =
     midBattle = true
@@ -463,7 +465,7 @@ class Game:
     selectorMenus = Vector() //close selector menus
     if bout.nonEmpty then //go back to selecting target
       forecast = None
-      bout = None
+      setBout(None)
     else //reset target to None
       target = None
   def menuUp() =

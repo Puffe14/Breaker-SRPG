@@ -18,10 +18,16 @@ class EmptyAction extends Action:
   def play(): Explain = explain
 
 class GameOver extends Action:
-  def play(): Explain = Explain("Game Over")
+  def play(): Explain =
+    explain = Explain("Game Over")
+    explain.addDialogue("You've lost.")
+    explain
 
 class MapWon extends Action:
-  def play(): Explain = Explain("Victory")
+  def play(): Explain =
+    explain = Explain("Game Over")
+    explain.addDialogue("You've won!")
+    explain
 
 
 class Move(unit: Units, fieldMap: FieldMap) extends Action:

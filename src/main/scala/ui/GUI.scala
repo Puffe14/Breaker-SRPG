@@ -111,6 +111,7 @@ object GUI extends JFXApp3:
     cursorY = 0
     infoText = "Hello player"
     currentMessage = Vector[String]()
+    explanation = Explain("")
     // CONNECT TO GAME
     game = Game()
     game.initialize()
@@ -424,6 +425,7 @@ object GUI extends JFXApp3:
     else if explanation.dialogueNotOver then
       event.code match
         case KeyCode.Tab => explanation.skipDialogue()
+        case KeyCode.M => startUp()
         case _ => explanation.advanceDialogue()
     //Controls during player turn for intereacting with the map
     else if game.turnOf == Team.Player && actList.isEmpty then
