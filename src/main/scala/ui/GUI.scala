@@ -136,6 +136,7 @@ object GUI extends JFXApp3:
     val bottomBox = HBox()
     val g = canvas.graphicsContext2D
     canvas.onMouseMoved = (event: MouseEvent) => setMouseLocation(event)
+    canvas.getGraphicsContext2D.setImageSmoothing(false) //FIXES ALIASING PROBLEM
 
     //Connect rest to root
     val root = GridPane()

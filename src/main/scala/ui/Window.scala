@@ -63,7 +63,7 @@ end MenuWindow
 
 
 class MessageWindow() extends Window:
-  override val width = 650-(font+margin)*2
+  override val width = 600-(font+margin)*2
   def draw(g: GraphicsContext, offset: Int, message: Vector[String]) =
     val xo = x + offset
     val yp = font*2+margin

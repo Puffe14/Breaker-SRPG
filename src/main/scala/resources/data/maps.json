@@ -25,16 +25,7 @@
     "enemies": [ [["BossLairaea",2,[1,1]]] ],
     "allies": [[]],
     "joining": [ ["Cylna",0,[0,0]] ],
-    "events": {
-      "knight_appears": {
-        "title": "reinforcement",
-        "units": [
-          ["Lochagos",[1,0]]
-        ],
-        "team": "Enemy",
-        "turns": [2]
-      }
-    },
+    "events": {},
     "grid": {
       "tiles": ["gray_field","gray_field",
                 "sand_field","sand_field"],

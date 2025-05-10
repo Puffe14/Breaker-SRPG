@@ -162,6 +162,7 @@ class Game:
    *  and return the Explain for it that the UI can use to showcase what took place. */
   def continue(): Explain =
     val ret = nextOnStack().play()
+    if currentMap.forall(_.isCleared) then nextMap()
     ret
 
   /** Was used for older testing before explain was implemented. */
