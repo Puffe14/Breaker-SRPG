@@ -2,19 +2,20 @@ package components
 
 trait Event:
   //triggers when the conditions are met
-  def trigger(fieldMap: FieldMap): Boolean =
+  def trigger(fieldMap: FieldMap): Vector[Action] =
     //If any of the conditions are met.
     val triggered = conditions.exists(_.met(fieldMap))
-    if triggered then effect(fieldMap)
-    triggered
-  def effect(fieldMap: FieldMap): Unit
+    if triggered then Vector(effect(fieldMap)) else Vector()
+
+  def effect(fieldMap: FieldMap): Action
   val conditions: Vector[Condition]
 
 
 class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector[Int]) extends Event:
   val conditions = turns.map(Survive(_))
-  def effect(fieldMap: FieldMap): Unit =
+  def effect(fieldMap: FieldMap): Action =
     val units = bunch.map(_._1)
+    val names = units.map(_.name).mkString(", ")
     // Place units on map
     bunch.foreach((u, p) =>
       fieldMap.theGrid.addUnitAt(u, p)
@@ -28,6 +29,9 @@ class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector
       case _ =>
         // add them to additional groups
         fieldMap.addGroup(Group(units, Behaviour.Agressive, team))
+    val act = EmptyAction()
+    act.explain.addDialogue(s"$names join(s) $team")
+    act
 
 
 //Often used conditions

@@ -14,7 +14,8 @@ end Action
 
 
 class EmptyAction extends Action:
-  def play(): Explain =  Explain("Empty Action")
+  explain = Explain("Empty Action")
+  def play(): Explain = explain
 
 class GameOver extends Action:
   def play(): Explain = Explain("Game Over")

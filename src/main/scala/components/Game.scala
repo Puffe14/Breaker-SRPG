@@ -177,6 +177,13 @@ class Game:
   def addOptionToStack(act: Option[Action]) =
     act.foreach(addToStack(_))
 
+  /** Add actions in a list of actions to the stack. */
+  def addVectorToStack(acts: Vector[Action]) =
+    acts.foreach(addToStack(_))
+  /** Add option list of actions to the stack. */
+  def addOptionVectorToStack(acts: Option[Vector[Action]]) =
+    acts.foreach(addVectorToStack(_))
+
   /** Returns the Action in the stack. */
   def nextOnStack(): Action =
     if stack.nonEmpty then stack.next()
@@ -290,11 +297,11 @@ class Game:
 
     //if the turn of the current team is over then change to the next teams turn.
     if groupsWithTurn.forall(_.doneActing) then
+      refreshAll()
       turnOf = turnOf match
         case Team.Player =>Team.Enemy
         case Team.Enemy => Team.Ally
         case Team.Ally =>  turnCountUp(); Team.Player
-      refreshAll()
       deSelect()
       groupsWithTurn.foreach(_.reduceTemporary()) //reduce temporary status effects
       currentMap.foreach(_.giveBonuses(true)) //hurt or heal tile effects and bonuses
@@ -324,7 +331,9 @@ class Game:
 
   def turnCountUp() =
     currentMap.foreach(_.tickTurn())
-    currentMap.map(_.eventCheck())
+    addOptionVectorToStack(          //Add the triggered event actions to stack.
+      currentMap.map(_.eventCheck()) //Check which events on the map produce actions.
+    )
 
   //Methods for creating actions
 

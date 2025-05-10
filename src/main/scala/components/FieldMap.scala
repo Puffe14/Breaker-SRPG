@@ -97,9 +97,8 @@ class FieldMap(enemies: Vector[Group],
     turnNumber+=1
 
   /**Check if an event should be triggered on the map. */
-  //!!! ability to give a message to announce event missing
-  def eventCheck() =
-    events.map(_.trigger(this))
+  def eventCheck(): Vector[Action] =
+    events.flatMap(_.trigger(this))
 
   /**Gives stat bonuses from tile, aura buffs, and debuffs
    * for all units on the map.*/

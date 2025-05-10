@@ -2,9 +2,7 @@ package ui
 
 import components.*
 import components.Animation.*
-import components.Team.Enemy
 import game.*
-import scalafx.event.*
 import scalafx.animation.AnimationTimer
 import scalafx.application.{JFXApp, JFXApp3}
 import scalafx.scene.Scene
@@ -166,7 +164,7 @@ object GUI extends JFXApp3:
         //Keep game going on
         if game.isBattleOver then
           infoText = s"BATTLE OVER"
-        else if actList.isEmpty then
+        else if actList.isEmpty && !explanation.dialogueNotOver then
           if game.currentMap.nonEmpty then
             game.handleTurn()
             infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
