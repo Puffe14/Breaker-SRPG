@@ -5,14 +5,17 @@ trait Event:
   def trigger(fieldMap: FieldMap): Vector[Action] =
     //If any of the conditions are met.
     val triggered = conditions.exists(_.met(fieldMap))
-    if triggered then Vector(effect(fieldMap)) else Vector()
+    if triggered then
+      conditions = conditions.filterNot(_.met(fieldMap))
+      Vector(effect(fieldMap))
+    else Vector()
 
   def effect(fieldMap: FieldMap): Action
-  val conditions: Vector[Condition]
+  var conditions: Vector[Condition]
 
 
 class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector[Int]) extends Event:
-  val conditions = turns.map(Survive(_))
+  var conditions = turns.map(Survive(_))
   def effect(fieldMap: FieldMap): Action =
     val units = bunch.map(_._1)
     val names = units.map(_.name).mkString(", ")
@@ -32,6 +35,17 @@ class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector
     val act = EmptyAction()
     act.explain.addDialogue(s"$names join(s) $team")
     act
+end Reinforcement
+
+
+class Speech(lines: Vector[String], triggeredBy: Condition) extends Event:
+  var conditions = Vector(triggeredBy)
+  def effect(fieldMap: FieldMap): Action =
+    val act = EmptyAction()
+    //Sets the lines for the action to be stacked by the game
+    lines.foreach(act.explain.addDialogue(_))
+    act
+end Speech
 
 
 //Often used conditions

@@ -25,7 +25,18 @@
     "enemies": [ [["BossLairaea",2,[1,1]]] ],
     "allies": [[]],
     "joining": [ ["Cylna",0,[0,0]] ],
-    "events": {},
+    "events": {
+      "message": {
+        "title": "message",
+        "lines": ["Cylna and Lairaea are training.",
+                  "Defeat Lairaea by first breaking her armor.\nThis will lower her physical defence.",
+                  "Then attack Lairaea to bring her HP to zero."],
+        "when": {
+          "title": "survive",
+          "limit": 1
+        }
+      }
+    },
     "grid": {
       "tiles": ["gray_field","gray_field",
                 "sand_field","sand_field"],
@@ -123,7 +134,7 @@
       "aynia_joins": {
         "title": "reinforcement",
         "units": [
-          ["Aynia",[4,5]]
+          ["Aynia",[2,4]]
         ],
         "team": "Player",
         "turns": [2]

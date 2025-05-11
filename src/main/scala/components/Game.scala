@@ -161,8 +161,11 @@ class Game:
   /** Takes the next action on the stack, plays its effects
    *  and return the Explain for it that the UI can use to showcase what took place. */
   def continue(): Explain =
+    //Next map if everything is over.
+    if currentMap.forall(_.isCleared) &&
+      stack.isEmpty then
+      nextMap()
     val ret = nextOnStack().play()
-    if currentMap.forall(_.isCleared) then nextMap()
     ret
 
   /** Was used for older testing before explain was implemented. */
@@ -285,10 +288,11 @@ class Game:
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
       currentTurn = fm.turnNumber
+      fm.eventCheck().foreach(addToStack(_))
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them
-    if turnOf!=Team.Player then
+    if turnOf!=Team.Player && stack.isEmpty then
       val groupsLeft = groupsWithTurn.filter(!_.doneActing)
       if AI.currentGroup.isEmpty && groupsLeft.nonEmpty then
         AI.game = this
@@ -297,7 +301,7 @@ class Game:
 
 
     //if the turn of the current team is over then change to the next teams turn.
-    if groupsWithTurn.forall(_.doneActing) then
+    if groupsWithTurn.forall(_.doneActing) && stack.isEmpty then
       refreshAll()
       turnOf = turnOf match
         case Team.Player =>Team.Enemy

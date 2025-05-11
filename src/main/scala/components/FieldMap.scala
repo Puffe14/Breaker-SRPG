@@ -314,4 +314,10 @@ object MapHandler:
         )
         val turns = read[Vector[Int]](map("turns"))
         Some(Reinforcement(bunch, team, turns))
+      case "message" =>
+        val lines = read[Vector[String]](map("lines"))
+        val condition = readCondition(map("when").obj)
+        Some(Speech(lines, condition))
       case _ => None
+
+      //where first lochagos? whyaynia wrong spot??
