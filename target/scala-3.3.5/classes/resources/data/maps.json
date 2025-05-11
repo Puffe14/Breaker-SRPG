@@ -134,7 +134,7 @@
       "aynia_joins": {
         "title": "reinforcement",
         "units": [
-          ["Aynia",[2,4]]
+          ["Aynia",[4,5]]
         ],
         "team": "Player",
         "turns": [2]
@@ -145,7 +145,7 @@
           ["Lochagos",[1,1]]
         ],
         "team": "Enemy",
-        "turns": [4]
+        "turns": [2,4]
       }
     },
     "grid": {

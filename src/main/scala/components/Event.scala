@@ -21,7 +21,7 @@ class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector
     val names = units.map(_.name).mkString(", ")
     // Place units on map
     bunch.foreach((u, p) =>
-      fieldMap.theGrid.addUnitAt(u, p)
+      fieldMap.theGrid.addUnitAt(u.copyMe, p)
       u.equipFirst()
     )
     // then based on the team

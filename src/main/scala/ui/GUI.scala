@@ -164,9 +164,8 @@ object GUI extends JFXApp3:
         drawMenus(game.menus, g)
 
         //Keep game going on
-        if game.isBattleOver then
-          infoText = s"BATTLE OVER"
-        else if actList.isEmpty && !explanation.dialogueNotOver then
+
+        if actList.isEmpty && !explanation.dialogueNotOver then
           if game.currentMap.nonEmpty then
             game.handleTurn()
             infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"

@@ -7,6 +7,7 @@ class Game:
   var currentMapNumber: Int = 1
   var currentMap: Option[FieldMap] = None
   var midBattle: Boolean = false
+  var changeMap: Boolean = false
   //Who is doing what to whom?
   var turnOf: Team = Team.Player
   var player: Option[Organization] = None
@@ -161,10 +162,6 @@ class Game:
   /** Takes the next action on the stack, plays its effects
    *  and return the Explain for it that the UI can use to showcase what took place. */
   def continue(): Explain =
-    //Next map if everything is over.
-    if currentMap.forall(_.isCleared) &&
-      stack.isEmpty then
-      nextMap()
     val ret = nextOnStack().play()
     ret
 
@@ -277,6 +274,10 @@ class Game:
 
   /** Called when the turn is continuing. */
   def handleTurn(): Unit =
+    //Next map if everything is over.
+    if changeMap && stack.isEmpty then
+      nextMap()
+      changeMap = false
     //all groups on a particular side on the current map
     var groupsWithTurn: Vector[Group] = Vector()
     currentMap.foreach(fm=>
@@ -312,6 +313,8 @@ class Game:
       currentMap.foreach(_.giveBonuses(true)) //hurt or heal tile effects and bonuses
     clearPostAction()
     clearMenuWhenActed()
+    if !changeMap then
+      changeMap = isBattleOver
   end handleTurn
 
   /** Checks whether if the battle is over or not */
