@@ -142,10 +142,10 @@
       "knight_appears": {
         "title": "reinforcement",
         "units": [
-          ["Lochagos",[1,1]]
+          ["Lochagos",[9,2]]
         ],
         "team": "Enemy",
-        "turns": [2,4]
+        "turns": [2,3,4]
       }
     },
     "grid": {

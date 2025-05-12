@@ -44,7 +44,11 @@ class Occupiable(file: String,
     1
 
   def occupied: Boolean = occupant.nonEmpty
-  def addOccupant(newUnit: Units) = occupant = Some(newUnit)
+  def addOccupant(newUnit: Units) =
+    if occupied then //fail if already occupied
+      throw Exception(s"Adding Occupant $newUnit failed. Tile already has $occupant")
+    else
+      occupant = Some(newUnit)
   def removeOccupant(): Option[Units] =
     val tempO = occupant
     occupant = None

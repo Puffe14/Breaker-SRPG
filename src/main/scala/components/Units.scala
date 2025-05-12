@@ -350,5 +350,5 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
     " Items: " + unitsInventory.toString()
 
   def copyMe: Units =
-    this.copy(character=character)
+    this.copy(character=character.copyMe,unitsInventory=unitsInventory.copyMe)
 end Units

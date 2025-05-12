@@ -289,7 +289,7 @@ class Game:
       fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
       currentTurn = fm.turnNumber
-      fm.eventCheck().foreach(addToStack(_))
+      addVectorToStack(fm.eventCheck())
     )
 
     //If the AI has no groups to control yet, give them all to the AI so it can handle them

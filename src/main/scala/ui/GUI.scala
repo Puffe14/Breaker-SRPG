@@ -171,7 +171,7 @@ object GUI extends JFXApp3:
             infoText = s"Turn ${game.currentTurn}, Pos $cursorX, $cursorY. ${game.turnOf}"
           else infoText = ""
 
-        while game.stack.hasNext && actList.isEmpty do
+        while game.stack.hasNext && actList.isEmpty && !explanation.dialogueNotOver do
           val explain = game.continue()
           //set the timer to zero
           delta = 0
@@ -355,6 +355,13 @@ object GUI extends JFXApp3:
     else if dir == 3 then  x* 8*drawScale   - y*8*drawScale    + middle(1) - z*8*drawScale
     else 0
 
+  def skipActs() =
+    game.allTilesWithUnits
+      .foreach(_.occupantOnTile
+        .foreach(setAniInt(_, Idle))
+      )
+    actList = Vector()
+
   //BUTTON INPUT HANDLING
 
   //Cursor movement based on viewing direction
@@ -450,4 +457,5 @@ object GUI extends JFXApp3:
     //Controls outside all the other possibilities
     else event.code match
         case KeyCode.M => startUp()
+        case KeyCode.Tab => skipActs()
         case _ =>

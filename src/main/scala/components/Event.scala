@@ -17,24 +17,32 @@ trait Event:
 class Reinforcement(bunch: Vector[(Units, (Int,Int))], team: Team, turns: Vector[Int]) extends Event:
   var conditions = turns.map(Survive(_))
   def effect(fieldMap: FieldMap): Action =
-    val units = bunch.map(_._1)
+    val pickings = bunch.map((u,p) => (u.copyMe, p)) //make new copies of units
+    val units = pickings.map(_._1)
     val names = units.map(_.name).mkString(", ")
-    // Place units on map
-    bunch.foreach((u, p) =>
-      fieldMap.theGrid.addUnitAt(u.copyMe, p)
-      u.equipFirst()
-    )
-    // then based on the team
-    team match
-      case Team.Player =>
-        // add them to deployed
-        fieldMap.addUnitListToDeployed(units)
+    
+    try
+      // Place units on map
+      pickings.foreach((u, p) =>
+        fieldMap.theGrid.addUnitAt(u, p)
+        u.equipFirst()
+      )
+      // then based on the team
+      team match
+        case Team.Player =>
+          // add them to deployed
+          fieldMap.addUnitListToDeployed(units)
+        case _ =>
+          // add them to additional groups
+          fieldMap.addGroup(Group(units, Behaviour.Agressive, team))
+      val act = EmptyAction()
+      act.explain.addDialogue(s"$names join(s) $team")
+      act
+    catch
       case _ =>
-        // add them to additional groups
-        fieldMap.addGroup(Group(units, Behaviour.Agressive, team))
-    val act = EmptyAction()
-    act.explain.addDialogue(s"$names join(s) $team")
-    act
+        val act = EmptyAction()
+        act.explain.addDialogue(s"$names of $team blocked")
+        act
 end Reinforcement
 
 
