@@ -90,6 +90,36 @@
     "debuffs": {}
   },
 
+  "swordsman": {
+    "name": "swordsman",
+    "level": 1,
+    "type": ["wounder","infantry"],
+    "stats": {
+      "movement": 3,
+      "jump": 2,
+      "hitpoints": 3,
+      "strength": 1,
+      "magic": 0,
+      "skill": 2,
+      "speed": 2,
+      "defence": 0,
+      "resistance": 1},
+    "growth": {
+      "hitpoints": 5,
+      "strength": 10,
+      "magic": 0,
+      "skill": 10,
+      "speed": 15,
+      "defence": 0,
+      "resistance": 0
+    },
+    "ranks": {
+      "Sharp":4
+    },
+    "buffs": {},
+    "debuffs": {}
+  },
+
   "taker": {
     "name": "taker",
     "level": 1,
