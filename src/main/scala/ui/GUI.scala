@@ -38,13 +38,14 @@ val idleImages = Map("Cylna" -> new Image(new FileInputStream(imagePath + "warri
                      "Geblah" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
 val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
-                         "slicer" -> boutImgSeq("swordsman"),
+                         "swordsman" -> boutImgSeq("swordsman"),
+                         "slicer" -> boutImgSeq("lairaea"),
                          "singer" -> boutImgSeq("guy"),
                          "taker" -> boutImgSeq("ninja"),
                          "archer" -> boutImgSeq("gunner"),
                          "warrior" -> boutImgSeq("pirate"),
-                         "channeler" -> boutImgSeq("guy"),
-                         "shooter" -> boutImgSeq("ninja"),
+                         "channeler" -> boutImgSeq("aynia"),
+                         "shooter" -> boutImgSeq("gunner"),
                          "medic" -> boutImgSeq("guy"),
                          "rider" -> boutImgSeq("knight"),
                          "flier" -> boutImgSeq("hoplite"))

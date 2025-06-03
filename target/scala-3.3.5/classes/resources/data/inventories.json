@@ -3,7 +3,8 @@
     ["w_club",2],
     ["i_mace",0  ],
     ["bread",1],
-    ["leather_greaves",0]
+    ["leather_greaves",0],
+    ["duper",0]
   ],
   "inventory_Lairaea": [
     ["bread",0],

@@ -119,6 +119,23 @@
     "effective": {},
     "bonus": {"MD": 1}
   },
+  "duper": {
+    "name": "Super Duper",
+    "description": "A basic, wooden club.",
+    "rank": "E",
+    "spent": 0,
+    "durability": 15,
+    "quick": false,
+    "wpntype": "Blunt",
+    "dmgtype": "force",
+    "power": 255,
+    "hit": 300,
+    "crit": 100,
+    "range": [1, 10],
+    "weight": 0,
+    "effective": {},
+    "bonus": {"MD": 20}
+  },
   "bamboo_bow": {
     "name": "Bamboo Bow",
     "description": "A light, but effective bow.",

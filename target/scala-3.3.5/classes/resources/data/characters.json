@@ -8,7 +8,6 @@
     "stats": {
       "hitpoints": 15,
       "strength": 6,
-      "magic": 0,
       "skill": 5,
       "speed": 5,
       "defence": 3,
@@ -282,8 +281,8 @@
   },
   "Swordsman": {
     "name": "Swordsman",
-    "class": "slicer",
-    "classes": ["slicer"],
+    "class": "swordsman",
+    "classes": ["swordsman"],
     "level": 2,
     "exp": 0,
     "stats": {

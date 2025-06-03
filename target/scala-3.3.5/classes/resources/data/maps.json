@@ -24,7 +24,7 @@
   "1": {
     "enemies": [ [["BossLairaea",2,[1,1]]] ],
     "allies": [[]],
-    "joining": [ ["Cylna",0,[0,0]] ],
+    "joining": [["Cylna",0,[0,0]]],
     "events": {
       "message": {
         "title": "message",
@@ -34,7 +34,15 @@
         "when": {
           "title": "survive",
           "limit": 1
+      },
+      "onclear": {
+        "title": "message",
+        "lines": ["Lairaea: You're tougher I remembered."],
+        "when": {
+          "title": "kill",
+          "target": ["Lairaea"]
         }
+      }
       }
     },
     "grid": {
@@ -142,10 +150,10 @@
       "knight_appears": {
         "title": "reinforcement",
         "units": [
-          ["Lochagos",[9,2]]
+          ["Lochagos",[0,0]]
         ],
         "team": "Enemy",
-        "turns": [2,3,4]
+        "turns": [3,4]
       }
     },
     "grid": {
