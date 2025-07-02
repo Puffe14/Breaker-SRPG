@@ -1,5 +1,5 @@
 package components
-import components.Part.{AnyPart, Head}
+import components.Part.{AnyPart, Arms, Head, Legs, Torso}
 import components.Team.*
 import game.Rules
 val rules = Rules()
@@ -146,6 +146,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
     wounds.map("wound "+_.name).toVector
     ++ armor.filter(_.bodyPart!=AnyPart).map("armor "+_.bodyPart.name)
     ++ status.map(_.fileName).toVector
+    ++ unitsLeader.filter(_==this).map(n=> if n.team != Team.Player then "leader" else "")
 
 
   //bonuses
@@ -234,10 +235,12 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def MaxHP: Int = hp
 
   //Move
-  def MOVE: Int = character.move + bonus("move")
+  def MOVE: Int = (character.move + bonus("move")  /
+        (if wounds.exists(p => p.similarTo(Legs)) then 3 else 1))
 
   //Jump
-  def JUMP: Int = character.jump + bonus("jump")
+  def JUMP: Int = (character.jump + bonus("jump")  /
+        (if wounds.exists(p => p.similarTo(Legs)) then 3 else 1))
 
   //Range
   def Range: (Int, Int) =
@@ -253,7 +256,8 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
       case Some(magical) if magical.dmgtyping == "magic" =>
          magical.power + mag + bonus("AT")
       case Some(physical) if physical.dmgtyping == "force" =>
-         physical.power + str + bonus("AT")
+        (physical.power + str + bonus("AT") /
+        (if wounds.exists(p => p.similarTo(Arms)) then 2 else 1))
       case _ => 0
 
   //Rate of critical hits
@@ -279,11 +283,13 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   //Physical defence
   def PD: Int =
-    dfn + bonus("PD")
+    (dfn + bonus("PD") /
+        (if wounds.exists(p => p.similarTo(Torso)) then 2 else 1))
 
   //Magical defence
   def MD: Int =
-    res + bonus("MD")
+    (res + bonus("MD") /
+        (if wounds.exists(p => p.similarTo(Torso)) then 2 else 1))
 
   //Hit rate
   def HI: Int =
@@ -295,7 +301,8 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   //Rate of avoiding attacks
   def AV: Int =
-    (spd + skl*0.5).toInt  + bonus("AV")
+    ((spd + skl*0.5).toInt  + bonus("AV") /
+        (if wounds.exists(p => p.similarTo(Legs)) then 2 else 1))
 
   //Rate of avoiding critical hits
   def CA: Int =

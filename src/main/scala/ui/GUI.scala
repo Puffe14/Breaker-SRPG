@@ -59,7 +59,8 @@ val iconImages =
       "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")),
       "armor torso" -> new Image(new FileInputStream(imagePath + "armor body.png")),
       "armor arms" -> new Image(new FileInputStream(imagePath + "armor arms.png")),
-      "armor legs" -> new Image(new FileInputStream(imagePath + "armor legs.png")))
+      "armor legs" -> new Image(new FileInputStream(imagePath + "armor legs.png")),
+      "leader" -> new Image(new FileInputStream(imagePath + "leader.png")))
 
 def animationToInt(animation: Animation) =
   animation match
