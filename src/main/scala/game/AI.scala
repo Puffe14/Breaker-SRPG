@@ -78,7 +78,8 @@ object AI:
     var chosen: Vector[Action] = Vector()
     // equip the first weapon&medkit, all armor in inventory
     u.equipFirst()
-    val availableActions = game.availableActions(u)
+    val canMove = currentGroup.forall(_.behaviour!=Stand) && u.canMove
+    val availableActions = game.availableActions(u, canMove)
     //all possible combat scenarios
     val combats = availableActions
                       .collect { case a: Combat => a }

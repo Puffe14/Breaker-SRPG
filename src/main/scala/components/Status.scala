@@ -12,8 +12,10 @@ trait Status(name: String, file: String):
 end Status
 
 
-class Confused extends Status("confused","status_confused"):
+object Confused extends Status("confused","status_confused"):
   override def description = "The character is confused and acts at random."
+object Stunned extends Status("stunned","status_stunned"):
+  override def description = "The character is stunned and can't move or jump."
 
 
 enum Part:

@@ -52,15 +52,24 @@ val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
 val defaultClassImageSet = boutImgSeq("guy")
 
 val iconImages =
-  Map("wound head" -> new Image(new FileInputStream(imagePath + "wound head.png")),
-      "wound arms" -> new Image(new FileInputStream(imagePath + "wound arms.png")),
-      "wound torso" -> new Image(new FileInputStream(imagePath + "wound body.png")),
-      "wound legs" -> new Image(new FileInputStream(imagePath + "wound legs.png")),
-      "armor head" -> new Image(new FileInputStream(imagePath + "armor head.png")),
-      "armor torso" -> new Image(new FileInputStream(imagePath + "armor body.png")),
-      "armor arms" -> new Image(new FileInputStream(imagePath + "armor arms.png")),
-      "armor legs" -> new Image(new FileInputStream(imagePath + "armor legs.png")),
-      "leader" -> new Image(new FileInputStream(imagePath + "leader.png")))
+  Seq("wound head",
+      "wound arms",
+      "wound torso",
+      "wound legs",
+      "armor head",
+      "armor torso",
+      "armor arms",
+      "armor legs",
+      "leader",
+      "status_confused",
+      "status_stunned" ,
+      "typing/mounted",
+      "typing/flier",
+      "typing/blunt",
+      "typing/long",
+      "typing/sharp",
+      "typing/ranged",
+      "typing/spell").map(pairImgString(_)).toMap
 
 def animationToInt(animation: Animation) =
   animation match
@@ -73,7 +82,6 @@ def animationToInt(animation: Animation) =
 
 def setAniInt(unit: Units, animation: Animation) =
   unit.setAniInt(animationToInt(animation))
-
 
 
 object GUI extends JFXApp3:

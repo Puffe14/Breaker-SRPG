@@ -21,6 +21,7 @@ class Window:
   val width = 200
   val height = 400
   val font = 20
+  val fontType = "Liberation Mono"
 
   def teamToColor(team: Team) =
     team match
@@ -44,7 +45,7 @@ class MenuWindow(menu: Menu) extends Window:
     g.fillRect(xo, y, width, height)
 
     //Selector outline
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fill = Purple // Set the fill color.
     val textY = y+pad-margin+fm*pos
     g.fillRect(xo+pad-margin, textY,
@@ -53,10 +54,10 @@ class MenuWindow(menu: Menu) extends Window:
     //Write nonsense
     g.fillText(menu.title, xo+pad, y+pad-margin + font)
     g.fill = Purple
-    g.font = Font(font) // Set text size
+    g.font = Font(fontType, font) // Set text size
     for i <- menu.itemTitles.indices do
       g.fill = Blue
-      g.font = Font(font) // Set text size
+      g.font = Font(fontType, font) // Set text size
       g.fillText(menu.itemTitles(i), xo+pad, y+pad-margin + font + fm*(i+1))
 
 end MenuWindow
@@ -76,7 +77,7 @@ class MessageWindow() extends Window:
 
     //Display the message
     g.fill = Purple
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fillText(message.mkString("\n"),fm,yp+margin)
 
 end MessageWindow
@@ -103,7 +104,7 @@ class ForecastWindow(fc: Forecast) extends Window:
       case _ => "->"
     //How many attacks and in what order?
     g.fill = Purple
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fillText(s"x${fc.aAtks} $direction x${fc.bAtks}", 240, 260)
 
 end ForecastWindow
@@ -123,7 +124,7 @@ class MiniUnitWindow(unit: Units) extends Window:
     //Draw the panel
     for i <- writables.indices do
       g.fill = if unit.acted then Color.LightGray else teamToColor(unit.team)
-      g.font = Font(font) // Set text size
+      g.font = Font(fontType, font) // Set text size
       g.fillText(writables(i), xo+pad, yo+pad-margin + font + fm*(i))
 end MiniUnitWindow
 
@@ -151,12 +152,12 @@ class TileWindow(tile: Tile) extends Window:
     g.fillRect(xo, y, width, height)
     //Draw the panel text
     g.fill = Blue
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fillText(title, xo+pad, y+pad-margin + font)
     for i <- writables.indices do
         for j <- writables(i).indices do
           g.fill = Blue
-          g.font = Font(font) // Set text size
+          g.font = Font(fontType, font) // Set text size
           g.fillText(writables(i)(j), xo+pad+width/2*j, y+pad-margin + font + fm*(i+1))
     // Draw occupant mini window
     occupant.foreach(drawOccupant(g, _))
@@ -188,11 +189,11 @@ class CharacterWindow(unit: Units) extends Window:
       for i <- vek.indices do
         for j <- vek(i).indices do
           g.fill = Blue
-          g.font = Font(font/fontDivider) // Set text size
+          g.font = Font(fontType,font/fontDivider) // Set text size
           g.fillText(vek(i)(j), xo+pad+width/2*j, y+pad-margin + font + fm*(i+fontsDown))
 
     g.fill = teamColor
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fillText(title, xo+pad, y+pad-margin + font)
     pairbunch(combVek,3,1)
     pairbunch(unitVek,9,1)
@@ -220,5 +221,5 @@ class LeftRightMenuWindow(menu: Menu) extends Window:
         "None"
 
     g.fill = Blue
-    g.font = Font(font)
+    g.font = Font(fontType, font)
     g.fillText(article, xo+pad,yo+pad)

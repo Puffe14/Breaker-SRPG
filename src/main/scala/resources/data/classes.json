@@ -182,7 +182,7 @@
     },
     "ranks": {
       "Sharp":2,
-      "Range": 1
+      "Ranged": 1
     },
     "buffs": {
       "strength": 1,
@@ -248,7 +248,7 @@
     },
     "ranks": {
       "Long":4,
-      "Range":3,
+      "Ranged":3,
       "Blunt":2
     },
     "buffs": {},
@@ -311,7 +311,7 @@
       "resistance": 0
     },
     "ranks": {
-      "Range":4
+      "Ranged":4
     },
     "buffs": {},
     "debuffs": {}

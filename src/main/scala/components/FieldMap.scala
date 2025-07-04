@@ -84,6 +84,7 @@ class FieldMap(enemies: Vector[Group],
   /** add new groups onto field map*/
   var additions = Vector[Group]()
   def addGroup(group: Group) =
+    if group.side != Player then group.setLeader()
     additions = additions.appended(group)
 
   /**add more characters to this maps current player organization*/
@@ -241,7 +242,9 @@ object MapHandler:
       
       //!!! Behaviour handling missing, all groups automatically Agressive.
       def makeGroup(memberInfo: Vector[(String,Int,(Int,Int))], team: Team): Group =
-        Group(memberInfo.map(makeUnit(_)), Behaviour.Agressive, team, false)
+        val g = Group(memberInfo.map(makeUnit(_)), Behaviour.Agressive, team, false)
+        if g.side != Player then g.setLeader()
+        g
       def makeUnit(unitInfo: (String,Int,(Int,Int))): Units =
         val unitName = unitInfo(0)  //get the name
         val unit = Units(DataLibrary.characters(unitName).copyMe,         // Find the character

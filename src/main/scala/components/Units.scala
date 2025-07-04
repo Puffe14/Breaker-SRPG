@@ -115,6 +115,10 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def turnOver = acted
   def moveOver = moved
 
+  def canMove = !status.contains(Stunned)
+  def stun() = takeStatus(Stunned)
+  def unstun() = healStatus(Stunned)
+
   //Change stat collections
   def addPermanent(which: String, amount: Int) =
     character.addToStat(which, amount)
@@ -127,6 +131,8 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
 
   def reduceTemporary() =
+    //remove stunned
+    if leader.nonEmpty && leader.forall(_.isAlive) then healStatus(Stunned)
     //increases negative stats and reduces positive ones
     def towardZero(target: Int, amount: Int): Int =
       if target > 0 then target - amount
@@ -143,10 +149,12 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   /** Lists all status names that need to be displayed by icons. */
   def statusList: Vector[String] =
-    wounds.map("wound "+_.name).toVector
+    weapon.map("typing/"+_.wpntyping.toLowerCase).toVector
+    ++ unitsLeader.filter(_==this).map(n=> if n.team != Team.Player then "leader" else "")
+    ++ types.filter(n=>n=="flier"||n=="mounted").map("typing/"+_)
+    ++ wounds.map("wound "+_.name).toVector
     ++ armor.filter(_.bodyPart!=AnyPart).map("armor "+_.bodyPart.name)
     ++ status.map(_.fileName).toVector
-    ++ unitsLeader.filter(_==this).map(n=> if n.team != Team.Player then "leader" else "")
 
 
   //bonuses

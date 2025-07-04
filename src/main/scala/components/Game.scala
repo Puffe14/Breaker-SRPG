@@ -197,14 +197,15 @@ class Game:
 
   // Actions available to a given unit
 
-  def availableActions(unit: Units): Vector[Action] =
+  def availableActions(unit: Units, moves: Boolean = true): Vector[Action] =
     currentMap match
       case None => Vector()
       case Some(fm) =>
         val possibleWeaponsOrNone = unit.usableWeapons.map(Some(_))++None
+        val areaOfMovement = if moves then fm.movementRangeTiles(unit) else fm.tileOf(unit).toSet
         val combats = (for weapon <- possibleWeaponsOrNone yield //Weapons that the character could use
           weapon.foreach(unit.equip(_))
-          fm.movementRangeTiles(unit) //On movement range tiles --Tiles
+          areaOfMovement //On movement range tiles --Tiles
           .flatMap(tile=>(fm.attackRangeUnitsAt(unit,tile,unit.Range))) //Who can be attacked? --(who, from)
           .toSet //all available unit, distance, tile combinations
           .map((targetable, distance, currentTile) =>
@@ -284,9 +285,9 @@ class Game:
       player.foreach(p => if fm.player!=p then
         fm.setPlayer(p)
         fm.deployPlayer()
+        fm.setLeaders()
       )
       fm.clearDead()
-      fm.setLeaders()
       groupsWithTurn = fm.groups.filter(_.side==turnOf)
       currentTurn = fm.turnNumber
       addVectorToStack(fm.eventCheck())
@@ -309,10 +310,15 @@ class Game:
         case Team.Enemy => Team.Ally
         case Team.Ally =>  turnCountUp(); Team.Player
       deSelect()
+      groupsWithTurn.foreach(_.handleLeader())
       groupsWithTurn.foreach(_.reduceTemporary()) //reduce temporary status effects
       currentMap.foreach(_.giveBonuses(true)) //hurt or heal tile effects and bonuses
+     
+    //stun all non player groups if their leader dies
+    currentMap.foreach(_.groups.foreach(_.stunLeaderless()))
     clearPostAction()
     clearMenuWhenActed()
+    //change maps if the battle is over
     if !changeMap then
       changeMap = isBattleOver
   end handleTurn

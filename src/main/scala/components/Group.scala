@@ -18,15 +18,25 @@ class Group(var members: Vector[Units], var behaviour: Behaviour,
   def metCondition() =
     conditionMet = true
   def setLeader() =
-    val leader = members.maxByOption(_.lvl)
-    members.foreach(m => m.setLeader(leader))
+    val leader = members.filter(_.isAlive).maxByOption(_.lvl)
+    members.foreach(m =>
+                    m.setLeader(leader)
+                    m.unstun())
+  def handleLeader() =
+    if side!=Team.Player && members.headOption.forall(_.leader.isEmpty) then
+      setLeader()
+    else if leaderDead then
+      members.foreach(_.setLeader(None))
   def reduceTemporary() =
     members.foreach(_.reduceTemporary())
+  def leaderDead = side!=Team.Player && members.headOption.forall(_.leader.forall(_.isDead))
+  def stunLeaderless() =
+    if leaderDead then
+      members.foreach(_.stun())
 end Group
 
 
 enum Behaviour:
-  //def a = ()
   case Agressive, Stand, OnSight, Reach, Control, Erratic
 
 
