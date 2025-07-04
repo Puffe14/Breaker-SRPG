@@ -126,6 +126,8 @@ class MiniUnitWindow(unit: Units) extends Window:
       g.fill = if unit.acted then Color.LightGray else teamToColor(unit.team)
       g.font = Font(fontType, font) // Set text size
       g.fillText(writables(i), xo+pad, yo+pad-margin + font + fm*(i))
+    //Draw portait
+    g.drawImage(GUI.portraitImage(unit.name.toLowerCase), xo+width-82, yo+height-84, 72, 72)
 end MiniUnitWindow
 
 

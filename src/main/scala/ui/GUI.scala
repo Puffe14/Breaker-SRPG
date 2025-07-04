@@ -71,6 +71,9 @@ val iconImages =
       "typing/ranged",
       "typing/spell").map(pairImgString(_)).toMap
 
+val portraitImages =
+  Seq("portraits/cylna","portraits/default","portraits/aynia","portraits/geblah").map(pairImgString(_)).toMap
+
 def animationToInt(animation: Animation) =
   animation match
     case Idle => 0
@@ -235,6 +238,9 @@ object GUI extends JFXApp3:
       scaleX = drawScale*8
       scaleY = drawScale*6
       viewOrder_(-loc(2).toDouble-1)
+
+  def portraitImage(name: String) =
+    portraitImages.getOrElse("portraits/"+name, portraitImages.getOrElse("portraits/default", deadImg))
 
 
   //   Larger methods
