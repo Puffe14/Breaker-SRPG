@@ -1,0 +1,11 @@
+[debug] > Exec(scala-cli versions.scala, None, None)
+[error] Expected ID character
+[error] Not a valid command: scala-cli
+[error] Expected project ID
+[error] Expected configuration
+[error] Expected ':'
+[error] Expected key
+[error] Not a valid key: scala-cli (similar: scalacOptions, scalaSource, scalaHome)
+[error] scala-cli versions.scala
+[error]          ^
+[debug] > Exec(idea-shell, None, None)
