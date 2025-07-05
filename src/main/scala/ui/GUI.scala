@@ -72,7 +72,13 @@ val iconImages =
       "typing/spell").map(pairImgString(_)).toMap
 
 val portraitImages =
-  Seq("portraits/cylna","portraits/default","portraits/aynia","portraits/geblah").map(pairImgString(_)).toMap
+  Seq("portraits/cylna",
+      "portraits/default",
+      "portraits/aynia",
+      "portraits/geblah",
+      "portraits/ulrarik",
+      "portraits/faga",
+      "portraits/lairaea").map(pairImgString(_)).toMap
 
 def animationToInt(animation: Animation) =
   animation match
