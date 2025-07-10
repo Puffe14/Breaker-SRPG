@@ -56,6 +56,10 @@ class Trade(unit: Units, inventory: Inventory, slot1: Int, slot2: Int) extends A
     val slots2 = inventory.items
     explain = Explain("swapped "+slots1(slot1)+" and "+slots2(slot2))
     explain.addAnimation(unit,Hurt,actLength)
+    def unequip(it: Option[Item]) = it.foreach(_.unequip())
+    //unequip the traded items
+    unequip(slots1(slot1))
+    unequip(slots2(slot2))
     unit.inventory.swap(inventory,slot1,slot2)
     explain
 end Trade

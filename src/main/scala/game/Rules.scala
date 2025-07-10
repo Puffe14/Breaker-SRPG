@@ -2,6 +2,7 @@ package game
 import components.*
 
 class Rules {
+  val instantTrade = true
   //limits for difference based activations in combat
   val vantageDiff = 9
   val alacrityDiff = 9

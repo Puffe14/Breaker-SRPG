@@ -263,7 +263,12 @@ class Game:
     attackRangeUnitsFor(unit).filter(_.woundableParts.nonEmpty)
   def treatRangeUnitsFor(unit: Units): Vector[Units] =
     medRangeUnitsFor(unit).filter(_.wounds.nonEmpty)
-
+  def tradeRangeUnitsFor(unit: Units): Vector[Units] =
+    var guys = Vector[Units]()
+    currentMap.foreach(fm=>fm.tileOf(unit)
+              .foreach(tl=> guys = fm.attackRangeUnitsAt(unit,tl,(1,1))
+                                   .map(_(0)).filter(_.team==unit.team).toVector))
+    guys
 
   def initialize() =
     IOHandler.buildClasses()
@@ -411,6 +416,8 @@ class Game:
   def performBout() =
     addOptionToStack(bout)
     setBout(None)
+  def performTrade(u: Units, i: Inventory, s1: Int, s2: Int): Unit =
+    addOptionToStack(trade(u,i,s1,s2))
   def setForecast() =
     bout.foreach(_.updateForecast())
     forecast = bout match
@@ -464,6 +471,8 @@ class Game:
     if openMenus.nonEmpty then
       val latest = openMenus.last
       latest match
+        case tm: TradingMenu =>
+          if tm.slot1.isEmpty then addMenu(latest.pick) else tm.effect(this)
         case m: ConfirmMenu =>
           if latest.subMenus.nonEmpty then addMenu(latest.pick)
         case _ =>

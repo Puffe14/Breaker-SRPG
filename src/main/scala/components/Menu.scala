@@ -1,4 +1,5 @@
 package components
+import game.Rules
 
 trait Menu:
   val title: String
@@ -35,13 +36,13 @@ trait Menu:
 end Menu
 
 
-class InventoryMenu extends Menu:
+class InventoryMenu(unit: Units) extends Menu:
   val title: String = "Inventory"
   override def createSubMenus(game: Game) =
-    game.acting.foreach(u=>
-      val inventory = u.inventory
-      setSubMenus(inventory.items.map(ItemMenu(_)))
-    )
+    val inventory = unit.inventory
+    setSubMenus(inventory.items.map(ItemMenu(_)))
+
+
 
 class ConfirmMenu extends Menu:
   val title: String = "Confirm"
@@ -224,6 +225,54 @@ class TreatMenu extends TargetMenu:
   override def filtered(before: Vector[Units]) =
     before.filter(_.wounds.nonEmpty)
 
+
+class TradeMenu extends TargetMenu:
+  override val title: String = "Trade"
+  def combat(g: Game) = None
+  def setSelect(game: Game, actor: Units, target: Units) =
+      val distance = game.unitToUnitDistance(actor, target)
+      /*game.setSelectMenus(Vector(TradingMenu(actor.inventory, actor.name),TradingMenu(target.inventory, target.name)))
+      */
+  override def createSubMenus(game: Game) =
+    game.acting.foreach(actor =>
+      val targetables = game.tradeRangeUnitsFor(actor)
+      setSubMenus(filtered(targetables).map(_.unitsInventory).map(targeted=>TradingMenu(actor,targeted,s"Trade - ${actor.name}",None)))
+     )
+    effect(game)
+
+
+      //setSubMenus(filtered(targetables).map(target=>TradingMenu(actor.unitsInventory,actor.name,
+        //Some(TradingMenu(target.unitsInventory,target.name))))))
+/*class TradingMenu(inv: Inventory, name: String, next: Option[TradingMenu] = None) extends Menu:
+  val title: String = s"Inv. - $name"
+  override def createSubMenus(game: Game) =
+    next.foreach(setSubMenus(inv.items.map(_)))
+  //override def effect(game: Game) =
+    //game.trade()
+*/
+
+class TradingMenu(unit: Units, inv: Inventory, name: String, val slot1: Option[Int] = None) extends InstantMenu:
+  override val title: String = s"$name"
+  def nameOrEmpty(item: Option[Item]): String = item match
+    case Some(i) => i.toString
+    case _ => "Empty"
+  override def selectDownEffect(game: Game): Unit = selectorDown()
+  override def selectUpEffect(game: Game): Unit = selectorUp()
+  override def effect(game: Game): Unit =
+    if slot1.nonEmpty then
+      if rules.instantTrade then
+        game.trade(unit, inv, slot1.getOrElse(0), select).foreach(_.play())
+      else
+        //actually finish the trade, this impelemtation of adding to stack
+        game.performTrade(unit, inv, slot1.getOrElse(0), select)
+  override def createSubMenus(game: Game) =
+    if slot1.isEmpty then
+      setSubMenus(unit.unitsInventory.items.zipWithIndex
+        .map((i,n)=>TradingMenu(unit,inv,nameOrEmpty(i),Some(n))).toVector)
+    else
+      setSubMenus(inv.items.map(i=>ItemMenu(i)))
+
+
 class ActionsMenu extends Menu:
   val title: String = "Actions"
   override def createSubMenus(game: Game) =
@@ -243,8 +292,11 @@ class ActionsMenu extends Menu:
         atc(HealMenu())
       if game.treatRangeUnitsFor(actor).nonEmpty then
         atc(TreatMenu())
+      if game.tradeRangeUnitsFor(actor).nonEmpty then
+        atc(TradeMenu())
+      //put them all in the general action menu
+      setSubMenus(collector ++ Vector(InventoryMenu(actor),WaitMenu()))
     )
-    setSubMenus(collector ++ Vector(InventoryMenu(),WaitMenu()))
 
 class WaitMenu extends ConfirmMenu:
   override val title: String = "Wait"
@@ -282,3 +334,18 @@ class ItemMenu(item: Option[Item]) extends Menu:
         if i.isInstanceOf[Consumable] then menus = menus ++ Vector(UseMenu(i))
         setSubMenus(menus++Vector(DiscardMenu(i))))
     )
+
+/*class TradeableMenu(item: Option[Item], inv: Inventory, next: Option[TradingMenu] = None) extends InstantMenu:
+  val name = item match
+    case Some(i) => i.toString
+    case _ => "Empty"
+  override val title: String = s"$name"
+
+  override def effect(game: Game)=
+    if next.isEmpty then
+      game.acting.foreach(game.trade(_,inv,game.menus.dropRight(1).last.select,game.menus.last.select)
+        .foreach(_.play()))
+  override def createSubMenus(game: Game) =
+    next match
+      case Some(tm) => setSubMenus(Vector(tm))
+      case None =>*/

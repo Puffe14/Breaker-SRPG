@@ -13,6 +13,7 @@ trait Item {
   def describe = name +": "+this.description
   def shouldRemove = false
   def copyMe: Item = this
+  def unequip() = ()
 }
 
 trait Consumable(val effectToStats: Map[String, Int], var uses: Int, val limit: Int) extends Item:
@@ -77,7 +78,7 @@ trait Equipment extends Item:
   def isEquipped: Boolean = equipped
   def equip() =
     equipped = true
-  def unequip() =
+  override def unequip() =
     equipped = false
   def toggleEquip() =
     equipped = !equipped
