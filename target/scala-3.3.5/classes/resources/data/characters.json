@@ -14,12 +14,12 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 35,
-      "strength": 35,
+      "hitpoints": 70,
+      "strength": 65,
       "magic": 0,
       "skill": 25,
-      "speed": 30,
-      "defence": 20,
+      "speed": 60,
+      "defence": 40,
       "resistance": 0
     }
   },
@@ -40,10 +40,10 @@
       "resistance": 2
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
-      "magic": 15,
-      "skill": 30,
+      "hitpoints": 50,
+      "strength": 60,
+      "magic": 20,
+      "skill": 60,
       "speed": 35,
       "defence": 10,
       "resistance": 10
@@ -66,13 +66,13 @@
       "resistance": 2
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 20,
-      "magic": 30,
-      "skill": 20,
+      "hitpoints": 50,
+      "strength": 40,
+      "magic": 60,
+      "skill": 40,
       "speed": 35,
       "defence": 10,
-      "resistance": 20
+      "resistance": 40
     }
   },
 
@@ -92,12 +92,12 @@
       "resistance": 1
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 20,
-      "magic": 15,
-      "skill": 20,
+      "hitpoints": 50,
+      "strength": 40,
+      "magic": 30,
+      "skill": 40,
       "speed": 35,
-      "defence": 20,
+      "defence": 40,
       "resistance": 10
     }
   },
@@ -118,12 +118,12 @@
       "resistance": 2
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 15,
-      "magic": 35,
-      "skill": 30,
+      "hitpoints": 50,
+      "strength": 30,
+      "magic": 60,
+      "skill": 45,
       "speed": 35,
-      "defence": 15,
+      "defence": 30,
       "resistance": 5
     }
   },
@@ -135,7 +135,7 @@
     "level": 3,
     "exp": 0,
     "stats": {
-      "hitpoints": 11,
+      "hitpoints": 12,
       "strength": 5,
       "magic": 0,
       "skill": 5,
@@ -144,12 +144,12 @@
       "resistance": 1
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
-      "defence": 15,
+      "defence": 30,
       "resistance": 5
     }
   },
@@ -170,10 +170,10 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
       "defence": 10,
       "resistance": 10
@@ -195,13 +195,13 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 25,
+      "hitpoints": 50,
+      "strength": 50,
       "magic": 0,
-      "skill": 25,
-      "speed": 25,
-      "defence": 20,
-      "resistance": 20
+      "skill": 50,
+      "speed": 50,
+      "defence": 40,
+      "resistance": 40
     }
   },
   "Archer": {
@@ -220,10 +220,10 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
       "defence": 10,
       "resistance": 10
@@ -245,10 +245,10 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
       "defence": 10,
       "resistance": 10
@@ -270,13 +270,13 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 15,
-      "speed": 15,
-      "defence": 10,
-      "resistance": 10
+      "skill": 30,
+      "speed": 30,
+      "defence": 20,
+      "resistance": 20
     }
   },
   "Swordsman": {
@@ -295,13 +295,13 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 15,
-      "speed": 15,
-      "defence": 10,
-      "resistance": 10
+      "skill": 30,
+      "speed": 30,
+      "defence": 20,
+      "resistance": 20
     }
   },
   "Lochagos": {
@@ -321,12 +321,12 @@
     },
     "growth": {
       "hitpoints": 25,
-      "strength": 30,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
-      "defence": 10,
-      "resistance": 10
+      "defence": 20,
+      "resistance": 20
     }
   },
   "Ghulam": {
@@ -345,13 +345,13 @@
       "resistance": 0
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
+      "hitpoints": 50,
+      "strength": 60,
       "magic": 0,
-      "skill": 30,
+      "skill": 60,
       "speed": 35,
-      "defence": 10,
-      "resistance": 10
+      "defence": 20,
+      "resistance": 20
     }
   },
 
@@ -371,13 +371,13 @@
       "resistance": 2
     },
     "growth": {
-      "hitpoints": 25,
-      "strength": 30,
-      "magic": 15,
-      "skill": 30,
+      "hitpoints": 50,
+      "strength": 60,
+      "magic": 20,
+      "skill": 60,
       "speed": 35,
-      "defence": 10,
-      "resistance": 10
+      "defence": 20,
+      "resistance": 20
     }
   },
 
