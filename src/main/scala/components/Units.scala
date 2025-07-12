@@ -35,6 +35,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def canBreak: Boolean = types.contains("breaker")
   def canWound: Boolean = types.contains("wounder")
   def canFlies: Boolean = types.contains("flier")
+  def canTakeSouls: Boolean = types.contains("mystic")
 
   def usableWeapons =
     unitsInventory.weapons // of the weapons in inventory
@@ -219,8 +220,10 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
   def discard(item: Item) =
     unitsInventory.remove(Some(item))
 
-  def loot: Vector[Item] =
-    unitsInventory.equippedArmors
+  def loot: Option[Inventory] =
+    inventory.toLoot
+    if inventory.empty then None
+    else Some(inventory)
 
   //effective stats totals
   def hp =  character.maxHp + bonus("hitpoints")
@@ -321,7 +324,7 @@ case class Units(var character: Character, val unitsInventory: Inventory = Inven
 
   //Amount of healing given
   def HL: Int =
-    mag/3 + skl/2
+    mag/2 + skl/2
 
 
   def shortInfo =

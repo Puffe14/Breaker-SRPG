@@ -410,6 +410,11 @@ class Game:
       addOptionToStack(wait(u))
     )
 
+  def actingLoot: Vector[Inventory] =
+    acting.flatMap(tileOf(_).flatMap(_.interactible.flatMap(_.loot))).toVector
+
+  def actingIsMystic: Boolean =
+    acting.exists(_.canTakeSouls)
 
   def setBout(combat: Option[Combat]) =
     bout = combat

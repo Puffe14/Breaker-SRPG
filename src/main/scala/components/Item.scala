@@ -138,6 +138,9 @@ trait Weapon extends Equipment:
   //Cause the weapon to lose durability by increasing the amount spent.
   def spend(durabilityLoss: Int) =
     spent += durabilityLoss
+  def fix(durabilityGain: Int = spent) =
+    spent -= durabilityGain
+    if spent < 0 then spent = 0
 
   //Gives the item description with
   override def describe: String =

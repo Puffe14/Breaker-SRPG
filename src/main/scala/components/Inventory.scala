@@ -128,6 +128,16 @@ class Inventory(slotCount: Int):
     }
     medInSlots
 
+  // When someone is killed by player, gives their inventory as loot
+  def toLoot: Vector[Item] =
+    weapons.foreach(w=>
+      w.spend(w.durability
+      .getOrElse(0)/rules.lootDurabilityCost)
+      w.unequip())
+    weapons
+  def empty: Boolean =
+    !items.exists(_.nonEmpty)
+
   // Equip methods
 
   def equipWeapon(weapon: Weapon, toggle: Boolean) =

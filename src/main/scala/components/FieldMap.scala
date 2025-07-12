@@ -56,12 +56,18 @@ class FieldMap(enemies: Vector[Group],
       case o: Occupiable =>
         former.foreach(_.removeOccupant())
         o.addOccupant(unit)
+        if o.containsSoul && unit.canTakeSouls then
+          o.spendSoul()
+          unit.weapon.foreach(_.fix())
       case _ => println(s"$target cannot be occupied")
 
   def clearDead() =
     grid.tilesWithUnits.filter(_.occupantOnTile
                        .forall(_.isDead))
-                       .foreach(_.removeOccupant())
+                       .foreach(t =>
+                         t.occupantOnTile.foreach(u=>t.addCorpse(u.loot))
+                         t.removeOccupant()
+                       )
     giveBonuses(false) //set bonuses again to account for deaths
 
   def unitsOnTeam(team: Team) =

@@ -11,11 +11,15 @@ import java.io.FileInputStream
 
 trait Tile(val photoFile: String, val name: String):
   var position: (Int, Int, Int) = (0, 0, 0)
+  var interactible: Option[Interactible] = None
   def giveName: String = name
   def pos = position
   def moveReduction(classMovementType: Vector[String]): Double = 1
   def setPos(x: Int, y: Int, z: Int) =
     position = (x, y, z)
+  def containsLoot: Boolean = interactible.nonEmpty && interactible.forall(_.loot.nonEmpty)
+  def containsSoul: Boolean = interactible.nonEmpty && interactible.forall(_.soulLeft)
+  def spendSoul() = interactible.foreach(_.consumeSoul())
   def copy: Tile
   val photo: Image =
     new Image(new FileInputStream("src/main/scala/resources/images/" + photoFile + ".png"))
@@ -53,6 +57,8 @@ class Occupiable(file: String,
     val tempO = occupant
     occupant = None
     occupant
+  def addCorpse(loot: Option[Inventory], hasSoul: Boolean = true) =
+    interactible = Some(Interactible(loot, hasSoul))
   def occupantOnTile = occupant
   def statsVector =
     Vector(
@@ -90,6 +96,18 @@ class Shop(file: String, name: String) extends Unoccupiable(file, name, true):
   val selection = Vector[(Item, String, Double)]()
   def sell(product: Item) = selection.head.head
 end Shop
+
+
+class Interactible(var loot: Option[Inventory], hasSoul: Boolean = true):
+  private var soul = hasSoul
+  def noLoot: Boolean =
+    loot.nonEmpty || loot.forall(_.empty)
+  def soulLeft = soul
+  def setLoot(newLoot: Option[Inventory]) =
+    loot = newLoot
+  /** A mystic consumes the soul to recover spell uses. */
+  def consumeSoul(): Unit =
+    soul = false
 
 
 object TileHandler extends ReadingHandler:

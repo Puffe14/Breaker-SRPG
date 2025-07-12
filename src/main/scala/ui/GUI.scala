@@ -37,6 +37,8 @@ val idleImages = Map("Cylna" -> new Image(new FileInputStream(imagePath + "warri
                      "ghost" -> new Image(new FileInputStream(imagePath + "guy_idle.png")),
                      "Geblah" -> new Image(new FileInputStream(imagePath + "guy_idle.png")))
 val deadImg = new Image(new FileInputStream(imagePath + "dead.png"))
+val soulImg = imgMake("interactibles/soul")
+val lootImg = imgMake("interactibles/loot")
 val classImageSets = Map("wilder" -> boutImgSeq("warrior"),
                          "swordsman" -> boutImgSeq("swordsman"),
                          "slicer" -> boutImgSeq("lairaea"),
@@ -257,6 +259,10 @@ object GUI extends JFXApp3:
         .foreach(t =>
           //img selection from tile photo value
           toDraw += tileImage(t.pos, t.photo)
+          if t.containsLoot then
+            toDraw += tileImage(t.pos, lootImg)
+          if game.actingIsMystic && t.containsSoul then
+            toDraw += tileImage(t.pos, soulImg)
           //add bottoms
           (1 to t.pos(2)).foreach(i =>
             val bottomPos = (t.pos(0), t.pos(1), i-1)

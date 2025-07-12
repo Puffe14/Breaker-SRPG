@@ -236,20 +236,12 @@ class TradeMenu extends TargetMenu:
   override def createSubMenus(game: Game) =
     game.acting.foreach(actor =>
       val targetables = game.tradeRangeUnitsFor(actor)
-      setSubMenus(filtered(targetables).map(_.unitsInventory).map(targeted=>TradingMenu(actor,targeted,s"Trade - ${actor.name}",None)))
+      setSubMenus((filtered(targetables).map(_.unitsInventory)++game.actingLoot)
+        .map(targeted=>TradingMenu(actor,targeted,s"Trade - ${actor.name}",None)))
      )
     effect(game)
 
 
-      //setSubMenus(filtered(targetables).map(target=>TradingMenu(actor.unitsInventory,actor.name,
-        //Some(TradingMenu(target.unitsInventory,target.name))))))
-/*class TradingMenu(inv: Inventory, name: String, next: Option[TradingMenu] = None) extends Menu:
-  val title: String = s"Inv. - $name"
-  override def createSubMenus(game: Game) =
-    next.foreach(setSubMenus(inv.items.map(_)))
-  //override def effect(game: Game) =
-    //game.trade()
-*/
 
 class TradingMenu(unit: Units, inv: Inventory, name: String, val slot1: Option[Int] = None) extends InstantMenu:
   override val title: String = s"$name"
@@ -292,7 +284,7 @@ class ActionsMenu extends Menu:
         atc(HealMenu())
       if game.treatRangeUnitsFor(actor).nonEmpty then
         atc(TreatMenu())
-      if game.tradeRangeUnitsFor(actor).nonEmpty then
+      if game.actingLoot.nonEmpty || game.tradeRangeUnitsFor(actor).nonEmpty then
         atc(TradeMenu())
       //put them all in the general action menu
       setSubMenus(collector ++ Vector(InventoryMenu(actor),WaitMenu()))
@@ -334,18 +326,3 @@ class ItemMenu(item: Option[Item]) extends Menu:
         if i.isInstanceOf[Consumable] then menus = menus ++ Vector(UseMenu(i))
         setSubMenus(menus++Vector(DiscardMenu(i))))
     )
-
-/*class TradeableMenu(item: Option[Item], inv: Inventory, next: Option[TradingMenu] = None) extends InstantMenu:
-  val name = item match
-    case Some(i) => i.toString
-    case _ => "Empty"
-  override val title: String = s"$name"
-
-  override def effect(game: Game)=
-    if next.isEmpty then
-      game.acting.foreach(game.trade(_,inv,game.menus.dropRight(1).last.select,game.menus.last.select)
-        .foreach(_.play()))
-  override def createSubMenus(game: Game) =
-    next match
-      case Some(tm) => setSubMenus(Vector(tm))
-      case None =>*/
