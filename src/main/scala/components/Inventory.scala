@@ -128,7 +128,7 @@ class Inventory(slotCount: Int):
     }
     medInSlots
 
-  // When someone is killed by player, gives their inventory as loot
+  // When someone is killed, their inventory is lootified
   def toLoot: Vector[Item] =
     weapons.foreach(w=>
       w.spend(w.durability
